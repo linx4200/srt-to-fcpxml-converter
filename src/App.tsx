@@ -20,6 +20,7 @@ export default function App() {
     fontSize: 36,
     orientation: 'portrait',
     platform: 'none',
+    fps: 60,
   });
 
   const {
@@ -34,6 +35,9 @@ export default function App() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // todo: 如果当前已经上传过了文件正在处理中，需要提示用户是否确认覆盖当前的修改
+
     setFileName(file.name);
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -53,7 +57,8 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName.replace('.srt', '.fcpxml');
+    // todo: 没有成功加上 .fcpxml 后缀
+    a.download = fileName.replace(/\.[^/.]+$/, "") + '.fcpxml';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -62,19 +67,19 @@ export default function App() {
 
   return (
     <div className="h-screen w-screen bg-[#0f0f0f] text-white flex flex-col overflow-hidden font-sans">
-      <Header 
-        fileName={fileName} 
-        canExport={srtEntries.length > 0} 
-        onExport={downloadFcpxml} 
+      <Header
+        fileName={fileName}
+        canExport={srtEntries.length > 0}
+        onExport={downloadFcpxml}
       />
 
       <main className="flex-1 flex overflow-hidden">
-        <SettingsPanel 
-          style={style} 
-          onStyleChange={setStyle} 
-          onFileSelect={handleFileUpload} 
+        <SettingsPanel
+          style={style}
+          onStyleChange={setStyle}
+          onFileSelect={handleFileUpload}
         />
-        <PreviewPanel 
+        <PreviewPanel
           srtEntries={srtEntries}
           style={style}
           currentEntry={currentEntry}

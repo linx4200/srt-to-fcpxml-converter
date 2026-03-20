@@ -17,4 +17,5 @@ export interface SubtitleStyle {
   fontSize: number;
   orientation: 'landscape' | 'portrait';
   platform: 'none' | 'xhs' | 'douyin';
+  fps: 30 | 60;
 }

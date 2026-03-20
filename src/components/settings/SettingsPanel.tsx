@@ -2,6 +2,7 @@ import React from 'react';
 import { SubtitleStyle } from '../../types';
 import { FileUpload } from './FileUpload';
 import { LayoutSettings } from './LayoutSettings';
+import { FpsSettings } from './FpsSettings';
 import { PlatformSettings } from './PlatformSettings';
 import { StyleSettings } from './StyleSettings';
 
@@ -19,6 +20,10 @@ export function SettingsPanel({ style, onStyleChange, onFileSelect }: SettingsPa
         <LayoutSettings 
           orientation={style.orientation} 
           onChange={(orientation) => onStyleChange({ ...style, orientation })} 
+        />
+        <FpsSettings 
+          fps={style.fps}
+          onChange={(fps) => onStyleChange({ ...style, fps })}
         />
         <PlatformSettings 
           platform={style.platform} 

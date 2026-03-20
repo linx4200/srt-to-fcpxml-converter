@@ -18,3 +18,8 @@ View your app in AI Studio: https://ai.studio/apps/b6a99bf5-50be-4b0d-8dda-6996c
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+
+todo: 写 README
+
+todo: 界面上 1. 增加 .src 生成方法的图文教程展示板块。  2. 增加 .fcpxml 导入 Final Cut Pro 的图文教程展示板块。

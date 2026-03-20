@@ -11,7 +11,9 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
         Subtitle Style
       </label>
-      
+
+      {/* todo: 支持字体大小设置 */}
+
       <div className="space-y-4">
         {/* Colors */}
         <div className="flex items-center justify-between">
@@ -34,6 +36,7 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
         </div>
 
         {/* Sliders */}
+        {/* todo: 支持输入修改 */}
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-white/40">
             <span>Opacity</span>

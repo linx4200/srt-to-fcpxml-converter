@@ -28,17 +28,19 @@ export function PlaybackControls({
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
   };
 
+  // todo: 进度条少了一个 controller
+
   return (
     <div className="mt-8 w-full max-w-2xl bg-white/5 px-6 py-4 rounded-3xl border border-white/10 space-y-4">
       {/* Timeline Slider */}
       <div className="flex items-center gap-4">
         <span className="text-[10px] font-mono text-white/40 w-20">{formatTime(currentTime)}</span>
         <div className="flex-1 h-1.5 bg-white/10 rounded-full relative group cursor-pointer overflow-hidden">
-          <div 
+          <div
             className="absolute inset-y-0 left-0 bg-emerald-500 transition-all duration-100"
             style={{ width: `${(currentTime / totalDuration) * 100}%` }}
           />
-          <input 
+          <input
             type="range"
             min="0"
             max={totalDuration}
@@ -53,15 +55,15 @@ export function PlaybackControls({
 
       {/* Playback Buttons */}
       <div className="flex items-center justify-center gap-8">
-        <button 
+        <button
           onClick={() => onTimeUpdate(0)}
           className="text-white/40 hover:text-white transition-colors p-2"
           title="Reset"
         >
           <RotateCcw size={18} />
         </button>
-        
-        <button 
+
+        <button
           onClick={onPlayPause}
           className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all"
         >
@@ -69,7 +71,7 @@ export function PlaybackControls({
         </button>
 
         <div className="flex items-center gap-2">
-          <button 
+          <button
             onClick={() => {
               const prev = srtEntries.slice().reverse().find(e => e.startSeconds < currentTime - 0.5);
               onTimeUpdate(prev ? prev.startSeconds : 0);
@@ -79,7 +81,7 @@ export function PlaybackControls({
             PREV
           </button>
           <span className="text-white/10">|</span>
-          <button 
+          <button
             onClick={() => {
               const next = srtEntries.find(e => e.startSeconds > currentTime + 0.1);
               if (next) onTimeUpdate(next.startSeconds);
