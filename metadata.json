@@ -1,0 +1,5 @@
+{
+  "name": "SRT to FCPXML Converter",
+  "description": "A browser-based tool to convert SRT subtitles to Final Cut Pro XML with real-time preview and social media UI overlays.",
+  "requestFramePermissions": []
+}
