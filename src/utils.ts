@@ -1,15 +1,7 @@
 /**
  * SRT Parser and FCPXML Generator Utilities
  */
-
-export interface SrtEntry {
-  id: number;
-  startTime: string; // HH:MM:SS,mmm
-  endTime: string;
-  text: string;
-  startSeconds: number;
-  endSeconds: number;
-}
+import { SrtEntry, SubtitleStyle } from './types';
 
 export function parseSrt(content: string): SrtEntry[] {
   const entries: SrtEntry[] = [];
@@ -48,18 +40,6 @@ function timeToSeconds(time: string): number {
   const [hms, ms] = time.split(',');
   const [h, m, s] = hms.split(':').map(Number);
   return h * 3600 + m * 60 + s + parseInt(ms) / 1000;
-}
-
-export interface SubtitleStyle {
-  textColor: string;
-  backgroundColor: string;
-  backgroundOpacity: number;
-  borderRadius: number;
-  paddingX: number;
-  paddingY: number;
-  fontSize: number;
-  orientation: 'landscape' | 'portrait';
-  platform: 'none' | 'xhs' | 'douyin';
 }
 
 function escapeXml(unsafe: string): string {
