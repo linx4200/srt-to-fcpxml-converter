@@ -49,9 +49,12 @@ export function PreviewPanel({
         <PlatformOverlay platform={style.platform} />
 
         {/* Subtitle Preview */}
-        <div className={`absolute left-0 right-0 flex justify-center ${
-          style.orientation === 'portrait' ? 'bottom-[25%]' : 'bottom-[15%]'
-        }`}>
+        <div 
+          className="absolute left-0 right-0 flex justify-center"
+          style={{
+            top: style.orientation === 'portrait' ? '70%' : '85%'
+          }}
+        >
           <SubtitlePreview currentEntry={currentEntry} style={style} />
         </div>
       </div>

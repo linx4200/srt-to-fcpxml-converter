@@ -55,9 +55,16 @@ export function generateFcpxml(entries: SrtEntry[], style: SubtitleStyle): strin
     const startOffset = startFrames * 100;
     const durOffset = (endFrames - startFrames) * 100;
     const escapedText = escapeXml(entry.text);
+    
+    // Y 坐标换算：FCPX 原点在屏幕中央 (0,0)
+    // 根据需求，竖屏时设置在距离顶部 70% 的位置，横屏时设置在底部 15% (距离顶部 85%)
+    const posY = style.orientation === 'portrait' 
+      ? (height / 2) - (height * 0.7) 
+      : (height / 2) - (height * 0.85);
 
     xml += `
                         <title ref="r2" offset="${startOffset}/${fpsScale}s" name="${escapedText.substring(0, 20)}" duration="${durOffset}/${fpsScale}s" start="0s">
+                            <adjust-transform position="0 ${posY}"/>
                             <text>
                                 <text-style ref="ts${index}">${escapedText}</text-style>
                             </text>
