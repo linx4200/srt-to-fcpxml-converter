@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'motion/react';
-import { XhsOverlay } from './overlays/XhsOverlay';
+import { XhsOverlay, XhsBottomBar } from './overlays/XhsOverlay';
 import { DouyinOverlay } from './overlays/DouyinOverlay';
 import { CleanOverlay } from './overlays/CleanOverlay';
 
@@ -13,6 +13,14 @@ export function PlatformOverlay({ platform }: PlatformOverlayProps) {
       {platform === 'xhs' && <XhsOverlay key="xhs" />}
       {platform === 'douyin' && <DouyinOverlay key="douyin" />}
       {platform === 'none' && <CleanOverlay key="clean" />}
+    </AnimatePresence>
+  );
+}
+
+export function PlatformBottomOverlay({ platform }: PlatformOverlayProps) {
+  return (
+    <AnimatePresence mode="wait">
+      {platform === 'xhs' && <XhsBottomBar key="xhs-bottom" />}
     </AnimatePresence>
   );
 }

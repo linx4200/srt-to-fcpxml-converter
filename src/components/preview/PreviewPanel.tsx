@@ -1,8 +1,10 @@
-import { Eye, Layout } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { SrtEntry, SubtitleStyle } from '../../types';
-import { PlatformOverlay } from './PlatformOverlay';
+import { PlatformOverlay, PlatformBottomOverlay } from './PlatformOverlay';
 import { SubtitlePreview } from './SubtitlePreview';
 import { PlaybackControls } from './PlaybackControls';
+import horizontalBg from './preview-bg-horizontal.jpg';
+import portraitBg from './preview-bg-portrait.jpg';
 
 interface PreviewPanelProps {
   srtEntries: SrtEntry[];
@@ -26,37 +28,52 @@ export function PreviewPanel({
   onTimeUpdate,
 }: PreviewPanelProps) {
   return (
-    <section className="flex-1 bg-[#0a0a0a] flex flex-col items-center justify-center p-8 relative">
+    <section className="flex-1 bg-[#101010] flex flex-col items-center justify-center p-8 relative">
       <div className="absolute top-6 left-6 flex items-center gap-2 text-white/30">
         <Eye size={16} />
         <span className="text-xs font-medium uppercase tracking-widest">Real-time Preview</span>
       </div>
 
-      {/* Preview Container */}
+      {/* Mockup Phone Wrapper */}
       <div 
-        className={`relative shadow-2xl overflow-hidden bg-zinc-900 transition-all duration-500 ease-in-out ${
-          style.orientation === 'portrait' ? 'aspect-[9/16] h-[80%]' : 'aspect-[16/9] w-[80%]'
-        }`}
+        className="relative shadow-2xl rounded-2xl overflow-hidden bg-[#0a0a0a] transition-all duration-500 ease-in-out shrink-0 flex flex-col"
+        style={{
+          width: style.orientation === 'landscape' ? '100%' : 'auto',
+          maxWidth: '80vw' // constrain landscape mode size
+        }}
       >
-        {/* Mock Video Content */}
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-800 to-zinc-950 flex items-center justify-center">
-          <div className="text-white/5 flex flex-col items-center gap-4">
-            <Layout size={64} />
-            <span className="text-sm font-medium uppercase tracking-[0.2em]">Video Content Area</span>
+        {/* Core 9:16 Video Bounds */}
+        <div 
+          className="relative bg-zinc-900 shrink-0"
+          style={{
+            aspectRatio: style.orientation === 'portrait' ? '9/16' : '16/9',
+            height: style.orientation === 'portrait' ? '65vh' : 'auto',
+          }}
+        >
+          {/* Mock Video Content */}
+          <div className="absolute inset-0 overflow-hidden">
+            <img 
+              src={style.orientation === 'portrait' ? portraitBg : horizontalBg} 
+              alt="Preview Background" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          <PlatformOverlay platform={style.platform} />
+
+          {/* Subtitle Preview */}
+          <div 
+            className="absolute left-0 right-0 flex justify-center"
+            style={{
+              top: style.orientation === 'portrait' ? '70%' : '85%'
+            }}
+          >
+            <SubtitlePreview currentEntry={currentEntry} style={style} />
           </div>
         </div>
 
-        <PlatformOverlay platform={style.platform} />
-
-        {/* Subtitle Preview */}
-        <div 
-          className="absolute left-0 right-0 flex justify-center"
-          style={{
-            top: style.orientation === 'portrait' ? '70%' : '85%'
-          }}
-        >
-          <SubtitlePreview currentEntry={currentEntry} style={style} />
-        </div>
+        {/* Extensions placed outside 9:16 bound */}
+        <PlatformBottomOverlay platform={style.platform} />
       </div>
 
       <PlaybackControls 
