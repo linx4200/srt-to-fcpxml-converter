@@ -40,7 +40,7 @@ export function PlaybackControls({
             style={{ width: `${(currentTime / totalDuration) * 100}%` }}
           />
           {/* Scrubber Thumb (Controller) */}
-          <div 
+          <div
             className="absolute w-2.5 h-2.5 bg-white rounded-full shadow-sm pointer-events-none -translate-x-1/2 transition-transform group-hover:scale-125"
             style={{ left: `${(currentTime / totalDuration) * 100}%` }}
           />
@@ -64,14 +64,14 @@ export function PlaybackControls({
             const prev = srtEntries.slice().reverse().find(e => e.startSeconds < currentTime - 0.5);
             onTimeUpdate(prev ? prev.startSeconds : 0);
           }}
-          className="text-white/40 hover:text-white transition-colors text-[9px] font-medium px-2 tracking-wider"
+          className="text-white/40 hover:text-white transition-colors text-[9px] font-medium px-2 tracking-wider hover:cursor-pointer"
         >
           PREV
         </button>
 
         <button
           onClick={onPlayPause}
-          className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-sm shrink-0"
+          className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-sm shrink-0 hover:cursor-pointer"
         >
           {isPlaying ? <Pause size={14} fill="currentColor" /> : <Play size={14} fill="currentColor" className="ml-0.5" />}
         </button>
@@ -81,7 +81,7 @@ export function PlaybackControls({
             const next = srtEntries.find(e => e.startSeconds > currentTime + 0.1);
             if (next) onTimeUpdate(next.startSeconds);
           }}
-          className="text-white/40 hover:text-white transition-colors text-[9px] font-medium px-2 tracking-wider"
+          className="text-white/40 hover:text-white transition-colors text-[9px] font-medium px-2 tracking-wider hover:cursor-pointer"
         >
           NEXT
         </button>

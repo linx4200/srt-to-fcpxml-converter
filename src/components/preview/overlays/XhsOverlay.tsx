@@ -78,12 +78,10 @@ export function XhsBottomBar() {
       exit={{ opacity: 0, height: 0 }}
       className="bg-[#0a0a0a] w-full flex flex-col shrink-0"
     >
-      {/* Time progress bar */}
-      <div className="flex items-center h-[2px] w-full px-4 mb-2 mt-2 shrink-0">
-        <div className="h-full bg-white w-1/3 relative rounded-l-full">
-          <div className="w-2 h-2 bg-white rounded-full absolute right-0 top-1/2 -translate-y-1/2 shadow-sm" />
-        </div>
-        <div className="h-full bg-white/30 w-2/3 rounded-r-full" />
+      {/* Time progress bar (Dimmed to prevent interaction confusion) */}
+      <div className="flex items-center h-[1.5px] w-full px-4 mb-2 mt-2 shrink-0 opacity-40 pointer-events-none">
+        <div className="h-full bg-white/80 w-1/3 rounded-l-full" />
+        <div className="h-full bg-white/20 w-2/3 rounded-r-full" />
       </div>
 
       {/* Bottom Input & Interaction Bar */}
