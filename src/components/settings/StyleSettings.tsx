@@ -25,6 +25,7 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
             className="w-8 h-8 rounded-lg bg-transparent border-none cursor-pointer"
           />
         </div>
+        {/* 由于 FCPX 不支持字幕自动背景，暂时隐藏下列设置
         <div className="flex items-center justify-between">
           <span className="text-sm text-white/60">Background</span>
           <input
@@ -34,9 +35,11 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
             className="w-8 h-8 rounded-lg bg-transparent border-none cursor-pointer"
           />
         </div>
+        */}
 
         {/* Sliders */}
         {/* todo: 支持输入修改 */}
+        {/* 由于 FCPX 不支持字幕自动背景，暂时隐藏
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-white/40">
             <span>Opacity</span>
@@ -98,6 +101,7 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
             />
           </div>
         </div>
+        */}
       </div>
     </section>
   );
