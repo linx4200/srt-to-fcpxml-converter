@@ -1,4 +1,5 @@
 import { SrtEntry, SubtitleStyle } from '../types';
+import { FCP_RESOLUTION } from '../constants';
 
 function escapeXml(unsafe: string): string {
   return unsafe.replace(/[<>&"']/g, (c) => {
@@ -20,8 +21,8 @@ export function generateFcpxml(entries: SrtEntry[], style: SubtitleStyle): strin
 
   const fpsScale = frameRate * 100; // 3000 for 30fps, 6000 for 60fps
 
-  const width = style.orientation === 'landscape' ? 1920 : 1080;
-  const height = style.orientation === 'landscape' ? 1080 : 1920;
+  const width = style.orientation === 'landscape' ? FCP_RESOLUTION.landscape.width : FCP_RESOLUTION.portrait.width;
+  const height = style.orientation === 'landscape' ? FCP_RESOLUTION.landscape.height : FCP_RESOLUTION.portrait.height;
 
   const hexToRgb = (hex: string) => {
     const r = parseInt(hex.slice(1, 3), 16) / 255;

@@ -1,4 +1,5 @@
 import { Eye } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { SrtEntry, SubtitleStyle } from '../../types';
 import { PlatformOverlay, PlatformBottomOverlay } from './PlatformOverlay';
 import { SubtitlePreview } from './SubtitlePreview';
@@ -6,6 +7,7 @@ import { PlaybackControls } from './PlaybackControls';
 import { SubtitleTimeline } from './SubtitleTimeline';
 import horizontalBg from './preview-bg-horizontal.jpg';
 import portraitBg from './preview-bg-portrait.jpg';
+import { UI_LOGICAL_RESOLUTION } from '../../constants';
 
 interface PreviewPanelProps {
   srtEntries: SrtEntry[];
@@ -18,6 +20,25 @@ interface PreviewPanelProps {
   onTimeUpdate: (time: number) => void;
 }
 
+function useContainerWidth() {
+  // 在 useEffect 中 ResizeObserver 一旦挂载，就会立即将其覆盖为 DOM 的真实像素宽度
+  const [width, setWidth] = useState(UI_LOGICAL_RESOLUTION.portrait.width);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new ResizeObserver((entries) => {
+      if (entries[0]?.contentRect) {
+        setWidth(entries[0].contentRect.width);
+      }
+    });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, width };
+}
+
 export function PreviewPanel({
   srtEntries,
   style,
@@ -28,6 +49,8 @@ export function PreviewPanel({
   onPlayPause,
   onTimeUpdate,
 }: PreviewPanelProps) {
+  const { ref: containerRef, width: containerWidth } = useContainerWidth();
+
   return (
     <section className="flex-1 bg-[#101010] flex flex-col xl:flex-row items-center justify-center p-8 gap-8 lg:gap-16 relative">
       {/* Background/Label */}
@@ -37,50 +60,53 @@ export function PreviewPanel({
       </div>
 
       {/* Left Column: Player & Controls */}
-      <div className="flex flex-col items-center justify-center w-full xl:w-auto shrink-0 mt-8 xl:mt-0">
+      <div className="
+        flex flex-col items-center justify-center
+        shrink-0 xl:flex-1 w-full
+        mt-12 xl:mt-0 px-2 lg:px-4">
         {/* Mockup Phone Wrapper */}
-        <div 
-          className="relative shadow-2xl rounded-2xl overflow-hidden bg-[#0a0a0a] transition-all duration-500 ease-in-out shrink-0 flex flex-col"
+        <div
+          ref={containerRef}
+          className="@container relative shadow-2xl rounded-2xl overflow-hidden bg-[#0a0a0a] transition-all duration-500 ease-in-out shrink-0 flex flex-col w-full"
           style={{
-            width: style.orientation === 'landscape' ? '100%' : 'auto',
-            maxWidth: '80vw' // constrain landscape mode size
+            maxWidth: style.orientation === 'landscape' ? 'min(100%, calc(65vh * 16 / 9))' : 'min(100%, calc(65vh * 9 / 16))',
+            containerType: 'inline-size',
           }}
         >
-          {/* Core 9:16 Video Bounds */}
-          <div 
-            className="relative bg-zinc-900 shrink-0"
+          {/* Core Video Bounds */}
+          <div
+            className="relative bg-zinc-900 shrink-0 w-full"
             style={{
               aspectRatio: style.orientation === 'portrait' ? '9/16' : '16/9',
-              height: style.orientation === 'portrait' ? '65vh' : 'auto',
             }}
           >
             {/* Mock Video Content */}
             <div className="absolute inset-0 overflow-hidden">
-              <img 
-                src={style.orientation === 'portrait' ? portraitBg : horizontalBg} 
-                alt="Preview Background" 
+              <img
+                src={style.orientation === 'portrait' ? portraitBg : horizontalBg}
+                alt="Preview Background"
                 className="w-full h-full object-cover"
               />
             </div>
 
-            <PlatformOverlay platform={style.platform} />
+            <PlatformOverlay platform={style.platform} orientation={style.orientation} containerWidth={containerWidth} />
 
             {/* Subtitle Preview */}
-            <div 
+            <div
               className="absolute left-0 right-0 flex justify-center"
               style={{
                 top: style.orientation === 'portrait' ? '70%' : '85%'
               }}
             >
-              <SubtitlePreview currentEntry={currentEntry} style={style} />
+              <SubtitlePreview currentEntry={currentEntry} style={style} containerWidth={containerWidth} />
             </div>
           </div>
 
           {/* Extensions placed outside 9:16 bound */}
-          <PlatformBottomOverlay platform={style.platform} />
+          <PlatformBottomOverlay platform={style.platform} orientation={style.orientation} containerWidth={containerWidth} />
         </div>
 
-        <PlaybackControls 
+        <PlaybackControls
           srtEntries={srtEntries}
           currentTime={currentTime}
           totalDuration={totalDuration}
@@ -92,10 +118,10 @@ export function PreviewPanel({
 
       {/* Right Column: Subtitle Timeline (Lyrics view) */}
       <div className="w-full xl:w-[280px] flex flex-col h-[75vh] shrink-0 opacity-80 hover:opacity-100 transition-opacity duration-300">
-        <SubtitleTimeline 
-          entries={srtEntries} 
-          currentTime={currentTime} 
-          onTimeClick={onTimeUpdate} 
+        <SubtitleTimeline
+          entries={srtEntries}
+          currentTime={currentTime}
+          onTimeClick={onTimeUpdate}
         />
       </div>
     </section>

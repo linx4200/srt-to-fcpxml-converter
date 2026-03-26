@@ -86,14 +86,14 @@ export function XhsBottomBar() {
 
       {/* Bottom Input & Interaction Bar */}
       <div className="h-10 px-4 bg-[#0a0a0a] flex items-center justify-between pb-1 shrink-0">
-        <div className="flex items-center gap-2 bg-white/10 rounded-full h-7 flex-1 mr-4 px-3">
+        <div className="flex items-center gap-2 bg-white/10 rounded-full h-7 flex-1 mr-4 px-2">
           <Edit2 size={12} className="text-white/40" />
-          <span className="text-white/40 text-[12px]">说点什么...</span>
+          <span className="text-white/40 text-[10px]">...</span>
         </div>
         <div className="flex items-center gap-4 text-white">
           <div className="flex items-center gap-1">
             <Heart size={18} />
-            <span className="text-[11px] font-medium">186</span>
+            <span className="text-[11px] font-medium">86</span>
           </div>
           <div className="flex items-center gap-1">
             <Star size={18} />
