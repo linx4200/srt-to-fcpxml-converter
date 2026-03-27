@@ -20,9 +20,10 @@ interface PreviewPanelProps {
   onTimeUpdate: (time: number) => void;
 }
 
-function useContainerWidth() {
+function useContainerSize() {
   // 在 useEffect 中 ResizeObserver 一旦挂载，就会立即将其覆盖为 DOM 的真实像素宽度
   const [width, setWidth] = useState(UI_LOGICAL_RESOLUTION.portrait.width);
+  const [height, setHeight] = useState(UI_LOGICAL_RESOLUTION.portrait.height);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,13 +31,14 @@ function useContainerWidth() {
     const observer = new ResizeObserver((entries) => {
       if (entries[0]?.contentRect) {
         setWidth(entries[0].contentRect.width);
+        setHeight(entries[0].contentRect.height);
       }
     });
     observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
-  return { ref, width };
+  return { ref, width, height };
 }
 
 export function PreviewPanel({
@@ -49,7 +51,7 @@ export function PreviewPanel({
   onPlayPause,
   onTimeUpdate,
 }: PreviewPanelProps) {
-  const { ref: containerRef, width: containerWidth } = useContainerWidth();
+  const { ref: containerRef, width: containerWidth, height: containerHeight } = useContainerSize();
 
   return (
     <section className="flex-1 bg-[#101010] flex flex-col xl:flex-row items-center justify-center p-8 gap-8 lg:gap-16 relative">
@@ -98,7 +100,7 @@ export function PreviewPanel({
                 top: style.orientation === 'portrait' ? '70%' : '85%'
               }}
             >
-              <SubtitlePreview currentEntry={currentEntry} style={style} containerWidth={containerWidth} />
+              <SubtitlePreview currentEntry={currentEntry} style={style} containerHeight={containerHeight} />
             </div>
           </div>
 
@@ -117,13 +119,17 @@ export function PreviewPanel({
       </div>
 
       {/* Right Column: Subtitle Timeline (Lyrics view) */}
-      <div className="w-full xl:w-[280px] flex flex-col h-[75vh] shrink-0 opacity-80 hover:opacity-100 transition-opacity duration-300">
-        <SubtitleTimeline
-          entries={srtEntries}
-          currentTime={currentTime}
-          onTimeClick={onTimeUpdate}
-        />
-      </div>
+      {srtEntries.length > 0 && (
+        <div className="w-full xl:flex-1 flex flex-col items-center justify-center h-[75vh] shrink-0 opacity-80 hover:opacity-100 transition-opacity duration-300">
+          <div className="w-full xl:max-w-[320px] h-full flex flex-col">
+            <SubtitleTimeline
+              entries={srtEntries}
+              currentTime={currentTime}
+              onTimeClick={onTimeUpdate}
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }

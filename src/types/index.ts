@@ -14,6 +14,7 @@ export interface SubtitleStyle {
   borderRadius: number;
   paddingX: number;
   paddingY: number;
+  /** FCP 里的文本大小, 不是前端里的 font size, 注意区分 */
   fontSize: number;
   orientation: 'landscape' | 'portrait';
   platform: 'none' | 'xhs' | 'douyin';

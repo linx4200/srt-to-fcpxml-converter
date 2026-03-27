@@ -17,7 +17,7 @@ export default function App() {
     borderRadius: 8,
     paddingX: 8,
     paddingY: 4,
-    fontSize: 28,
+    fontSize: 40,
     orientation: 'portrait',
     platform: 'none',
     fps: 60,

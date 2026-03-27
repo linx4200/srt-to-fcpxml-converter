@@ -2,14 +2,15 @@ import { motion } from 'motion/react';
 import { useMemo } from 'react';
 import { SrtEntry, SubtitleStyle } from '../../types';
 import { FCP_RESOLUTION, UI_LOGICAL_RESOLUTION } from '../../constants';
+import { getFontPixelSize } from '../../utils';
 
 interface SubtitlePreviewProps {
   currentEntry?: SrtEntry;
   style: SubtitleStyle;
-  containerWidth?: number;
+  containerHeight?: number;
 }
 
-export function SubtitlePreview({ currentEntry, style, containerWidth = UI_LOGICAL_RESOLUTION.portrait.width }: SubtitlePreviewProps) {
+export function SubtitlePreview({ currentEntry, style, containerHeight = UI_LOGICAL_RESOLUTION.portrait.height }: SubtitlePreviewProps) {
   // Auto-wrap text for preview
   const wrappedText = useMemo(() => {
     if (!currentEntry) return '';
@@ -32,8 +33,11 @@ export function SubtitlePreview({ currentEntry, style, containerWidth = UI_LOGIC
     );
   }
 
-  const referenceWidth = style.orientation === 'portrait' ? FCP_RESOLUTION.portrait.width : FCP_RESOLUTION.landscape.width;
-  const scale = containerWidth / referenceWidth;
+  // const referenceWidth = style.orientation === 'portrait' ? FCP_RESOLUTION.portrait.width : FCP_RESOLUTION.landscape.width;
+  const referenceHeight = style.orientation === 'portrait' ? FCP_RESOLUTION.portrait.height : FCP_RESOLUTION.landscape.height;
+
+  const scale = containerHeight / referenceHeight;
+  const fontSize = getFontPixelSize(style.fontSize, referenceHeight).height;
 
   return (
     <motion.div
@@ -46,7 +50,7 @@ export function SubtitlePreview({ currentEntry, style, containerWidth = UI_LOGIC
         backgroundColor: `${style.backgroundColor}${Math.round(style.backgroundOpacity * 255).toString(16).padStart(2, '0')}`,
         borderRadius: `${style.borderRadius * scale}px`,
         padding: `${style.paddingY * scale}px ${style.paddingX * scale}px`,
-        fontSize: `${style.fontSize * scale}px`,
+        fontSize: `${fontSize * scale}px`,
         lineHeight: 1.4,
       }}
     >
