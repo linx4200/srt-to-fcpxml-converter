@@ -1,4 +1,4 @@
-import { SrtEntry } from '../types';
+import { SrtEntry, SubtitleStyle } from '../types';
 
 export * from './fcpxml';
 
@@ -41,6 +41,89 @@ function timeToSeconds(time: string): number {
   return h * 3600 + m * 60 + s + parseInt(ms) / 1000;
 }
 
+function secondsToTime(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  const ms = Math.floor((seconds % 1) * 1000);
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
+}
+
+export function splitSubtitlesByWidth(
+  entries: SrtEntry[],
+  style: SubtitleStyle,
+  videoWidth: number,
+  videoHeight: number
+): SrtEntry[] {
+  const maxWidth = videoWidth * 0.8;
+  const { width: charWidth } = getFontPixelSize(style.fontSize, videoHeight);
+
+  const result: SrtEntry[] = [];
+  let currentId = 1;
+
+  for (const entry of entries) {
+    // 预处理：将原有的换行替换为空格，合并成单行进行判断
+    const fullText = entry.text.replace(/\n\s*/g, ' ').trim();
+    if (!fullText) continue;
+
+    const chars = Array.from(fullText);
+    const parts: string[] = [];
+    let currentPart = '';
+    let currentWidth = 0;
+
+    for (const char of chars) {
+      // 简单启发式估算：非 ASCII (通常是中日韩) 算 1 个位宽，ASCII (英数标点) 算 0.5 个位宽
+      const charScale = /[^\x00-\xff]/.test(char) ? 1 : 0.5;
+      const estimatedWidth = charWidth * charScale;
+
+      if (currentWidth + estimatedWidth > maxWidth && currentPart.length > 0) {
+        parts.push(currentPart.trim());
+        currentPart = char;
+        currentWidth = estimatedWidth;
+      } else {
+        currentPart += char;
+        currentWidth += estimatedWidth;
+      }
+    }
+    if (currentPart) {
+      parts.push(currentPart.trim());
+    }
+
+    if (parts.length <= 1) {
+      result.push({ ...entry, id: currentId++, text: fullText });
+      continue;
+    }
+
+    // 按字符长度比例分配时间
+    const totalChars = parts.join('').length;
+    const duration = entry.endSeconds - entry.startSeconds;
+    let runningStartTime = entry.startSeconds;
+
+    for (let i = 0; i < parts.length; i++) {
+      const partText = parts[i];
+      const partDuration = (partText.length / totalChars) * duration;
+      const partEndSeconds = Math.min(
+        entry.endSeconds,
+        i === parts.length - 1 ? entry.endSeconds : runningStartTime + partDuration
+      );
+
+      result.push({
+        ...entry,
+        id: currentId++,
+        text: partText,
+        startSeconds: runningStartTime,
+        endSeconds: partEndSeconds,
+        startTime: secondsToTime(runningStartTime),
+        endTime: secondsToTime(partEndSeconds)
+      });
+
+      runningStartTime = partEndSeconds;
+    }
+  }
+
+  return result;
+}
+
 type FontMetricsOptions = {
   /**
    * 宽度系数（默认基于实际测量的数据拟合）
@@ -59,7 +142,8 @@ type FontMetricsOptions = {
 };
 
 const DEFAULT_WIDTH_FACTOR = 0.00092;
-const DEFAULT_HEIGHT_FACTOR = 0.00080;
+// const DEFAULT_HEIGHT_FACTOR = 0.00080;
+const DEFAULT_HEIGHT_FACTOR = 0.0009;
 
 const WIDTH_OFFSET = 2;
 const HEIGHT_OFFSET = 1.5;

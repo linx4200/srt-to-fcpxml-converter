@@ -68,7 +68,6 @@ export function PreviewPanel({
         mt-12 xl:mt-0 px-2 lg:px-4">
         {/* Mockup Phone Wrapper */}
         <div
-          ref={containerRef}
           className="@container relative shadow-2xl rounded-2xl overflow-hidden bg-[#0a0a0a] transition-all duration-500 ease-in-out shrink-0 flex flex-col w-full"
           style={{
             maxWidth: style.orientation === 'landscape' ? 'min(100%, calc(65vh * 16 / 9))' : 'min(100%, calc(65vh * 9 / 16))',
@@ -81,6 +80,7 @@ export function PreviewPanel({
             style={{
               aspectRatio: style.orientation === 'portrait' ? '9/16' : '16/9',
             }}
+            ref={containerRef}
           >
             {/* Mock Video Content */}
             <div className="absolute inset-0 overflow-hidden">
