@@ -11,6 +11,9 @@ import { FCP_RESOLUTION } from './constants';
 export default function App() {
   const [srtEntries, setSrtEntries] = useState<SrtEntry[]>([]);
   const [fileName, setFileName] = useState<string>('');
+  const [audioUrl, setAudioUrl] = useState<string>('');
+  const [audioFileName, setAudioFileName] = useState<string>('');
+
   const [style, setStyle] = useState<SubtitleStyle>({
     textColor: '#ffffff',
     backgroundColor: '#000000',
@@ -47,7 +50,7 @@ export default function App() {
     setIsPlaying,
     totalDuration,
     currentEntry
-  } = usePlayback(formattedEntries);
+  } = usePlayback(formattedEntries, audioUrl);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,6 +66,21 @@ export default function App() {
       setIsPlaying(false);
     };
     reader.readAsText(file);
+  };
+
+  const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    setAudioFileName(file.name);
+    setAudioUrl(URL.createObjectURL(file));
+  };
+
+  const handleAudioClear = () => {
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    setAudioUrl('');
+    setAudioFileName('');
   };
 
   const downloadFcpxml = () => {
@@ -92,6 +110,9 @@ export default function App() {
           style={style}
           onStyleChange={setStyle}
           onFileSelect={handleFileUpload}
+          audioFileName={audioFileName}
+          onAudioSelect={handleAudioUpload}
+          onAudioClear={handleAudioClear}
         />
         <PreviewPanel
           srtEntries={formattedEntries}

@@ -5,18 +5,34 @@ import { LayoutSettings } from './LayoutSettings';
 import { FpsSettings } from './FpsSettings';
 import { PlatformSettings } from './PlatformSettings';
 import { StyleSettings } from './StyleSettings';
+import { AudioUpload } from './AudioUpload';
 
 interface SettingsPanelProps {
   style: SubtitleStyle;
   onStyleChange: (style: SubtitleStyle) => void;
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  audioFileName: string;
+  onAudioSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onAudioClear: () => void;
 }
 
-export function SettingsPanel({ style, onStyleChange, onFileSelect }: SettingsPanelProps) {
+export function SettingsPanel({ 
+  style, 
+  onStyleChange, 
+  onFileSelect,
+  audioFileName,
+  onAudioSelect,
+  onAudioClear
+}: SettingsPanelProps) {
   return (
     <aside className="w-80 border-r border-white/10 bg-[#141414] flex flex-col overflow-y-auto shrink-0 scrollbar-hide">
       <div className="p-6 space-y-8">
         <FileUpload onFileSelect={onFileSelect} />
+        <AudioUpload 
+          fileName={audioFileName} 
+          onAudioSelect={onAudioSelect} 
+          onClear={onAudioClear} 
+        />
         <LayoutSettings 
           orientation={style.orientation} 
           onChange={(orientation) => onStyleChange({ ...style, orientation })} 
