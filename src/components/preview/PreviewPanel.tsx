@@ -1,6 +1,7 @@
 import { Eye } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { SrtEntry, SubtitleStyle } from '../../types';
+import { useAudioWaveform } from '../../hooks/useAudioWaveform';
 import { PlatformOverlay, PlatformBottomOverlay } from './PlatformOverlay';
 import { SubtitlePreview } from './SubtitlePreview';
 import { PlaybackControls } from './PlaybackControls';
@@ -11,6 +12,7 @@ import { UI_LOGICAL_RESOLUTION } from '../../constants';
 
 interface PreviewPanelProps {
   srtEntries: SrtEntry[];
+  audioFile: File | null;
   style: SubtitleStyle;
   currentEntry?: SrtEntry;
   currentTime: number;
@@ -43,6 +45,7 @@ function useContainerSize() {
 
 export function PreviewPanel({
   srtEntries,
+  audioFile,
   style,
   currentEntry,
   currentTime,
@@ -52,6 +55,7 @@ export function PreviewPanel({
   onTimeUpdate,
 }: PreviewPanelProps) {
   const { ref: containerRef, width: containerWidth, height: containerHeight } = useContainerSize();
+  const { samples, audioDuration, isLoading } = useAudioWaveform(audioFile);
 
   return (
     <section className="flex-1 bg-[#101010] flex flex-col xl:flex-row items-center justify-center p-8 gap-8 lg:gap-16 relative">
@@ -120,12 +124,16 @@ export function PreviewPanel({
 
       {/* Right Column: Subtitle Timeline (Lyrics view) */}
       {srtEntries.length > 0 && (
-        <div className="w-full xl:flex-1 flex flex-col items-center justify-center h-[75vh] shrink-0 opacity-80 hover:opacity-100 transition-opacity duration-300">
-          <div className="w-full xl:max-w-[320px] h-full flex flex-col">
+        <div className="w-full xl:flex-[1.15] flex flex-col items-stretch justify-center h-[75vh] shrink-0 opacity-80 hover:opacity-100 transition-opacity duration-300">
+          <div className="w-full max-w-[880px] h-full flex flex-col self-center">
             <SubtitleTimeline
               entries={srtEntries}
               currentTime={currentTime}
               onTimeClick={onTimeUpdate}
+              waveformSamples={samples}
+              waveformDuration={audioDuration}
+              showWaveform={Boolean(audioFile)}
+              isWaveformLoading={isLoading}
             />
           </div>
         </div>

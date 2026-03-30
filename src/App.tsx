@@ -13,6 +13,7 @@ export default function App() {
   const [fileName, setFileName] = useState<string>('');
   const [audioUrl, setAudioUrl] = useState<string>('');
   const [audioFileName, setAudioFileName] = useState<string>('');
+  const [audioFile, setAudioFile] = useState<File | null>(null);
 
   const [style, setStyle] = useState<SubtitleStyle>({
     textColor: '#ffffff',
@@ -73,12 +74,14 @@ export default function App() {
     if (!file) return;
     
     if (audioUrl) URL.revokeObjectURL(audioUrl);
+    setAudioFile(file);
     setAudioFileName(file.name);
     setAudioUrl(URL.createObjectURL(file));
   };
 
   const handleAudioClear = () => {
     if (audioUrl) URL.revokeObjectURL(audioUrl);
+    setAudioFile(null);
     setAudioUrl('');
     setAudioFileName('');
   };
@@ -116,6 +119,7 @@ export default function App() {
         />
         <PreviewPanel
           srtEntries={formattedEntries}
+          audioFile={audioFile}
           style={style}
           currentEntry={currentEntry}
           currentTime={currentTime}
