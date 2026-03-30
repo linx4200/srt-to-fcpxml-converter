@@ -1,4 +1,5 @@
 import { Smartphone, Monitor } from 'lucide-react';
+import { SettingButton } from './SettingButton';
 
 interface LayoutSettingsProps {
   orientation: 'landscape' | 'portrait';
@@ -12,28 +13,20 @@ export function LayoutSettings({ orientation, onChange }: LayoutSettingsProps) {
         Video Layout
       </label>
       <div className="grid grid-cols-2 gap-2">
-        <button
+        <SettingButton
+          isActive={orientation === 'portrait'}
           onClick={() => onChange('portrait')}
-          className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
-            orientation === 'portrait'
-              ? 'bg-theme-primary/10 border-theme-primary text-theme-primary'
-              : 'bg-white/5 border-transparent text-white/60 hover:bg-white/10'
-          }`}
         >
           <Smartphone size={20} />
           <span className="text-xs font-medium">Portrait (9:16)</span>
-        </button>
-        <button
+        </SettingButton>
+        <SettingButton
+          isActive={orientation === 'landscape'}
           onClick={() => onChange('landscape')}
-          className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
-            orientation === 'landscape'
-              ? 'bg-theme-primary/10 border-theme-primary text-theme-primary'
-              : 'bg-white/5 border-transparent text-white/60 hover:bg-white/10'
-          }`}
         >
           <Monitor size={20} />
           <span className="text-xs font-medium">Landscape (16:9)</span>
-        </button>
+        </SettingButton>
       </div>
     </section>
   );
