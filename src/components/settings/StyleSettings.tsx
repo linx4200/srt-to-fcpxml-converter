@@ -52,7 +52,7 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
             step="0.1"
             value={style.backgroundOpacity}
             onChange={(e) => onChange({ ...style, backgroundOpacity: parseFloat(e.target.value) })}
-            className="w-full accent-emerald-500 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+            className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
           />
         </div>
 
@@ -67,7 +67,7 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
             max="40"
             value={style.borderRadius}
             onChange={(e) => onChange({ ...style, borderRadius: parseInt(e.target.value) })}
-            className="w-full accent-emerald-500 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+            className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
           />
         </div>
 
@@ -83,7 +83,7 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
               max="60"
               value={style.paddingX}
               onChange={(e) => onChange({ ...style, paddingX: parseInt(e.target.value) })}
-              className="w-full accent-emerald-500 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
             />
           </div>
           <div className="space-y-2">
@@ -97,7 +97,7 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
               max="40"
               value={style.paddingY}
               onChange={(e) => onChange({ ...style, paddingY: parseInt(e.target.value) })}
-              className="w-full accent-emerald-500 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
             />
           </div>
         </div>

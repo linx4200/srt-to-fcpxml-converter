@@ -19,8 +19,8 @@ export function AudioUpload({ fileName, onAudioSelect, onClear }: AudioUploadPro
       {fileName ? (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between group">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
-              <Music size={16} className="text-emerald-500" />
+            <div className="w-8 h-8 rounded-lg bg-theme-primary/20 flex items-center justify-center shrink-0">
+              <Music size={16} className="text-theme-primary" />
             </div>
             <div className="overflow-hidden">
               <p className="text-sm font-medium truncate">{fileName}</p>

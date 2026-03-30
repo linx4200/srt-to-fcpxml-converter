@@ -169,7 +169,7 @@ export function SubtitleTimeline({
                 type="button"
                 onClick={() => onTimeClick(entry.startSeconds)}
                 className={`text-[9px] font-mono mt-[3px] w-9 text-right shrink-0 transition-colors duration-500 ${
-                  isActive ? 'text-emerald-400' : isPast ? 'text-white/20' : 'text-white/40 group-hover:text-white/60'
+                  isActive ? 'text-theme-primary-soft' : isPast ? 'text-white/20' : 'text-white/40 group-hover:text-white/60'
                 }`}
               >
                 {formatTime(entry.startSeconds)}
@@ -183,7 +183,7 @@ export function SubtitleTimeline({
                   onKeyDown={(event) => handleEditorKeyDown(event, index)}
                   autoFocus
                   rows={1}
-                  className="flex-1 resize-none overflow-hidden rounded-lg border border-emerald-400/30 bg-black/20 px-2 py-1 text-[13px] leading-snug text-white outline-none"
+                  className="flex-1 resize-none overflow-hidden rounded-lg border border-theme-primary-soft/30 bg-black/20 px-2 py-1 text-[13px] leading-snug text-white outline-none"
                 />
               ) : (
                 <button

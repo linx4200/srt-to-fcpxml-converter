@@ -14,7 +14,7 @@ export function FpsSettings({ fps, onChange }: FpsSettingsProps) {
           onClick={() => onChange(30)}
           className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${
             fps === 30
-              ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500'
+              ? 'bg-theme-primary/10 border-theme-primary text-theme-primary'
               : 'bg-white/5 border-transparent text-white/60 hover:bg-white/10'
           }`}
         >
@@ -24,7 +24,7 @@ export function FpsSettings({ fps, onChange }: FpsSettingsProps) {
           onClick={() => onChange(60)}
           className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${
             fps === 60
-              ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500'
+              ? 'bg-theme-primary/10 border-theme-primary text-theme-primary'
               : 'bg-white/5 border-transparent text-white/60 hover:bg-white/10'
           }`}
         >

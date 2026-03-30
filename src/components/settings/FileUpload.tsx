@@ -17,10 +17,10 @@ export function FileUpload({ onFileSelect, canSplit, onSplitSubtitles }: FileUpl
       </label>
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 hover:border-emerald-500/50 hover:bg-emerald-500/5 cursor-pointer transition-all group"
+        className="border-2 border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 hover:border-theme-primary/50 hover:bg-theme-primary/5 cursor-pointer transition-all group"
       >
-        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-emerald-500/20 transition-all">
-          <Upload size={20} className="text-white/40 group-hover:text-emerald-500" />
+        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-theme-primary/20 transition-all">
+          <Upload size={20} className="text-white/40 group-hover:text-theme-primary" />
         </div>
         <div className="text-center">
           <p className="text-sm font-medium">Click to upload SRT</p>
@@ -38,7 +38,7 @@ export function FileUpload({ onFileSelect, canSplit, onSplitSubtitles }: FileUpl
         type="button"
         onClick={onSplitSubtitles}
         disabled={!canSplit}
-        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white/80 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white/80 transition-all hover:border-theme-primary/40 hover:bg-theme-primary/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
       >
         <Scissors size={16} />
         手动执行自动拆行

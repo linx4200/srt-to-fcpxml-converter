@@ -36,7 +36,7 @@ export function PlaybackControls({
         <div className="flex-1 h-1 bg-white/10 rounded-full relative group cursor-pointer flex items-center">
           {/* Active track */}
           <div
-            className="absolute inset-y-0 left-0 bg-emerald-500 rounded-full pointer-events-none"
+            className="absolute inset-y-0 left-0 bg-theme-primary rounded-full pointer-events-none"
             style={{ width: `${(currentTime / totalDuration) * 100}%` }}
           />
           {/* Scrubber Thumb (Controller) */}

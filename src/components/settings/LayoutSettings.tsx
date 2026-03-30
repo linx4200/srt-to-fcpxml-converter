@@ -16,7 +16,7 @@ export function LayoutSettings({ orientation, onChange }: LayoutSettingsProps) {
           onClick={() => onChange('portrait')}
           className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
             orientation === 'portrait'
-              ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500'
+              ? 'bg-theme-primary/10 border-theme-primary text-theme-primary'
               : 'bg-white/5 border-transparent text-white/60 hover:bg-white/10'
           }`}
         >
@@ -27,7 +27,7 @@ export function LayoutSettings({ orientation, onChange }: LayoutSettingsProps) {
           onClick={() => onChange('landscape')}
           className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
             orientation === 'landscape'
-              ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500'
+              ? 'bg-theme-primary/10 border-theme-primary text-theme-primary'
               : 'bg-white/5 border-transparent text-white/60 hover:bg-white/10'
           }`}
         >

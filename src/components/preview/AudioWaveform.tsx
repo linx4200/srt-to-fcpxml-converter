@@ -65,7 +65,7 @@ export function AudioWaveform({
               <div
                 key={index}
                 className={`flex-1 rounded-full transition-colors ${
-                  bucketStartTime <= currentTime ? 'bg-emerald-400/95' : hasAudio ? 'bg-white/45' : 'bg-white/10'
+                  bucketStartTime <= currentTime ? 'bg-theme-primary/95' : hasAudio ? 'bg-white/45' : 'bg-white/10'
                 }`}
                 style={{
                   minHeight: '4px',
@@ -82,7 +82,7 @@ export function AudioWaveform({
 
         {timelineDuration > 0 && (
           <div
-            className="pointer-events-none absolute inset-y-0 w-px bg-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.65)]"
+            className="pointer-events-none absolute inset-y-0 w-px bg-theme-primary-tint shadow-[0_0_12px_color-mix(in_srgb,var(--color-theme-primary)_65%,transparent)]"
             style={{ left: `${Math.min((currentTime / timelineDuration) * 100, 100)}%` }}
           />
         )}
