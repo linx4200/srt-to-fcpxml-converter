@@ -1,6 +1,7 @@
 import React from 'react';
 import { SubtitleStyle } from '../../types';
 import { FileUpload } from './FileUpload';
+import { SplitSubtitlesButton } from './SplitSubtitlesButton';
 import { LayoutSettings } from './LayoutSettings';
 import { FpsSettings } from './FpsSettings';
 import { PlatformSettings } from './PlatformSettings';
@@ -11,6 +12,7 @@ interface SettingsPanelProps {
   style: SubtitleStyle;
   onStyleChange: (style: SubtitleStyle) => void;
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClearAll?: () => void;
   audioFileName: string;
   onAudioSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAudioClear: () => void;
@@ -18,10 +20,11 @@ interface SettingsPanelProps {
   onSplitSubtitles: () => void;
 }
 
-export function SettingsPanel({ 
-  style, 
-  onStyleChange, 
+export function SettingsPanel({
+  style,
+  onStyleChange,
   onFileSelect,
+  onClearAll,
   audioFileName,
   onAudioSelect,
   onAudioClear,
@@ -33,29 +36,32 @@ export function SettingsPanel({
       <div className="p-6 space-y-8">
         <FileUpload
           onFileSelect={onFileSelect}
+          onClearAll={onClearAll}
+        />
+        <SplitSubtitlesButton
           canSplit={canSplit}
           onSplitSubtitles={onSplitSubtitles}
         />
-        <AudioUpload 
-          fileName={audioFileName} 
-          onAudioSelect={onAudioSelect} 
-          onClear={onAudioClear} 
+        <AudioUpload
+          fileName={audioFileName}
+          onAudioSelect={onAudioSelect}
+          onClear={onAudioClear}
         />
-        <LayoutSettings 
-          orientation={style.orientation} 
-          onChange={(orientation) => onStyleChange({ ...style, orientation })} 
+        <LayoutSettings
+          orientation={style.orientation}
+          onChange={(orientation) => onStyleChange({ ...style, orientation })}
         />
-        <FpsSettings 
+        <FpsSettings
           fps={style.fps}
           onChange={(fps) => onStyleChange({ ...style, fps })}
         />
-        <PlatformSettings 
-          platform={style.platform} 
-          onChange={(platform) => onStyleChange({ ...style, platform })} 
+        <PlatformSettings
+          platform={style.platform}
+          onChange={(platform) => onStyleChange({ ...style, platform })}
         />
-        <StyleSettings 
-          style={style} 
-          onChange={onStyleChange} 
+        <StyleSettings
+          style={style}
+          onChange={onStyleChange}
         />
       </div>
     </aside>

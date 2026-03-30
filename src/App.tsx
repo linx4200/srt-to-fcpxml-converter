@@ -90,6 +90,13 @@ export default function App() {
     setAudioFileName('');
   };
 
+  const handleClearAll = () => {
+    setTimelineEntries([]);
+    setFileName('');
+    setCurrentTime(0);
+    setIsPlaying(false);
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code !== 'Space') return;
@@ -138,6 +145,7 @@ export default function App() {
           style={style}
           onStyleChange={setStyle}
           onFileSelect={handleFileUpload}
+          onClearAll={handleClearAll}
           audioFileName={audioFileName}
           onAudioSelect={handleAudioUpload}
           onAudioClear={handleAudioClear}
