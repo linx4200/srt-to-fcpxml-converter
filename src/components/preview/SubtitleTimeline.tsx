@@ -1,11 +1,12 @@
 import { AudioWaveform } from './AudioWaveform';
-import { useEffect, useRef } from 'react';
+import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { SrtEntry } from '../../types';
 
 interface SubtitleTimelineProps {
   entries: SrtEntry[];
   currentTime: number;
   onTimeClick: (time: number) => void;
+  onEntriesChange: (entries: SrtEntry[]) => void;
   waveformSamples?: number[];
   waveformDuration?: number;
   showWaveform?: boolean;
@@ -16,6 +17,7 @@ export function SubtitleTimeline({
   entries,
   currentTime,
   onTimeClick,
+  onEntriesChange,
   waveformSamples = [],
   waveformDuration = 0,
   showWaveform = false,
@@ -24,6 +26,8 @@ export function SubtitleTimeline({
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
   const waveformRef = useRef<HTMLDivElement>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [draftText, setDraftText] = useState('');
 
   // Find active entry index
   const activeIndex = entries.findIndex(
@@ -53,6 +57,65 @@ export function SubtitleTimeline({
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const beginEditing = (index: number) => {
+    setEditingIndex(index);
+    setDraftText(entries[index]?.text ?? '');
+  };
+
+  const cancelEditing = () => {
+    setEditingIndex(null);
+    setDraftText('');
+  };
+
+  const commitEditing = (index: number) => {
+    const entry = entries[index];
+    if (!entry) {
+      cancelEditing();
+      return;
+    }
+
+    const nextText = draftText.trim();
+    if (nextText.length === 0) {
+      const shouldDelete = window.confirm('这一行已被清空，确认删除并把时间归并到上一行吗？');
+      if (!shouldDelete) {
+        setDraftText(entry.text);
+        return;
+      }
+
+      const nextEntries = [...entries];
+      if (index > 0) {
+        nextEntries[index - 1] = {
+          ...nextEntries[index - 1],
+          endSeconds: entry.endSeconds,
+          endTime: entry.endTime,
+        };
+      }
+      nextEntries.splice(index, 1);
+      onEntriesChange(nextEntries);
+      cancelEditing();
+      return;
+    }
+
+    const nextEntries = entries.map((item, itemIndex) =>
+      itemIndex === index ? { ...item, text: nextText } : item
+    );
+    onEntriesChange(nextEntries);
+    cancelEditing();
+  };
+
+  const handleEditorKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>, index: number) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      commitEditing(index);
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      cancelEditing();
+    }
   };
 
   if (entries.length === 0) {
@@ -96,28 +159,47 @@ export function SubtitleTimeline({
             <div
               key={index}
               ref={isActive ? activeRef : null}
-              onClick={() => onTimeClick(entry.startSeconds)}
               className={`group flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all duration-500 ease-out ${
                 isActive 
                   ? 'bg-white/10 scale-[1.02] shadow-xl border border-white/10' 
                   : 'hover:bg-white/5 border border-transparent scale-100'
               }`}
             >
-              <div className={`text-[9px] font-mono mt-[3px] w-9 text-right shrink-0 transition-colors duration-500 ${
-                isActive ? 'text-emerald-400' : isPast ? 'text-white/20' : 'text-white/40 group-hover:text-white/60'
-              }`}>
+              <button
+                type="button"
+                onClick={() => onTimeClick(entry.startSeconds)}
+                className={`text-[9px] font-mono mt-[3px] w-9 text-right shrink-0 transition-colors duration-500 ${
+                  isActive ? 'text-emerald-400' : isPast ? 'text-white/20' : 'text-white/40 group-hover:text-white/60'
+                }`}
+              >
                 {formatTime(entry.startSeconds)}
-              </div>
+              </button>
               
-              <div className={`text-[13px] leading-snug transition-all duration-500 ${
-                isActive 
-                  ? 'text-white font-medium drop-shadow-md' 
-                  : isPast
-                    ? 'text-white/20'
-                    : 'text-white/50 group-hover:text-white/70'
-              }`}>
-                {entry.text}
-              </div>
+              {editingIndex === index ? (
+                <textarea
+                  value={draftText}
+                  onChange={(event) => setDraftText(event.target.value)}
+                  onBlur={() => commitEditing(index)}
+                  onKeyDown={(event) => handleEditorKeyDown(event, index)}
+                  autoFocus
+                  rows={1}
+                  className="flex-1 resize-none overflow-hidden rounded-lg border border-emerald-400/30 bg-black/20 px-2 py-1 text-[13px] leading-snug text-white outline-none"
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => beginEditing(index)}
+                  className={`flex-1 text-left text-[13px] leading-snug transition-all duration-500 ${
+                    isActive 
+                      ? 'text-white font-medium drop-shadow-md' 
+                      : isPast
+                        ? 'text-white/20'
+                        : 'text-white/50 group-hover:text-white/70'
+                  }`}
+                >
+                  {entry.text}
+                </button>
+              )}
             </div>
           );
         })}

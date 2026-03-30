@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePlayback } from './hooks/usePlayback';
 import { parseSrt, generateFcpxml, splitSubtitlesByWidth } from './utils';
 import { SrtEntry, SubtitleStyle } from './types';
@@ -9,7 +9,7 @@ import { PreviewPanel } from './components/preview/PreviewPanel';
 import { FCP_RESOLUTION } from './constants';
 
 export default function App() {
-  const [srtEntries, setSrtEntries] = useState<SrtEntry[]>([]);
+  const [timelineEntries, setTimelineEntries] = useState<SrtEntry[]>([]);
   const [fileName, setFileName] = useState<string>('');
   const [audioUrl, setAudioUrl] = useState<string>('');
   const [audioFileName, setAudioFileName] = useState<string>('');
@@ -28,21 +28,18 @@ export default function App() {
     fps: 60,
   });
 
-  // 根据当前样式和分辨率，动态计算拆分后的字幕列表
-  const formattedEntries = useMemo(() => {
-    if (srtEntries.length === 0) return [];
-
+  const splitEntries = (entries: SrtEntry[]) => {
     const resolution = style.orientation === 'portrait'
       ? FCP_RESOLUTION.portrait
       : FCP_RESOLUTION.landscape;
 
     return splitSubtitlesByWidth(
-      srtEntries,
+      entries,
       style,
       resolution.width,
       resolution.height
     );
-  }, [srtEntries, style]);
+  };
 
   const {
     currentTime,
@@ -51,7 +48,7 @@ export default function App() {
     setIsPlaying,
     totalDuration,
     currentEntry
-  } = usePlayback(formattedEntries, audioUrl);
+  } = usePlayback(timelineEntries, audioUrl);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -62,11 +59,18 @@ export default function App() {
     reader.onload = (event) => {
       const content = event.target?.result as string;
       const parsed = parseSrt(content);
-      setSrtEntries(parsed);
+      setTimelineEntries(splitEntries(parsed));
       setCurrentTime(0);
       setIsPlaying(false);
     };
     reader.readAsText(file);
+  };
+
+  const handleSplitSubtitles = () => {
+    if (timelineEntries.length === 0) return;
+    setTimelineEntries(splitEntries(timelineEntries));
+    setCurrentTime(0);
+    setIsPlaying(false);
   };
 
   const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,9 +90,30 @@ export default function App() {
     setAudioFileName('');
   };
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== 'Space') return;
+
+      const target = event.target as HTMLElement | null;
+      const tagName = target?.tagName?.toLowerCase();
+      const isTypingTarget =
+        tagName === 'input' ||
+        tagName === 'textarea' ||
+        target?.isContentEditable;
+
+      if (isTypingTarget || timelineEntries.length === 0) return;
+
+      event.preventDefault();
+      setIsPlaying((prev) => !prev);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [timelineEntries.length, setIsPlaying]);
+
   const downloadFcpxml = () => {
-    if (formattedEntries.length === 0) return;
-    const xml = generateFcpxml(formattedEntries, style);
+    if (timelineEntries.length === 0) return;
+    const xml = generateFcpxml(timelineEntries, style);
     const blob = new Blob([xml], { type: 'application/xml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -104,7 +129,7 @@ export default function App() {
     <div className="h-screen w-screen bg-[#0f0f0f] text-white flex flex-col overflow-hidden font-sans">
       <Header
         fileName={fileName}
-        canExport={formattedEntries.length > 0}
+        canExport={timelineEntries.length > 0}
         onExport={downloadFcpxml}
       />
 
@@ -116,9 +141,11 @@ export default function App() {
           audioFileName={audioFileName}
           onAudioSelect={handleAudioUpload}
           onAudioClear={handleAudioClear}
+          canSplit={timelineEntries.length > 0}
+          onSplitSubtitles={handleSplitSubtitles}
         />
         <PreviewPanel
-          srtEntries={formattedEntries}
+          srtEntries={timelineEntries}
           audioFile={audioFile}
           style={style}
           currentEntry={currentEntry}
@@ -127,6 +154,7 @@ export default function App() {
           isPlaying={isPlaying}
           onPlayPause={() => setIsPlaying(!isPlaying)}
           onTimeUpdate={setCurrentTime}
+          onEntriesChange={setTimelineEntries}
         />
       </main>
 

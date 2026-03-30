@@ -20,6 +20,7 @@ interface PreviewPanelProps {
   isPlaying: boolean;
   onPlayPause: () => void;
   onTimeUpdate: (time: number) => void;
+  onEntriesChange: (entries: SrtEntry[]) => void;
 }
 
 function useContainerSize() {
@@ -53,6 +54,7 @@ export function PreviewPanel({
   isPlaying,
   onPlayPause,
   onTimeUpdate,
+  onEntriesChange,
 }: PreviewPanelProps) {
   const { ref: containerRef, width: containerWidth, height: containerHeight } = useContainerSize();
   const { samples, audioDuration, isLoading } = useAudioWaveform(audioFile);
@@ -130,6 +132,7 @@ export function PreviewPanel({
               entries={srtEntries}
               currentTime={currentTime}
               onTimeClick={onTimeUpdate}
+              onEntriesChange={onEntriesChange}
               waveformSamples={samples}
               waveformDuration={audioDuration}
               showWaveform={Boolean(audioFile)}

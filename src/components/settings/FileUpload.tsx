@@ -1,11 +1,13 @@
 import React, { useRef } from 'react';
-import { Upload } from 'lucide-react';
+import { Scissors, Upload } from 'lucide-react';
 
 interface FileUploadProps {
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  canSplit: boolean;
+  onSplitSubtitles: () => void;
 }
 
-export function FileUpload({ onFileSelect }: FileUploadProps) {
+export function FileUpload({ onFileSelect, canSplit, onSplitSubtitles }: FileUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -32,6 +34,15 @@ export function FileUpload({ onFileSelect }: FileUploadProps) {
           className="hidden"
         />
       </div>
+      <button
+        type="button"
+        onClick={onSplitSubtitles}
+        disabled={!canSplit}
+        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white/80 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        <Scissors size={16} />
+        手动执行自动拆行
+      </button>
     </section>
   );
 }

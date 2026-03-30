@@ -14,6 +14,8 @@ interface SettingsPanelProps {
   audioFileName: string;
   onAudioSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAudioClear: () => void;
+  canSplit: boolean;
+  onSplitSubtitles: () => void;
 }
 
 export function SettingsPanel({ 
@@ -22,12 +24,18 @@ export function SettingsPanel({
   onFileSelect,
   audioFileName,
   onAudioSelect,
-  onAudioClear
+  onAudioClear,
+  canSplit,
+  onSplitSubtitles,
 }: SettingsPanelProps) {
   return (
     <aside className="w-80 border-r border-white/10 bg-[#141414] flex flex-col overflow-y-auto shrink-0 scrollbar-hide">
       <div className="p-6 space-y-8">
-        <FileUpload onFileSelect={onFileSelect} />
+        <FileUpload
+          onFileSelect={onFileSelect}
+          canSplit={canSplit}
+          onSplitSubtitles={onSplitSubtitles}
+        />
         <AudioUpload 
           fileName={audioFileName} 
           onAudioSelect={onAudioSelect} 
