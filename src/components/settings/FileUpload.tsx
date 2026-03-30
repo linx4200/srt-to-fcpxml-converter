@@ -43,7 +43,7 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
           </div>
           <button
             onClick={handleDelete}
-            className="p-2 hover:bg-white/10 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+            className="p-2 hover:bg-white/10 hover:cursor-pointer rounded-full transition-colors opacity-0 group-hover:opacity-100"
           >
             <X size={16} className="text-white/40" />
           </button>

@@ -6,6 +6,7 @@ import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { SettingsPanel } from './components/settings/SettingsPanel';
 import { PreviewPanel } from './components/preview/PreviewPanel';
+import { message } from './components/message';
 import { FCP_RESOLUTION } from './constants';
 
 export default function App() {
@@ -62,15 +63,22 @@ export default function App() {
       setTimelineEntries(splitEntries(parsed));
       setCurrentTime(0);
       setIsPlaying(false);
+      message.success('上传成功，并已自动拆行');
     };
     reader.readAsText(file);
   };
 
   const handleSplitSubtitles = () => {
     if (timelineEntries.length === 0) return;
-    setTimelineEntries(splitEntries(timelineEntries));
-    setCurrentTime(0);
-    setIsPlaying(false);
+    try {
+      setTimelineEntries(splitEntries(timelineEntries));
+      setCurrentTime(0);
+      setIsPlaying(false);
+      message.success('字幕已重新自动拆行');
+    } catch (error) {
+      console.error('Failed to split subtitles:', error);
+      message.error('字幕拆行失败，请检查当前参数设置');
+    }
   };
 
   const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,6 +138,7 @@ export default function App() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    message.success('FCPXML 已开始下载');
   };
 
   return (
