@@ -158,7 +158,7 @@ export default function App() {
           audioFileName={audioFileName}
           onAudioSelect={handleAudioUpload}
           onAudioClear={handleAudioClear}
-          canSplit={timelineEntries.length > 0}
+          isSubtitleUploaded={timelineEntries.length > 0}
           onSplitSubtitles={handleSplitSubtitles}
         />
         <PreviewPanel

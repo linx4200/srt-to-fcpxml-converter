@@ -16,7 +16,7 @@ interface SettingsPanelProps {
   audioFileName: string;
   onAudioSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAudioClear: () => void;
-  canSplit: boolean;
+  isSubtitleUploaded: boolean;
   onSplitSubtitles: () => void;
 }
 
@@ -28,7 +28,7 @@ export function SettingsPanel({
   audioFileName,
   onAudioSelect,
   onAudioClear,
-  canSplit,
+  isSubtitleUploaded,
   onSplitSubtitles,
 }: SettingsPanelProps) {
   return (
@@ -39,11 +39,12 @@ export function SettingsPanel({
           onClearAll={onClearAll}
         />
         <SplitSubtitlesButton
-          canSplit={canSplit}
+          canSplit={isSubtitleUploaded}
           onSplitSubtitles={onSplitSubtitles}
         />
         <AudioUpload
           fileName={audioFileName}
+          disabled={!isSubtitleUploaded}
           onAudioSelect={onAudioSelect}
           onClear={onAudioClear}
         />

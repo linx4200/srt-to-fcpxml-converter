@@ -28,7 +28,7 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
   return (
     <section>
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4 block">
-        Source File
+        Subtitle File
       </label>
       {uploadedFileName ? (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between group">
@@ -57,7 +57,7 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
             <Upload size={20} className="text-white/40 group-hover:text-theme-primary" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-medium">Click to upload SRT</p>
+            <p className="text-sm font-medium">Click to upload .srt file</p>
             <p className="text-xs text-white/30 mt-1">or drag and drop</p>
           </div>
           <input
