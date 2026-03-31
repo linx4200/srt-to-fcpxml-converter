@@ -1,6 +1,6 @@
 import { AnimatePresence } from 'motion/react';
 import { XhsOverlay, XhsBottomBar } from './overlays/XhsOverlay';
-import { DouyinOverlay } from './overlays/DouyinOverlay';
+import { DouyinOverlay, DouyinBottomBar } from './overlays/DouyinOverlay';
 import { CleanOverlay } from './overlays/CleanOverlay';
 import { UI_LOGICAL_RESOLUTION } from '../../constants';
 
@@ -41,10 +41,8 @@ export function PlatformBottomOverlay({ platform, orientation, containerWidth }:
   const refWidth = isPortrait ? UI_LOGICAL_RESOLUTION.portrait.width : UI_LOGICAL_RESOLUTION.landscape.width;
   const scale = containerWidth / refWidth;
 
-  // XhsBottomBar 的近似逻辑高度 (mt-2: 8px, mb-2: 8px, h-1.5: 1.5px, h-10: 40px) = 57.5px
-  // 使用 padding-bottom hack 可以让容器的高度按照父级宽度的特定比例 (57.5 / 390) 自动展开，
-  // 从而让 transform scale 中的元素完美贴合正常的 flex 布局流，不产生空白高度坍塌！
-  const bottomBarHeight = platform === 'xhs' ? 57.5 : 0;
+  // 底部扩展栏需要处于 9:16 视频区域之外，因此这里按逻辑分辨率为不同平台预留高度。
+  const bottomBarHeight = platform === 'xhs' ? 57.5 : platform === 'douyin' ? 56 : 0;
 
   if (bottomBarHeight === 0) return null;
 
@@ -62,6 +60,7 @@ export function PlatformBottomOverlay({ platform, orientation, containerWidth }:
       >
         <AnimatePresence mode="wait">
           {platform === 'xhs' && <XhsBottomBar key="xhs-bottom" />}
+          {platform === 'douyin' && <DouyinBottomBar key="douyin-bottom" />}
         </AnimatePresence>
       </div>
     </div>

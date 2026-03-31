@@ -37,20 +37,20 @@ export function XhsOverlay() {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-white/30 border border-white/20 overflow-hidden shrink-0" />
-              <span className="text-white text-[15px] font-medium ml-2 drop-shadow-sm">闹钟响了就起床</span>
-              <div className="bg-[#ff2442] text-white text-[11px] px-2.5 py-0.5 rounded-full ml-2 font-medium tracking-wide">关注</div>
+              <span className="text-white text-[14px] font-medium ml-2 drop-shadow-sm">闹钟响了就起床</span>
+              <div className="bg-[#ff2442] text-white text-[12px] px-2.5 py-0.5 rounded-full ml-2 font-medium tracking-wide">关注</div>
             </div>
           </div>
 
           {/* Description & Chapters inline */}
           <div className="flex items-center gap-2 mt-1">
-            <div className="flex items-center gap-1 bg-black/20 border border-white/20 text-white/90 text-[11px] px-1.5 py-0.5 rounded backdrop-blur-sm shrink-0">
+            <div className="flex items-center gap-1 bg-black/20 border border-white/20 text-white/90 text-[12px] px-1.5 py-0.5 rounded backdrop-blur-sm shrink-0">
               <List size={12} />
               <span>章节</span>
               <ChevronDown size={10} className="opacity-70 -ml-0.5" />
             </div>
-            <div className="text-white text-[14px] drop-shadow-md line-clamp-1 flex-1">
-              ⬆️ 请关注 @闹钟响了就起床 <span className="text-white/60 text-[13px] ml-1"></span>
+            <div className="text-white/80 text-[12px] drop-shadow-md line-clamp-1 flex-1">
+              ⬆️ 请关注 @闹钟响了就起床
             </div>
           </div>
 
