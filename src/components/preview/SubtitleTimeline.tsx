@@ -42,10 +42,10 @@ export function SubtitleTimeline({
       const waveformOffset = showWaveform
         ? ((waveformRef.current?.offsetHeight ?? 0) + 12) / 2
         : 0;
-      
+
       // Keep the active row near the same visual position even when waveform takes top space.
       const topPos = element.offsetTop - container.offsetHeight / 2 + element.offsetHeight / 2 + waveformOffset;
-      
+
       container.scrollTo({
         top: topPos,
         behavior: 'smooth'
@@ -143,13 +143,13 @@ export function SubtitleTimeline({
         </div>
       )}
 
-      <div 
+      <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-2 space-y-2.5 rounded-2xl bg-white/5 border border-white/5 mask-image-y"
+        className="flex-1 overflow-y-auto px-2 space-y-2.5 rounded-2xl bg-white/5 border border-white/10 mask-image-y"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <div className="h-[30vh]" /> {/* Top Spacer */}
-        
+
         {entries.map((entry, index) => {
           const isActive = index === activeIndex;
           // Past entries are dimmed

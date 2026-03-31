@@ -37,13 +37,13 @@ export function AudioWaveform({
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Audio Waveform</p>
           <p className="mt-1 text-[11px] text-white/45">
-            {isLoading ? 'Decoding audio...' : 'Aligned to current subtitle timeline'}
+            {isLoading ? 'Decoding audio...' : ''}
           </p>
         </div>
-        <div className="text-right text-[10px] font-mono text-white/35">
+        {/* <div className="text-right text-[10px] font-mono text-white/35">
           <div>{formatTime(currentTime)}</div>
           <div>{formatTime(timelineDuration)}</div>
-        </div>
+        </div> */}
       </div>
 
       <div

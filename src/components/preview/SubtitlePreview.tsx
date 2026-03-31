@@ -31,8 +31,8 @@ export function SubtitlePreview({ currentEntry, style, containerHeight = UI_LOGI
       className="max-w-[80%] text-center whitespace-pre-wrap"
       style={{
         color: style.textColor,
-        backgroundColor: `${style.backgroundColor}${Math.round(style.backgroundOpacity * 255).toString(16).padStart(2, '0')}`,
-        borderRadius: `${style.borderRadius * scale}px`,
+        // backgroundColor: `${style.backgroundColor}${Math.round(style.backgroundOpacity * 255).toString(16).padStart(2, '0')}`,
+        // borderRadius: `${style.borderRadius * scale}px`,
         padding: `${style.paddingY * scale}px ${style.paddingX * scale}px`,
         fontSize: `${fontSize * scale}px`,
         lineHeight: 1,

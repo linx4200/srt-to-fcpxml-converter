@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { ChevronLeft, Copy, Search, Share, Heart, Star, MessageCircle, Edit2, List, Layers, Play, ChevronDown, Wifi, BatteryFull } from 'lucide-react';
+import { ChevronLeft, Copy, Search, Share, Heart, Star, MessageCircle, Edit2, List, Layers, ChevronDown, Wifi, BatteryFull } from 'lucide-react';
 
 export function XhsOverlay() {
   return (
@@ -30,11 +30,6 @@ export function XhsOverlay() {
         </div>
       </div>
 
-      {/* Central Play Button */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-60">
-        <Play size={64} fill="white" className="text-white drop-shadow-xl" />
-      </div>
-
       {/* Bottom Area (Inside Video) */}
       <div className="flex flex-col opacity-100 relative">
         <div className="px-4 pb-3 flex flex-col gap-2">
@@ -55,7 +50,7 @@ export function XhsOverlay() {
               <ChevronDown size={10} className="opacity-70 -ml-0.5" />
             </div>
             <div className="text-white text-[14px] drop-shadow-md line-clamp-1 flex-1">
-              ⬆️ 请关注 @闹钟响了就起床 <span className="text-white/60 text-[13px] ml-1">展开</span>
+              ⬆️ 请关注 @闹钟响了就起床 <span className="text-white/60 text-[13px] ml-1"></span>
             </div>
           </div>
 
