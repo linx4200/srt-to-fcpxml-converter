@@ -1,7 +1,14 @@
 import { motion } from 'motion/react';
 import { ChevronLeft, Copy, Search, Share, Heart, Star, MessageCircle, Edit2, List, Layers, ChevronDown, Wifi, BatteryFull } from 'lucide-react';
 
-export function XhsOverlay() {
+interface XhsOverlayProps {
+  currentTime: number;
+  totalDuration: number;
+}
+
+export function XhsOverlay({ currentTime, totalDuration }: XhsOverlayProps) {
+  const progress = totalDuration > 0 ? Math.min(Math.max(currentTime / totalDuration, 0), 1) : 0;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -65,8 +72,14 @@ export function XhsOverlay() {
 
       {/* Time progress bar (Dimmed to prevent interaction confusion) */}
       <div className="absolute bottom-0 left-4 right-4 flex items-center h-[1.5px]">
-        <div className="h-full bg-white/80 w-1/3 rounded-l-full" />
-        <div className="h-full bg-white/20 w-2/3 rounded-r-full" />
+        <div
+          className="h-full bg-white/80 rounded-l-full"
+          style={{ width: `${progress * 100}%` }}
+        />
+        <div
+          className="h-full bg-white/20 rounded-r-full"
+          style={{ width: `${(1 - progress) * 100}%` }}
+        />
       </div>
     </motion.div>
   );

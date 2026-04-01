@@ -46,7 +46,14 @@ function ActionItem({
   );
 }
 
-export function DouyinOverlay() {
+interface DouyinOverlayProps {
+  currentTime: number;
+  totalDuration: number;
+}
+
+export function DouyinOverlay({ currentTime, totalDuration }: DouyinOverlayProps) {
+  const progress = totalDuration > 0 ? Math.min(Math.max(currentTime / totalDuration, 0), 1) : 0;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -108,7 +115,10 @@ export function DouyinOverlay() {
           <span className="text-lg leading-none text-white/70">›</span>
 
         <div className="absolute left-4 right-4 bottom-0 h-[2px] rounded-full bg-white/30 overflow-hidden">
-          <div className="h-full w-[13%] rounded-full bg-white" />
+          <div
+            className="h-full rounded-full bg-white"
+            style={{ width: `${progress * 100}%` }}
+          />
         </div>
       </div>
     </motion.div>

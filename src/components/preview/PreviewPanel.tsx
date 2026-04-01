@@ -102,7 +102,13 @@ export function PreviewPanel({
               />
             </div>
 
-            <PlatformOverlay platform={style.platform} orientation={style.orientation} containerWidth={containerWidth} />
+            <PlatformOverlay
+              platform={style.platform}
+              orientation={style.orientation}
+              containerWidth={containerWidth}
+              currentTime={currentTime}
+              totalDuration={totalDuration}
+            />
 
             {/* Subtitle Preview */}
             <div

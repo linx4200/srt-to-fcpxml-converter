@@ -8,9 +8,17 @@ interface PlatformOverlayProps {
   platform: 'none' | 'xhs' | 'douyin';
   orientation: 'landscape' | 'portrait';
   containerWidth: number;
+  currentTime?: number;
+  totalDuration?: number;
 }
 
-export function PlatformOverlay({ platform, orientation, containerWidth }: PlatformOverlayProps) {
+export function PlatformOverlay({
+  platform,
+  orientation,
+  containerWidth,
+  currentTime = 0,
+  totalDuration = 0,
+}: PlatformOverlayProps) {
   const isPortrait = orientation === 'portrait';
   // 引用 UI_LOGICAL_RESOLUTION 的基准宽度
   const refWidth = isPortrait ? UI_LOGICAL_RESOLUTION.portrait.width : UI_LOGICAL_RESOLUTION.landscape.width;
@@ -28,8 +36,8 @@ export function PlatformOverlay({ platform, orientation, containerWidth }: Platf
       }}
     >
       <AnimatePresence mode="wait">
-        {platform === 'xhs' && <XhsOverlay key="xhs" />}
-        {platform === 'douyin' && <DouyinOverlay key="douyin" />}
+        {platform === 'xhs' && <XhsOverlay key="xhs" currentTime={currentTime} totalDuration={totalDuration} />}
+        {platform === 'douyin' && <DouyinOverlay key="douyin" currentTime={currentTime} totalDuration={totalDuration} />}
         {platform === 'none' && <CleanOverlay key="clean" />}
       </AnimatePresence>
     </div>
