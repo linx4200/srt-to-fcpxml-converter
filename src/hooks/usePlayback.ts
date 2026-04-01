@@ -91,7 +91,11 @@ export function usePlayback(srtEntries: SrtEntry[], audioUrl?: string) {
   }, []);
 
   const currentEntry = useMemo(() => {
-    return srtEntries.find(e => currentTime >= e.startSeconds && currentTime <= e.endSeconds);
+    return srtEntries.find(
+      (entry, index) =>
+        currentTime >= entry.startSeconds &&
+        (currentTime < entry.endSeconds || (index === srtEntries.length - 1 && currentTime <= entry.endSeconds))
+    );
   }, [srtEntries, currentTime]);
 
   return {

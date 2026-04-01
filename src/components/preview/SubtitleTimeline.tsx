@@ -1,4 +1,3 @@
-import { AudioWaveform } from './AudioWaveform';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { SrtEntry } from '../../types';
 
@@ -7,10 +6,6 @@ interface SubtitleTimelineProps {
   currentTime: number;
   onTimeClick: (time: number) => void;
   onEntriesChange: (entries: SrtEntry[]) => void;
-  waveformSamples?: number[];
-  waveformDuration?: number;
-  showWaveform?: boolean;
-  isWaveformLoading?: boolean;
 }
 
 export function SubtitleTimeline({
@@ -18,20 +13,17 @@ export function SubtitleTimeline({
   currentTime,
   onTimeClick,
   onEntriesChange,
-  waveformSamples = [],
-  waveformDuration = 0,
-  showWaveform = false,
-  isWaveformLoading = false,
 }: SubtitleTimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
-  const waveformRef = useRef<HTMLDivElement>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [draftText, setDraftText] = useState('');
 
   // Find active entry index
   const activeIndex = entries.findIndex(
-    (entry) => currentTime >= entry.startSeconds && currentTime <= entry.endSeconds
+    (entry, index) =>
+      currentTime >= entry.startSeconds &&
+      (currentTime < entry.endSeconds || (index === entries.length - 1 && currentTime <= entry.endSeconds))
   );
 
   // Auto-scroll to active entry
@@ -39,19 +31,23 @@ export function SubtitleTimeline({
     if (activeRef.current && scrollRef.current) {
       const container = scrollRef.current;
       const element = activeRef.current;
-      const waveformOffset = showWaveform
-        ? ((waveformRef.current?.offsetHeight ?? 0) + 12) / 2
-        : 0;
-
-      // Keep the active row near the same visual position even when waveform takes top space.
-      const topPos = element.offsetTop - container.offsetHeight / 2 + element.offsetHeight / 2 + waveformOffset;
+      const containerRect = container.getBoundingClientRect();
+      const elementRect = element.getBoundingClientRect();
+      const visibleAnchor = container.clientHeight * 0.35;
+      const targetTop =
+        container.scrollTop +
+        (elementRect.top - containerRect.top) +
+        elementRect.height / 2 -
+        visibleAnchor;
+      const maxScrollTop = Math.max(container.scrollHeight - container.clientHeight, 0);
+      const topPos = Math.min(Math.max(targetTop, 0), maxScrollTop);
 
       container.scrollTo({
         top: topPos,
         behavior: 'smooth'
       });
     }
-  }, [activeIndex, showWaveform]);
+  }, [activeIndex]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -126,23 +122,8 @@ export function SubtitleTimeline({
     );
   }
 
-  const timelineDuration = entries[entries.length - 1]?.endSeconds ?? 0;
-
   return (
-    <div className="flex h-full flex-col gap-3">
-      {showWaveform && timelineDuration > 0 && (
-        <div ref={waveformRef}>
-          <AudioWaveform
-            samples={waveformSamples}
-            audioDuration={waveformDuration}
-            timelineDuration={timelineDuration}
-            currentTime={currentTime}
-            onSeek={onTimeClick}
-            isLoading={isWaveformLoading}
-          />
-        </div>
-      )}
-
+    <div className="flex h-full flex-col">
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto px-2 space-y-2.5 rounded-2xl bg-white/5 border border-white/10 mask-image-y"
@@ -159,26 +140,26 @@ export function SubtitleTimeline({
             <div
               key={index}
               ref={isActive ? activeRef : null}
+              onClick={() => onTimeClick(entry.startSeconds)}
               className={`group flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all duration-500 ease-out ${
-                isActive 
-                  ? 'bg-white/10 scale-[1.02] shadow-xl border border-white/10' 
+                isActive
+                  ? 'bg-white/10 scale-[1.02] shadow-xl border border-white/10'
                   : 'hover:bg-white/5 border border-transparent scale-100'
               }`}
             >
-              <button
-                type="button"
-                onClick={() => onTimeClick(entry.startSeconds)}
-                className={`text-[9px] font-mono mt-[3px] w-9 text-right shrink-0 transition-colors duration-500 ${
+              <div
+                className={`text-[9px] font-mono mt-0.75 w-9 text-right shrink-0 transition-colors duration-500 ${
                   isActive ? 'text-theme-primary-soft' : isPast ? 'text-white/20' : 'text-white/40 group-hover:text-white/60'
                 }`}
               >
                 {formatTime(entry.startSeconds)}
-              </button>
-              
+              </div>
+
               {editingIndex === index ? (
                 <textarea
                   value={draftText}
                   onChange={(event) => setDraftText(event.target.value)}
+                  onClick={(event) => event.stopPropagation()}
                   onBlur={() => commitEditing(index)}
                   onKeyDown={(event) => handleEditorKeyDown(event, index)}
                   autoFocus
@@ -188,10 +169,12 @@ export function SubtitleTimeline({
               ) : (
                 <button
                   type="button"
-                  onClick={() => beginEditing(index)}
-                  className={`flex-1 text-left text-[13px] leading-snug transition-all duration-500 ${
-                    isActive 
-                      ? 'text-white font-medium drop-shadow-md' 
+                  onClick={() => {
+                    beginEditing(index);
+                  }}
+                  className={`text-left text-[13px] leading-snug transition-all duration-500 self-start ${
+                    isActive
+                      ? 'text-white font-medium drop-shadow-md'
                       : isPast
                         ? 'text-white/20'
                         : 'text-white/50 group-hover:text-white/70'

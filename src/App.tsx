@@ -103,6 +103,7 @@ export default function App() {
     setFileName('');
     setCurrentTime(0);
     setIsPlaying(false);
+    handleAudioClear();
   };
 
   useEffect(() => {

@@ -1,11 +1,10 @@
 import { Eye } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { SrtEntry, SubtitleStyle } from '../../types';
-import { useAudioWaveform } from '../../hooks/useAudioWaveform';
 import { PlatformOverlay, PlatformBottomOverlay } from './PlatformOverlay';
 import { SubtitlePreview } from './SubtitlePreview';
 import { PlaybackControls } from './PlaybackControls';
-import { SubtitleTimeline } from './SubtitleTimeline';
+import { TimelinePanel } from './TimelinePanel';
 import horizontalBg from './preview-bg-horizontal.jpg';
 import portraitBg from './preview-bg-portrait.jpg';
 import { UI_LOGICAL_RESOLUTION } from '../../constants';
@@ -57,7 +56,6 @@ export function PreviewPanel({
   onEntriesChange,
 }: PreviewPanelProps) {
   const { ref: containerRef, width: containerWidth, height: containerHeight } = useContainerSize();
-  const { samples, audioDuration, isLoading } = useAudioWaveform(audioFile);
 
   return (
     <section className="flex-1 bg-[#101010] flex flex-col xl:flex-row items-center justify-center p-8 gap-8 lg:gap-16 relative">
@@ -136,23 +134,13 @@ export function PreviewPanel({
         />
       </div>
 
-      {/* Right Column: Subtitle Timeline (Lyrics view) */}
-      {srtEntries.length > 0 && (
-        <div className="w-full xl:flex-[1.15] flex flex-col items-stretch justify-center h-[75vh] shrink-0 opacity-80 hover:opacity-100 transition-opacity duration-300">
-          <div className="w-full max-w-220 h-full flex flex-col self-center">
-            <SubtitleTimeline
-              entries={srtEntries}
-              currentTime={currentTime}
-              onTimeClick={onTimeUpdate}
-              onEntriesChange={onEntriesChange}
-              waveformSamples={samples}
-              waveformDuration={audioDuration}
-              showWaveform={Boolean(audioFile)}
-              isWaveformLoading={isLoading}
-            />
-          </div>
-        </div>
-      )}
+      <TimelinePanel
+        entries={srtEntries}
+        audioFile={audioFile}
+        currentTime={currentTime}
+        onTimeUpdate={onTimeUpdate}
+        onEntriesChange={onEntriesChange}
+      />
     </section>
   );
 }

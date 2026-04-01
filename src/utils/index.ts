@@ -55,7 +55,7 @@ export function splitSubtitlesByWidth(
   videoWidth: number,
   videoHeight: number
 ): SrtEntry[] {
-  const maxWidth = videoWidth * 0.8;
+  const maxWidth = videoWidth * 0.85;
   const { width: charWidth } = getFontPixelSize(style.fontSize, videoHeight);
 
   const result: SrtEntry[] = [];

@@ -28,7 +28,7 @@ export function SubtitlePreview({ currentEntry, style, containerHeight = UI_LOGI
       key={currentEntry.id}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-[80%] text-center whitespace-pre-wrap"
+      className="text-center whitespace-pre-wrap"
       style={{
         color: style.textColor,
         // backgroundColor: `${style.backgroundColor}${Math.round(style.backgroundOpacity * 255).toString(16).padStart(2, '0')}`,
