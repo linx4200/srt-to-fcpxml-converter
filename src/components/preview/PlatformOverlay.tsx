@@ -1,6 +1,6 @@
 import { AnimatePresence } from 'motion/react';
-import { XhsOverlay, XhsBottomBar } from './overlays/XhsOverlay';
-import { DouyinOverlay, DouyinBottomBar } from './overlays/DouyinOverlay';
+import { XhsOverlay, XhsBottomBar, xhsBottomHeightSpacing } from './overlays/XhsOverlay';
+import { DouyinOverlay, DouyinBottomBar, douyinBottomHeightSpacing } from './overlays/DouyinOverlay';
 import { CleanOverlay } from './overlays/CleanOverlay';
 import { UI_LOGICAL_RESOLUTION } from '../../constants';
 
@@ -37,22 +37,26 @@ export function PlatformOverlay({ platform, orientation, containerWidth }: Platf
 }
 
 export function PlatformBottomOverlay({ platform, orientation, containerWidth }: PlatformOverlayProps) {
+
+  if (platform === 'none') return null;
+
   const isPortrait = orientation === 'portrait';
   const refWidth = isPortrait ? UI_LOGICAL_RESOLUTION.portrait.width : UI_LOGICAL_RESOLUTION.landscape.width;
   const scale = containerWidth / refWidth;
 
   // 底部扩展栏需要处于 9:16 视频区域之外，因此这里按逻辑分辨率为不同平台预留高度。
-  const bottomBarHeight = platform === 'xhs' ? 57.5 : platform === 'douyin' ? 56 : 0;
+  const bottomBarHeight = platform === 'xhs' ? xhsBottomHeightSpacing * 4 : platform === 'douyin' ? douyinBottomHeightSpacing * 4 : 0;
 
-  if (bottomBarHeight === 0) return null;
 
   return (
+    // 外层 div 预留放大后的尺寸
     <div
-      className="relative w-full pointer-events-none"
+      className="relative w-full pointer-events-none h-10"
       style={{ paddingBottom: `${(bottomBarHeight / refWidth) * 100}%` }}
     >
+      {/* 里层 div 使用 scale 进行原设计尺寸放大 */}
       <div
-        className="absolute top-0 left-0 origin-top-left flex flex-col w-full h-full"
+        className="absolute inset-0 origin-top-left"
         style={{
           width: `${refWidth}px`,
           transform: `scale(${scale})`,

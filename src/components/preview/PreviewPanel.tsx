@@ -74,7 +74,12 @@ export function PreviewPanel({
         mt-12 xl:mt-0 px-2 lg:px-4">
         {/* Mockup Phone Wrapper */}
         <div
-          className="@container relative shadow-2xl rounded-2xl overflow-hidden bg-[#0a0a0a] transition-all duration-500 ease-in-out shrink-0 flex flex-col w-full"
+          className="
+            @container relative
+            shrink-0 flex flex-col w-full
+            shadow-2xl rounded-2xl overflow-hidden bg-[#0a0a0a]
+            transition-all duration-500 ease-in-out
+            border border-white/10"
           style={{
             maxWidth: style.orientation === 'landscape' ? 'min(100%, calc(65vh * 16 / 9))' : 'min(100%, calc(65vh * 9 / 16))',
             containerType: 'inline-size',
@@ -127,7 +132,7 @@ export function PreviewPanel({
       {/* Right Column: Subtitle Timeline (Lyrics view) */}
       {srtEntries.length > 0 && (
         <div className="w-full xl:flex-[1.15] flex flex-col items-stretch justify-center h-[75vh] shrink-0 opacity-80 hover:opacity-100 transition-opacity duration-300">
-          <div className="w-full max-w-[880px] h-full flex flex-col self-center">
+          <div className="w-full max-w-220 h-full flex flex-col self-center">
             <SubtitleTimeline
               entries={srtEntries}
               currentTime={currentTime}

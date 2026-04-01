@@ -29,7 +29,7 @@ function ActionItem({
         <div
           className={
             withAvatar
-              ? 'w-10 h-10 rounded-full border-[2px] border-white/85'
+              ? 'w-10 h-10 rounded-full border-2 border-white/85'
               : 'w-10 h-10 flex items-center justify-center'
           }
         >
@@ -52,7 +52,7 @@ export function DouyinOverlay() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 pointer-events-none overflow-hidden text-white"
+      className="absolute inset-0 overflow-hidden text-white"
     >
 
       {/* iOS Status Bar Mock */}
@@ -135,3 +135,5 @@ export function DouyinBottomBar() {
     </motion.div>
   );
 }
+
+export const douyinBottomHeightSpacing = 14;

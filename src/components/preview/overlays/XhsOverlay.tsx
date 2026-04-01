@@ -7,7 +7,7 @@ export function XhsOverlay() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 pointer-events-none flex flex-col justify-between"
+      className="absolute inset-0 flex flex-col justify-between"
     >
       {/* iOS Status Bar Mock */}
       <div className="absolute top-0 left-0 right-0 h-9 flex justify-between items-center px-6 text-white text-[13px] font-semibold drop-shadow-md z-50 tracking-wide">
@@ -61,6 +61,13 @@ export function XhsOverlay() {
           </div>
         </div>
       </div>
+
+
+      {/* Time progress bar (Dimmed to prevent interaction confusion) */}
+      <div className="absolute bottom-0 left-4 right-4 flex items-center h-[1.5px]">
+        <div className="h-full bg-white/80 w-1/3 rounded-l-full" />
+        <div className="h-full bg-white/20 w-2/3 rounded-r-full" />
+      </div>
     </motion.div>
   );
 }
@@ -68,38 +75,32 @@ export function XhsOverlay() {
 export function XhsBottomBar() {
   return (
     <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
-      exit={{ opacity: 0, height: 0 }}
-      className="bg-[#0a0a0a] w-full flex flex-col shrink-0"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="bg-[#0a0a0a] w-full px-4 py-2 h-14 flex items-center justify-between"
     >
-      {/* Time progress bar (Dimmed to prevent interaction confusion) */}
-      <div className="flex items-center h-[1.5px] w-full px-4 mb-2 mt-2 shrink-0 opacity-40 pointer-events-none">
-        <div className="h-full bg-white/80 w-1/3 rounded-l-full" />
-        <div className="h-full bg-white/20 w-2/3 rounded-r-full" />
-      </div>
-
       {/* Bottom Input & Interaction Bar */}
-      <div className="h-10 px-4 bg-[#0a0a0a] flex items-center justify-between pb-1 shrink-0">
-        <div className="flex items-center gap-2 bg-white/10 rounded-full h-7 flex-1 mr-4 px-2">
-          <Edit2 size={12} className="text-white/40" />
-          <span className="text-white/40 text-[10px]">...</span>
+      <div className="flex items-center gap-2 bg-white/10 rounded-full h-8 flex-1 mr-4 px-2">
+        <Edit2 size={12} className="text-white/40" />
+        {/* <span className="text-white/40 text-[10px]"></span> */}
+      </div>
+      <div className="flex items-center gap-4 text-white">
+        <div className="flex items-center gap-1">
+          <Heart size={26} />
+          <span className="text-[11px] font-medium">86</span>
         </div>
-        <div className="flex items-center gap-4 text-white">
-          <div className="flex items-center gap-1">
-            <Heart size={18} />
-            <span className="text-[11px] font-medium">86</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Star size={18} />
-            <span className="text-[11px] font-medium">72</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <MessageCircle size={18} />
-            <span className="text-[11px] font-medium">17</span>
-          </div>
+        <div className="flex items-center gap-1">
+          <Star size={26} />
+          <span className="text-[11px] font-medium">72</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <MessageCircle size={26} />
+          <span className="text-[11px] font-medium">17</span>
         </div>
       </div>
     </motion.div>
   );
 }
+
+export const xhsBottomHeightSpacing = 14;

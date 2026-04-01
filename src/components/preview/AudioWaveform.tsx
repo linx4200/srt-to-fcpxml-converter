@@ -32,7 +32,7 @@ export function AudioWaveform({
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
+    <div className="rounded-2xl border border-white/10 bg-white/4 px-4 py-3">
       <div className="mb-3 flex items-center justify-between">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Audio Waveform</p>

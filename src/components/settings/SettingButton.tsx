@@ -5,13 +5,19 @@ interface SettingButtonProps {
   onClick: () => void;
   children: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }
 
-export function SettingButton({ isActive, onClick, children, className = '' }: SettingButtonProps) {
+export function SettingButton({ isActive, onClick, children, className = '', disabled = false }: SettingButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 p-3 rounded-xl border transition-all hover:cursor-pointer ${
+      disabled={disabled}
+      className={`flex items-center gap-2 p-3 rounded-xl border transition-all ${
+        disabled
+          ? 'cursor-not-allowed opacity-50'
+          : 'hover:cursor-pointer'
+      } ${
         isActive
           ? 'bg-theme-primary/10 border-theme-primary text-theme-primary'
           : 'bg-white/5 border-transparent text-white/60 hover:bg-white/10'

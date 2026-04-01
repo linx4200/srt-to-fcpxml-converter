@@ -23,6 +23,7 @@ export function LayoutSettings({ orientation, onChange }: LayoutSettingsProps) {
         <SettingButton
           isActive={orientation === 'landscape'}
           onClick={() => onChange('landscape')}
+          disabled
         >
           <Monitor size={20} />
           <span className="text-xs font-medium">Landscape (16:9)</span>
