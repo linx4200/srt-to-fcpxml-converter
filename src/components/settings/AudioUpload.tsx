@@ -12,11 +12,10 @@ export function AudioUpload({ fileName, disabled, onAudioSelect, onClear }: Audi
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <section>
-      <label className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4 block">
+    <section className="space-y-4">
+      <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
         Audio
       </label>
-
       {fileName ? (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between group">
           <div className="flex items-center gap-3 overflow-hidden">

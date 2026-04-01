@@ -68,7 +68,8 @@ export function PreviewPlayer({
           <div
             className="absolute left-0 right-0 flex justify-center"
             style={{
-              top: style.orientation === 'portrait' ? '70%' : '85%',
+              // 67% 而不是 xml 里的 70% 是因为这是根据实际 fcp 里调整的
+              top: style.orientation === 'portrait' ? '67%' : '85%',
             }}
           >
             <PreviewSubtitle

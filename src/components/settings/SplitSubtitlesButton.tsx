@@ -35,8 +35,11 @@ export function SplitSubtitlesButton({ canSplit, onSplitSubtitles }: SplitSubtit
   ) : null;
 
   return (
-    <>
-      <div className="relative -mt-4">
+    <section className="space-y-4">
+      <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
+        Subtitle Actions
+      </label>
+      <div className="relative">
         <button
           ref={buttonRef}
           type="button"
@@ -44,7 +47,7 @@ export function SplitSubtitlesButton({ canSplit, onSplitSubtitles }: SplitSubtit
           disabled={!canSplit}
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
-          className={`mt-3 w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer ${
+          className={`w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer ${
             canSplit
               ? 'bg-theme-primary/75 text-[#1a1a1a] shadow-[0_8px_20px_rgba(255,99,126,0.2)] hover:shadow-[0_12px_30px_rgba(255,99,126,0.3)] hover:brightness-110'
               : 'border border-white/10 bg-white/5 text-white/40'
@@ -55,6 +58,6 @@ export function SplitSubtitlesButton({ canSplit, onSplitSubtitles }: SplitSubtit
         </button>
       </div>
       {ReactDOM.createPortal(tooltipContent, document.body)}
-    </>
+    </section>
   );
 }

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { SubtitleStyle } from '../../types';
 
 interface StyleSettingsProps {
@@ -5,16 +6,82 @@ interface StyleSettingsProps {
   onChange: (style: SubtitleStyle) => void;
 }
 
+const MIN_FONT_SIZE = 20;
+const MAX_FONT_SIZE = 80;
+
 export function StyleSettings({ style, onChange }: StyleSettingsProps) {
+  const [fontSizeInput, setFontSizeInput] = useState(String(style.fontSize));
+
+  useEffect(() => {
+    setFontSizeInput(String(style.fontSize));
+  }, [style.fontSize]);
+
+  const updateFontSize = (fontSize: number) => {
+    const nextFontSize = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, fontSize));
+    onChange({ ...style, fontSize: nextFontSize });
+    return nextFontSize;
+  };
+
+  const commitFontSizeInput = (value: string) => {
+    if (value.trim() === '') {
+      setFontSizeInput(String(style.fontSize));
+      return;
+    }
+
+    const parsedValue = parseInt(value, 10);
+    if (Number.isNaN(parsedValue)) {
+      setFontSizeInput(String(style.fontSize));
+      return;
+    }
+
+    const nextFontSize = updateFontSize(parsedValue);
+    setFontSizeInput(String(nextFontSize));
+  };
+
   return (
-    <section className="space-y-6">
+    <section className="space-y-4">
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
         Subtitle Style
       </label>
 
-      {/* todo: 支持字体大小设置 */}
-
       <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs text-white/40">
+            <span className="text-sm text-white/60">Font Size</span>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min={MIN_FONT_SIZE}
+                max={MAX_FONT_SIZE}
+                step="1"
+                value={fontSizeInput}
+                onChange={(e) => setFontSizeInput(e.target.value)}
+                onBlur={(e) => commitFontSizeInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    commitFontSizeInput(e.currentTarget.value);
+                    e.currentTarget.blur();
+                  }
+                }}
+                className="w-16 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-right text-sm text-white outline-none transition focus:border-white/30"
+              />
+            </div>
+          </div>
+          <input
+            type="range"
+            min={MIN_FONT_SIZE}
+            max={MAX_FONT_SIZE}
+            step="1"
+            value={style.fontSize}
+            onChange={(e) => {
+              const nextValue = parseInt(e.target.value, 10);
+              const nextFontSize = updateFontSize(nextValue);
+              setFontSizeInput(String(nextFontSize));
+            }}
+            className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+          />
+        </div>
+
         {/* Colors */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-white/60">Text Color</span>

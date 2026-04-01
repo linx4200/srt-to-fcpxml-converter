@@ -38,10 +38,6 @@ export function SettingsPanel({
           onFileSelect={onFileSelect}
           onClearAll={onClearAll}
         />
-        <SplitSubtitlesButton
-          canSplit={isSubtitleUploaded}
-          onSplitSubtitles={onSplitSubtitles}
-        />
         <AudioUpload
           fileName={audioFileName}
           disabled={!isSubtitleUploaded}
@@ -63,6 +59,10 @@ export function SettingsPanel({
         <StyleSettings
           style={style}
           onChange={onStyleChange}
+        />
+        <SplitSubtitlesButton
+          canSplit={isSubtitleUploaded}
+          onSplitSubtitles={onSplitSubtitles}
         />
       </div>
     </aside>
