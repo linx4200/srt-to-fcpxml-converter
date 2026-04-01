@@ -8,6 +8,7 @@ interface PlaybackControlsProps {
   isPlaying: boolean;
   onPlayPause: () => void;
   onTimeUpdate: (time: number) => void;
+  maxWidth?: string;
 }
 
 export function PlaybackControls({
@@ -17,6 +18,7 @@ export function PlaybackControls({
   isPlaying,
   onPlayPause,
   onTimeUpdate,
+  maxWidth,
 }: PlaybackControlsProps) {
   if (srtEntries.length === 0) return null;
 
@@ -29,7 +31,10 @@ export function PlaybackControls({
   };
 
   return (
-    <div className="mt-4 w-full max-w-sm bg-white/5 px-4 py-2.5 rounded-2xl border border-white/10 space-y-2">
+    <div
+      className="mt-4 w-full bg-white/5 px-4 py-2.5 rounded-2xl border border-white/10 space-y-2"
+      style={{ maxWidth }}
+    >
       {/* Timeline Slider */}
       <div className="flex items-center gap-3">
         <span className="text-[9px] font-mono text-white/40 w-[60px]">{formatTime(currentTime)}</span>

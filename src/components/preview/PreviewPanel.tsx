@@ -126,6 +126,7 @@ export function PreviewPanel({
           isPlaying={isPlaying}
           onPlayPause={onPlayPause}
           onTimeUpdate={onTimeUpdate}
+          maxWidth={style.orientation === 'landscape' ? 'min(100%, calc(65vh * 16 / 9))' : 'min(100%, calc(65vh * 9 / 16))'}
         />
       </div>
 
