@@ -1,9 +1,9 @@
-import { useAudioWaveform } from '../../hooks/useAudioWaveform';
-import { SrtEntry } from '../../types';
+import { useAudioWaveform } from '../../../hooks/useAudioWaveform';
+import { SrtEntry } from '../../../types';
 import { AudioWaveform } from './AudioWaveform';
-import { SubtitleTimeline } from './SubtitleTimeline';
+import { EditableSubtitleTimeline } from './EditableSubtitleTimeline';
 
-interface TimelinePanelProps {
+interface PreviewTimelinePanelProps {
   entries: SrtEntry[];
   audioFile: File | null;
   currentTime: number;
@@ -11,13 +11,13 @@ interface TimelinePanelProps {
   onEntriesChange: (entries: SrtEntry[]) => void;
 }
 
-export function TimelinePanel({
+export function PreviewTimelinePanel({
   entries,
   audioFile,
   currentTime,
   onTimeUpdate,
   onEntriesChange,
-}: TimelinePanelProps) {
+}: PreviewTimelinePanelProps) {
   const { samples, audioDuration, isLoading } = useAudioWaveform(audioFile);
   const timelineDuration = entries[entries.length - 1]?.endSeconds ?? 0;
 
@@ -39,7 +39,7 @@ export function TimelinePanel({
           />
         )}
 
-        <SubtitleTimeline
+        <EditableSubtitleTimeline
           entries={entries}
           currentTime={currentTime}
           onTimeClick={onTimeUpdate}

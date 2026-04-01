@@ -1,5 +1,5 @@
 import { Pause, Play } from 'lucide-react';
-import { SrtEntry } from '../../types';
+import { SrtEntry } from '../../../types';
 
 interface PlaybackControlsProps {
   srtEntries: SrtEntry[];

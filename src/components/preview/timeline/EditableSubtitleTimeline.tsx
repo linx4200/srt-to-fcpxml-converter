@@ -1,19 +1,19 @@
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
-import { SrtEntry } from '../../types';
+import { SrtEntry } from '../../../types';
 
-interface SubtitleTimelineProps {
+interface EditableSubtitleTimelineProps {
   entries: SrtEntry[];
   currentTime: number;
   onTimeClick: (time: number) => void;
   onEntriesChange: (entries: SrtEntry[]) => void;
 }
 
-export function SubtitleTimeline({
+export function EditableSubtitleTimeline({
   entries,
   currentTime,
   onTimeClick,
   onEntriesChange,
-}: SubtitleTimelineProps) {
+}: EditableSubtitleTimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);

@@ -1,15 +1,19 @@
 import { motion } from 'motion/react';
-import { SrtEntry, SubtitleStyle } from '../../types';
-import { FCP_RESOLUTION, UI_LOGICAL_RESOLUTION } from '../../constants';
-import { getFontPixelSize } from '../../utils';
+import { SrtEntry, SubtitleStyle } from '../../../types';
+import { FCP_RESOLUTION, UI_LOGICAL_RESOLUTION } from '../../../constants';
+import { getFontPixelSize } from '../../../utils';
 
-interface SubtitlePreviewProps {
+interface PreviewSubtitleProps {
   currentEntry?: SrtEntry;
   style: SubtitleStyle;
   containerHeight?: number;
 }
 
-export function SubtitlePreview({ currentEntry, style, containerHeight = UI_LOGICAL_RESOLUTION.portrait.height }: SubtitlePreviewProps) {
+export function PreviewSubtitle({
+  currentEntry,
+  style,
+  containerHeight = UI_LOGICAL_RESOLUTION.portrait.height,
+}: PreviewSubtitleProps) {
   if (!currentEntry) {
     return (
       <div className="text-white/20 text-sm italic">
@@ -18,7 +22,10 @@ export function SubtitlePreview({ currentEntry, style, containerHeight = UI_LOGI
     );
   }
 
-  const referenceHeight = style.orientation === 'portrait' ? FCP_RESOLUTION.portrait.height : FCP_RESOLUTION.landscape.height;
+  const referenceHeight =
+    style.orientation === 'portrait'
+      ? FCP_RESOLUTION.portrait.height
+      : FCP_RESOLUTION.landscape.height;
 
   const scale = containerHeight / referenceHeight;
   const fontSize = getFontPixelSize(style.fontSize, referenceHeight).height;
