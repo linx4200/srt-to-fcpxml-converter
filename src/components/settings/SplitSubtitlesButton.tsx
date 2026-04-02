@@ -17,22 +17,22 @@ export function SplitSubtitlesButton({ canSplit, onSplitSubtitles }: SplitSubtit
     if (!buttonRef.current) return { top: 0, left: 0 };
     const rect = buttonRef.current.getBoundingClientRect();
     return {
-      top: rect.top + rect.height / 2, // 8px above the button
-      left: rect.left, // center horizontally
+      top: rect.top,
+      left: rect.left,
     };
   };
 
   const tooltipContent = showTooltip ? (
     <div
-      className="fixed px-3 py-2 bg-black/90 text-white text-xs rounded-lg whitespace-nowrap z-50 border border-white/20 pointer-events-none"
+      className="fixed px-3 py-2 bg-black/90 text-white/80 text-xs rounded-lg whitespace-nowrap z-50 pointer-events-none"
       style={{
         top: `${getTooltipPosition().top}px`,
         left: `${getTooltipPosition().left}px`,
-        transform: 'translateY(100%)',
+        transform: 'translateY(-120%)',
       }}
     >
       {t('splitTooltip')}
-      <div className="absolute -top-1 left-1/8 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-black/90"></div>
+      <div className="absolute -bottom-1 left-1/8 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/90"></div>
     </div>
   ) : null;
 

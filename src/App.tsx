@@ -3,7 +3,6 @@ import { usePlayback } from './hooks/usePlayback';
 import { parseSrt, generateFcpxml, splitSubtitlesByWidth } from './utils';
 import { SrtEntry, SubtitleStyle } from './types';
 import { Header } from './components/layout/Header';
-import { Footer } from './components/layout/Footer';
 import { SettingsPanel } from './components/settings/SettingsPanel';
 import { PreviewPanel } from './components/preview/PreviewPanel';
 import { message } from './components/message';
@@ -179,8 +178,6 @@ export default function App() {
           onEntriesChange={setTimelineEntries}
         />
       </main>
-
-      <Footer />
     </div>
   );
 }
