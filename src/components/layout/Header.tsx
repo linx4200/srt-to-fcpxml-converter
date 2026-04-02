@@ -1,4 +1,4 @@
-import { Type, Download, Globe, Github } from 'lucide-react';
+import { Type, Download, Github, UserRound } from 'lucide-react';
 import { useI18n } from '../../i18n';
 
 interface HeaderProps {
@@ -30,7 +30,7 @@ export function Header({ canExport, onExport }: HeaderProps) {
             title={t('authorWebsite')}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-colors hover:text-white hover:bg-white/10"
           >
-            <Globe size={16} />
+            <UserRound size={16} />
           </a>
           <a
             href={GITHUB_REPO_URL}

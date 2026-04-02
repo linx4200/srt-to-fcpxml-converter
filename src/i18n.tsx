@@ -135,7 +135,6 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, language);
     document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
-    document.title = translations[language].appTitle;
   }, [language]);
 
   const value = useMemo<I18nContextValue>(
