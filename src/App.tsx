@@ -8,9 +8,10 @@ import { PreviewPanel } from './components/preview/PreviewPanel';
 import { message } from './components/message';
 import { FCP_RESOLUTION } from './constants';
 import { useI18n } from './i18n';
+import { syncSeo } from './seo';
 
 export default function App() {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const [sourceEntries, setSourceEntries] = useState<SrtEntry[]>([]);
   const [timelineEntries, setTimelineEntries] = useState<SrtEntry[]>([]);
   const [fileName, setFileName] = useState<string>('');
@@ -130,6 +131,10 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [timelineEntries.length, setIsPlaying]);
+
+  useEffect(() => {
+    syncSeo(language);
+  }, [language]);
 
   const downloadFcpxml = () => {
     if (timelineEntries.length === 0) return;

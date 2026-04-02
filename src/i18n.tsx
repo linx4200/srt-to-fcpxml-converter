@@ -119,14 +119,14 @@ const translations = {
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 function getInitialLanguage(): Language {
-  if (typeof window === 'undefined') return 'zh';
+  if (typeof window === 'undefined') return 'en';
 
   const savedLanguage = window.localStorage.getItem(STORAGE_KEY);
   if (savedLanguage === 'zh' || savedLanguage === 'en') {
     return savedLanguage;
   }
 
-  return window.navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+  return 'en';
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
