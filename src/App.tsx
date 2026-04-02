@@ -8,8 +8,10 @@ import { SettingsPanel } from './components/settings/SettingsPanel';
 import { PreviewPanel } from './components/preview/PreviewPanel';
 import { message } from './components/message';
 import { FCP_RESOLUTION } from './constants';
+import { useI18n } from './i18n';
 
 export default function App() {
+  const { t } = useI18n();
   const [sourceEntries, setSourceEntries] = useState<SrtEntry[]>([]);
   const [timelineEntries, setTimelineEntries] = useState<SrtEntry[]>([]);
   const [fileName, setFileName] = useState<string>('');
@@ -65,7 +67,7 @@ export default function App() {
       setTimelineEntries(splitEntries(parsed));
       setCurrentTime(0);
       setIsPlaying(false);
-      message.success('上传成功，并已自动拆行');
+      message.success(t('uploadSuccess'));
     };
     reader.readAsText(file);
   };
@@ -76,10 +78,10 @@ export default function App() {
       setTimelineEntries(splitEntries(sourceEntries));
       setCurrentTime(0);
       setIsPlaying(false);
-      message.success('字幕已重新自动拆行');
+      message.success(t('splitSuccess'));
     } catch (error) {
       console.error('Failed to split subtitles:', error);
-      message.error('字幕拆行失败，请检查当前参数设置');
+      message.error(t('splitError'));
     }
   };
 
@@ -142,13 +144,12 @@ export default function App() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    message.success('FCPXML 已开始下载');
+    message.success(t('downloadStarted'));
   };
 
   return (
     <div className="h-screen w-screen bg-[#0f0f0f] text-white flex flex-col overflow-hidden font-sans">
       <Header
-        fileName={fileName}
         canExport={timelineEntries.length > 0}
         onExport={downloadFcpxml}
       />

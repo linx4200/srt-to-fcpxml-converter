@@ -1,5 +1,6 @@
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { SrtEntry } from '../../../types';
+import { useI18n } from '../../../i18n';
 
 interface EditableSubtitleTimelineProps {
   entries: SrtEntry[];
@@ -14,6 +15,7 @@ export function EditableSubtitleTimeline({
   onTimeClick,
   onEntriesChange,
 }: EditableSubtitleTimelineProps) {
+  const { t } = useI18n();
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -74,7 +76,7 @@ export function EditableSubtitleTimeline({
 
     const nextText = draftText.trim();
     if (nextText.length === 0) {
-      const shouldDelete = window.confirm('这一行已被清空，确认删除并把时间归并到上一行吗？');
+      const shouldDelete = window.confirm(t('deleteLineConfirm'));
       if (!shouldDelete) {
         setDraftText(entry.text);
         return;
@@ -116,8 +118,8 @@ export function EditableSubtitleTimeline({
 
   if (entries.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center text-white/20 text-sm h-[70vh]">
-        Waiting for subtitle file...
+        <div className="flex-1 flex items-center justify-center text-white/20 text-sm h-[70vh]">
+        {t('emptyTimeline')}
       </div>
     );
   }

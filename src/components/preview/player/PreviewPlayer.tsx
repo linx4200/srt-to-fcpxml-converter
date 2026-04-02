@@ -5,6 +5,7 @@ import horizontalBg from '../preview-bg-horizontal.jpg';
 import portraitBg from '../preview-bg-portrait.jpg';
 import { PlaybackControls } from './PlaybackControls';
 import { PreviewSubtitle } from './PreviewSubtitle';
+import { useI18n } from '../../../i18n';
 
 interface PreviewPlayerProps {
   entries: SrtEntry[];
@@ -27,6 +28,7 @@ export function PreviewPlayer({
   onPlayPause,
   onTimeUpdate,
 }: PreviewPlayerProps) {
+  const { t } = useI18n();
   const { ref: containerRef, width: containerWidth, height: containerHeight } = useContainerSize();
   const playerMaxWidth =
     style.orientation === 'landscape'
@@ -52,7 +54,7 @@ export function PreviewPlayer({
           <div className="absolute inset-0 overflow-hidden">
             <img
               src={style.orientation === 'portrait' ? portraitBg : horizontalBg}
-              alt="Preview Background"
+              alt={t('previewBackgroundAlt')}
               className="w-full h-full object-cover"
             />
           </div>

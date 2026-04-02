@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Upload, X } from 'lucide-react';
+import { useI18n } from '../../i18n';
 
 interface FileUploadProps {
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -7,6 +8,7 @@ interface FileUploadProps {
 }
 
 export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
@@ -19,7 +21,7 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
   };
 
   const handleDelete = () => {
-    if (window.confirm('您确定要清空当前的所有操作并重新上传字幕文本吗？')) {
+    if (window.confirm(t('clearAllConfirm'))) {
       setUploadedFileName(null);
       onClearAll?.();
     }
@@ -28,7 +30,7 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
   return (
     <section className="space-y-4">
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
-        Subtitle File
+        {t('subtitleFile')}
       </label>
       {uploadedFileName ? (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between group">
@@ -38,7 +40,7 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
             </div>
             <div className="overflow-hidden">
               <p className="text-sm font-medium truncate">{uploadedFileName}</p>
-              <p className="text-[10px] text-white/30 uppercase tracking-tighter">SRT Loaded</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-tighter">{t('srtLoaded')}</p>
             </div>
           </div>
           <button
@@ -57,8 +59,8 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
             <Upload size={20} className="text-white/40 group-hover:text-theme-primary" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-medium">Click to upload .srt file</p>
-            <p className="text-xs text-white/30 mt-1">or drag and drop</p>
+            <p className="text-sm font-medium">{t('uploadSrt')}</p>
+            <p className="text-xs text-white/30 mt-1">{t('dragAndDrop')}</p>
           </div>
           <input
             type="file"

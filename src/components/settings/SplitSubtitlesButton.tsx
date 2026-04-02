@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Scissors } from 'lucide-react';
+import { useI18n } from '../../i18n';
 
 interface SplitSubtitlesButtonProps {
   canSplit: boolean;
@@ -8,6 +9,7 @@ interface SplitSubtitlesButtonProps {
 }
 
 export function SplitSubtitlesButton({ canSplit, onSplitSubtitles }: SplitSubtitlesButtonProps) {
+  const { t } = useI18n();
   const [showTooltip, setShowTooltip] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -29,7 +31,7 @@ export function SplitSubtitlesButton({ canSplit, onSplitSubtitles }: SplitSubtit
         transform: 'translateY(100%)',
       }}
     >
-      Automatically split long subtitle lines to fit the screen width
+      {t('splitTooltip')}
       <div className="absolute -top-1 left-1/8 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-black/90"></div>
     </div>
   ) : null;
@@ -37,7 +39,7 @@ export function SplitSubtitlesButton({ canSplit, onSplitSubtitles }: SplitSubtit
   return (
     <section className="space-y-4">
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
-        Subtitle Actions
+        {t('subtitleActions')}
       </label>
       <div className="relative">
         <button
@@ -52,9 +54,9 @@ export function SplitSubtitlesButton({ canSplit, onSplitSubtitles }: SplitSubtit
               ? 'bg-theme-primary/75 text-[#1a1a1a] shadow-[0_8px_20px_rgba(255,99,126,0.2)] hover:shadow-[0_12px_30px_rgba(255,99,126,0.3)] hover:brightness-110'
               : 'border border-white/10 bg-white/5 text-white/40'
           }`}
-        >
+          >
           <Scissors size={16} />
-          手动执行自动拆行
+          {t('splitSubtitles')}
         </button>
       </div>
       {ReactDOM.createPortal(tooltipContent, document.body)}

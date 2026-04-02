@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { SubtitleStyle } from '../../types';
+import { useI18n } from '../../i18n';
 
 interface StyleSettingsProps {
   style: SubtitleStyle;
@@ -10,6 +11,7 @@ const MIN_FONT_SIZE = 20;
 const MAX_FONT_SIZE = 80;
 
 export function StyleSettings({ style, onChange }: StyleSettingsProps) {
+  const { t } = useI18n();
   const [fontSizeInput, setFontSizeInput] = useState(String(style.fontSize));
 
   useEffect(() => {
@@ -41,13 +43,13 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
   return (
     <section className="space-y-4">
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
-        Subtitle Style
+        {t('subtitleStyle')}
       </label>
 
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs text-white/40">
-            <span className="text-sm text-white/60">Font Size</span>
+            <span className="text-sm text-white/60">{t('fontSize')}</span>
             <div className="flex items-center gap-2">
               <input
                 type="number"
@@ -84,7 +86,7 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
 
         {/* Colors */}
         <div className="flex items-center justify-between">
-          <span className="text-sm text-white/60">Text Color</span>
+          <span className="text-sm text-white/60">{t('textColor')}</span>
           <input
             type="color"
             value={style.textColor}

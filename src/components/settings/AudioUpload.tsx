@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Speech, X } from 'lucide-react';
+import { useI18n } from '../../i18n';
 
 interface AudioUploadProps {
   fileName: string;
@@ -9,12 +10,13 @@ interface AudioUploadProps {
 }
 
 export function AudioUpload({ fileName, disabled, onAudioSelect, onClear }: AudioUploadProps) {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <section className="space-y-4">
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
-        Audio
+        {t('audio')}
       </label>
       {fileName ? (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between group">
@@ -24,7 +26,7 @@ export function AudioUpload({ fileName, disabled, onAudioSelect, onClear }: Audi
             </div>
             <div className="overflow-hidden">
               <p className="text-sm font-medium truncate">{fileName}</p>
-              <p className="text-[10px] text-white/30 uppercase tracking-tighter">Audio Loaded</p>
+              <p className="text-[10px] text-white/30 uppercase tracking-tighter">{t('audioLoaded')}</p>
             </div>
           </div>
           <button
@@ -51,8 +53,7 @@ export function AudioUpload({ fileName, disabled, onAudioSelect, onClear }: Audi
             <Speech size={20} className={`text-white/40 ${disabled ? '' : 'group-hover:text-theme-primary'}`} />
           </div>
           <div className="text-center">
-            <p className="text-sm font-medium">Add Related Audio
-            </p>
+            <p className="text-sm font-medium">{disabled ? t('uploadAudioFirstSubtitle') : t('addRelatedAudio')}</p>
             <p className="text-xs text-white/30 mt-1">MP3, WAV, M4A</p>
           </div>
           <input

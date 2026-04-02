@@ -1,5 +1,6 @@
 import { Music2 } from 'lucide-react';
 import { SettingButton } from './SettingButton';
+import { useI18n } from '../../i18n';
 
 interface PlatformSettingsProps {
   platform: 'none' | 'xhs' | 'douyin';
@@ -7,12 +8,13 @@ interface PlatformSettingsProps {
 }
 
 export function PlatformSettings({ platform, onChange }: PlatformSettingsProps) {
+  const { t } = useI18n();
   const platforms: ('none' | 'xhs' | 'douyin')[] = ['none', 'xhs', 'douyin'];
 
   return (
     <section className="space-y-4">
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
-        UI Preview Overlay
+        {t('overlay')}
       </label>
       <div className="flex flex-wrap gap-2">
         {platforms.map((p) => (
@@ -21,9 +23,9 @@ export function PlatformSettings({ platform, onChange }: PlatformSettingsProps) 
             isActive={platform === p}
             onClick={() => onChange(p)}
           >
-              {p === 'none' && <span className="text-xs font-medium">Clean</span>}
-              {p === 'xhs' && <><span className="text-xs font-medium">🍠</span><span className="text-xs font-medium">Redbook</span></>}
-              {p === 'douyin' && <><Music2 size={15} /><span className="text-xs font-medium">TikTok</span></>}
+              {p === 'none' && <span className="text-xs font-medium">{t('overlayClean')}</span>}
+              {p === 'xhs' && <><span className="text-xs font-medium">🍠</span><span className="text-xs font-medium">{t('overlayRednote')}</span></>}
+              {p === 'douyin' && <><Music2 size={15} /><span className="text-xs font-medium">{t('overlayTiktok')}</span></>}
           </SettingButton>
         ))}
       </div>

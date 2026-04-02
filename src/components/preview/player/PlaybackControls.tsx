@@ -1,5 +1,6 @@
 import { Pause, Play } from 'lucide-react';
 import { SrtEntry } from '../../../types';
+import { useI18n } from '../../../i18n';
 
 interface PlaybackControlsProps {
   srtEntries: SrtEntry[];
@@ -20,6 +21,8 @@ export function PlaybackControls({
   onTimeUpdate,
   maxWidth,
 }: PlaybackControlsProps) {
+  const { t } = useI18n();
+
   if (srtEntries.length === 0) return null;
 
   const formatTime = (seconds: number) => {
@@ -71,7 +74,7 @@ export function PlaybackControls({
           }}
           className="text-white/40 hover:text-white transition-colors text-[9px] font-medium px-2 tracking-wider hover:cursor-pointer"
         >
-          PREV
+          {t('prev')}
         </button>
 
         <button
@@ -88,7 +91,7 @@ export function PlaybackControls({
           }}
           className="text-white/40 hover:text-white transition-colors text-[9px] font-medium px-2 tracking-wider hover:cursor-pointer"
         >
-          NEXT
+          {t('next')}
         </button>
       </div>
     </div>

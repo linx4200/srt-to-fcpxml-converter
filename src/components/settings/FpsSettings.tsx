@@ -1,4 +1,5 @@
 import { SettingButton } from './SettingButton';
+import { useI18n } from '../../i18n';
 
 interface FpsSettingsProps {
   fps: 30 | 60;
@@ -6,10 +7,12 @@ interface FpsSettingsProps {
 }
 
 export function FpsSettings({ fps, onChange }: FpsSettingsProps) {
+  const { t } = useI18n();
+
   return (
     <section className="space-y-4">
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
-        Frame Rate
+        {t('frameRate')}
       </label>
       <div className="grid grid-cols-2 gap-2">
         <SettingButton

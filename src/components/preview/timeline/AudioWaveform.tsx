@@ -1,4 +1,5 @@
 import type { MouseEvent } from 'react';
+import { useI18n } from '../../../i18n';
 
 interface AudioWaveformProps {
   samples: number[];
@@ -17,6 +18,8 @@ export function AudioWaveform({
   onSeek,
   isLoading = false,
 }: AudioWaveformProps) {
+  const { t } = useI18n();
+
   const handleSeek = (event: MouseEvent<HTMLDivElement>) => {
     if (timelineDuration <= 0) return;
 
@@ -29,9 +32,9 @@ export function AudioWaveform({
     <div className="rounded-2xl border border-white/10 bg-white/4 px-4 py-3">
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Audio Waveform</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">{t('waveformTitle')}</p>
           <p className="mt-1 text-[11px] text-white/45">
-            {isLoading ? 'Decoding audio...' : ''}
+            {isLoading ? t('decodingAudio') : ''}
           </p>
         </div>
         {/* <div className="text-right text-[10px] font-mono text-white/35">
@@ -70,7 +73,7 @@ export function AudioWaveform({
           })
         ) : (
           <div className="flex h-full w-full items-center justify-center text-xs text-white/25">
-            {isLoading ? 'Generating waveform...' : 'Upload audio to see waveform'}
+            {isLoading ? t('generatingWaveform') : t('uploadAudioToSeeWaveform')}
           </div>
         )}
 
