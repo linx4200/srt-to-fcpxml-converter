@@ -30,9 +30,14 @@ export function PreviewPanel({
 }: PreviewPanelProps) {
   return (
     <section className="flex-1 bg-[#101010] flex flex-col xl:flex-row items-center justify-center p-8 gap-8 lg:gap-16 relative">
-      <div className="absolute top-6 left-6 flex items-center gap-2 text-white/30 z-10">
-        <Eye size={16} />
-        <span className="text-xs font-medium uppercase tracking-widest">Real-time Preview</span>
+      <div className="absolute top-6 left-6 z-10">
+        <div className="flex items-center gap-2 text-white/30">
+          <Eye size={16} />
+          <span className="text-xs font-medium uppercase tracking-widest">Real-time Preview</span>
+          <span className="text-[11px] font-normal normal-case tracking-normal text-white/20">
+            实际效果以 Final Cut Pro 为准
+          </span>
+        </div>
       </div>
 
       <PreviewPlayer

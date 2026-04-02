@@ -55,8 +55,9 @@ export function splitSubtitlesByWidth(
   videoWidth: number,
   videoHeight: number
 ): SrtEntry[] {
-  const maxWidth = videoWidth * 0.85;
-  const { width: charWidth } = getFontPixelSize(style.fontSize, videoHeight);
+  // 0.70 基于测试的经验值
+  const maxWidth = videoWidth * 0.70;
+  const { height: fontPixelSize } = getFontPixelSize(style.fontSize, videoHeight);
 
   const result: SrtEntry[] = [];
   let currentId = 1;
@@ -69,20 +70,16 @@ export function splitSubtitlesByWidth(
     const chars = Array.from(fullText);
     const parts: string[] = [];
     let currentPart = '';
-    let currentWidth = 0;
 
     for (const char of chars) {
-      // 简单启发式估算：非 ASCII (通常是中日韩) 算 1 个位宽，ASCII (英数标点) 算 0.5 个位宽
-      const charScale = /[^\x00-\xff]/.test(char) ? 1 : 0.5;
-      const estimatedWidth = charWidth * charScale;
+      const nextPart = currentPart + char;
+      const estimatedWidth = measureSubtitleTextWidth(nextPart, fontPixelSize);
 
-      if (currentWidth + estimatedWidth > maxWidth && currentPart.length > 0) {
+      if (estimatedWidth > maxWidth && currentPart.length > 0) {
         parts.push(currentPart.trim());
         currentPart = char;
-        currentWidth = estimatedWidth;
       } else {
-        currentPart += char;
-        currentWidth += estimatedWidth;
+        currentPart = nextPart;
       }
     }
     if (currentPart) {
@@ -122,6 +119,27 @@ export function splitSubtitlesByWidth(
   }
 
   return result;
+}
+
+let textMeasureCanvas: HTMLCanvasElement | null = null;
+
+function measureSubtitleTextWidth(text: string, fontPixelSize: number): number {
+  if (!text) return 0;
+
+  if (typeof document !== 'undefined') {
+    textMeasureCanvas ??= document.createElement('canvas');
+    const context = textMeasureCanvas.getContext('2d');
+
+    if (context) {
+      context.font = `${fontPixelSize}px "PingFang SC", "Microsoft YaHei", sans-serif`;
+      return context.measureText(text).width;
+    }
+  }
+
+  return Array.from(text).reduce((total, char) => {
+    const charScale = /[^\x00-\xff]/.test(char) ? 1 : 0.55;
+    return total + fontPixelSize * charScale;
+  }, 0);
 }
 
 type FontMetricsOptions = {

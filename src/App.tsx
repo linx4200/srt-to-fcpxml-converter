@@ -10,6 +10,7 @@ import { message } from './components/message';
 import { FCP_RESOLUTION } from './constants';
 
 export default function App() {
+  const [sourceEntries, setSourceEntries] = useState<SrtEntry[]>([]);
   const [timelineEntries, setTimelineEntries] = useState<SrtEntry[]>([]);
   const [fileName, setFileName] = useState<string>('');
   const [audioUrl, setAudioUrl] = useState<string>('');
@@ -60,6 +61,7 @@ export default function App() {
     reader.onload = (event) => {
       const content = event.target?.result as string;
       const parsed = parseSrt(content);
+      setSourceEntries(parsed);
       setTimelineEntries(splitEntries(parsed));
       setCurrentTime(0);
       setIsPlaying(false);
@@ -69,9 +71,9 @@ export default function App() {
   };
 
   const handleSplitSubtitles = () => {
-    if (timelineEntries.length === 0) return;
+    if (sourceEntries.length === 0) return;
     try {
-      setTimelineEntries(splitEntries(timelineEntries));
+      setTimelineEntries(splitEntries(sourceEntries));
       setCurrentTime(0);
       setIsPlaying(false);
       message.success('字幕已重新自动拆行');
@@ -99,6 +101,7 @@ export default function App() {
   };
 
   const handleClearAll = () => {
+    setSourceEntries([]);
     setTimelineEntries([]);
     setFileName('');
     setCurrentTime(0);

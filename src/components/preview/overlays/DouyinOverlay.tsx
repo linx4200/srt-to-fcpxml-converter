@@ -87,7 +87,7 @@ export function DouyinOverlay({ currentTime, totalDuration }: DouyinOverlayProps
         <Search size={20} strokeWidth={2.4} className="drop-shadow-md shrink-0" />
       </div>
 
-      <div className="absolute right-3 bottom-11 flex flex-col items-center gap-2 z-20">
+      <div className="absolute right-3 bottom-8 flex flex-col items-center gap-2 z-20">
         <ActionItem
           withAvatar
           icon={<div className="w-full h-full rounded-full bg-white/50"/>}
