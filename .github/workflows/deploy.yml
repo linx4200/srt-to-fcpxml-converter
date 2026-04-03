@@ -1,0 +1,59 @@
+name: Deploy Static Site
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build static site
+      env:
+        VITE_BASE_PATH: /srt-to-fcpxml/
+      run: npm run build
+
+    - name: Prepare upload directory
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          rm -rf "${{ secrets.DEPLOY_PATH_TMP }}"
+          mkdir -p "${{ secrets.DEPLOY_PATH_TMP }}"
+
+    - name: Upload site files
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        source: dist/*
+        target: ${{ secrets.DEPLOY_PATH_TMP }}
+        strip_components: 1
+
+    - name: Publish on server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          mkdir -p "${{ secrets.DEPLOY_PATH }}"
+          find "${{ secrets.DEPLOY_PATH }}" -mindepth 1 -maxdepth 1 ! -name '.well-known' -exec rm -rf {} +
+          cp -R "${{ secrets.DEPLOY_PATH_TMP }}/." "${{ secrets.DEPLOY_PATH }}/"
+          rm -rf "${{ secrets.DEPLOY_PATH_TMP }}"
