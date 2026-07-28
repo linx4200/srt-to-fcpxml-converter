@@ -1,4 +1,4 @@
-import { Type, Download, Github, UserRound } from 'lucide-react';
+import { Type, Download, Github } from 'lucide-react';
 import { useI18n } from '../../i18n';
 
 interface HeaderProps {
@@ -6,7 +6,6 @@ interface HeaderProps {
   onExport: () => void;
 }
 
-const AUTHOR_WEBSITE_URL = 'https://xinranliu.me/';
 const GITHUB_REPO_URL = 'https://github.com/linx4200/srt-to-fcpxml-converter';
 
 export function Header({ canExport, onExport }: HeaderProps) {
@@ -22,16 +21,6 @@ export function Header({ canExport, onExport }: HeaderProps) {
       </div>
       <div className="flex items-center gap-4 flex-wrap justify-end">
         <nav className="flex items-center gap-3 text-sm text-white/60">
-          <a
-            href={AUTHOR_WEBSITE_URL}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={t('authorWebsite')}
-            title={t('authorWebsite')}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-colors hover:text-white hover:bg-white/10"
-          >
-            <UserRound size={16} />
-          </a>
           <a
             href={GITHUB_REPO_URL}
             target="_blank"

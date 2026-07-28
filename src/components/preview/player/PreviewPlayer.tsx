@@ -6,6 +6,7 @@ import portraitBg from '../preview-bg-portrait.jpg';
 import { PlaybackControls } from './PlaybackControls';
 import { PreviewSubtitle } from './PreviewSubtitle';
 import { useI18n } from '../../../i18n';
+import { getRenderedSubtitleText } from '../../../utils';
 
 interface PreviewPlayerProps {
   entries: SrtEntry[];
@@ -16,6 +17,8 @@ interface PreviewPlayerProps {
   isPlaying: boolean;
   onPlayPause: () => void;
   onTimeUpdate: (time: number) => void;
+  showControls?: boolean;
+  compact?: boolean;
 }
 
 export function PreviewPlayer({
@@ -27,16 +30,19 @@ export function PreviewPlayer({
   isPlaying,
   onPlayPause,
   onTimeUpdate,
+  showControls = true,
+  compact = false,
 }: PreviewPlayerProps) {
   const { t } = useI18n();
   const { ref: containerRef, width: containerWidth, height: containerHeight } = useContainerSize();
   const playerMaxWidth =
     style.orientation === 'landscape'
-      ? 'min(100%, calc(65vh * 16 / 9))'
-      : 'min(100%, calc(65vh * 9 / 16))';
+      ? compact ? '100%' : 'min(100%, calc(65vh * 16 / 9))'
+      : compact ? '100%' : 'min(100%, calc(65vh * 9 / 16))';
+  const renderedText = getRenderedSubtitleText(currentEntry, style);
 
   return (
-    <div className="flex flex-col items-center justify-center shrink-0 xl:flex-1 w-full mt-12 xl:mt-0 px-2 lg:px-4">
+    <div className={`flex flex-col items-center justify-center shrink-0 w-full ${compact ? 'px-0 mt-0' : 'xl:flex-1 mt-12 xl:mt-0 px-2 lg:px-4'}`}>
       <div
         className="@container relative shrink-0 flex flex-col w-full shadow-2xl rounded-2xl overflow-hidden bg-[#0a0a0a] transition-all duration-500 ease-in-out border border-white/10"
         style={{
@@ -75,7 +81,7 @@ export function PreviewPlayer({
             }}
           >
             <PreviewSubtitle
-              currentEntry={currentEntry}
+              text={renderedText}
               style={style}
               containerHeight={containerHeight}
             />
@@ -89,15 +95,17 @@ export function PreviewPlayer({
         />
       </div>
 
-      <PlaybackControls
-        srtEntries={entries}
-        currentTime={currentTime}
-        totalDuration={totalDuration}
-        isPlaying={isPlaying}
-        onPlayPause={onPlayPause}
-        onTimeUpdate={onTimeUpdate}
-        maxWidth={playerMaxWidth}
-      />
+      {showControls ? (
+        <PlaybackControls
+          srtEntries={entries}
+          currentTime={currentTime}
+          totalDuration={totalDuration}
+          isPlaying={isPlaying}
+          onPlayPause={onPlayPause}
+          onTimeUpdate={onTimeUpdate}
+          maxWidth={playerMaxWidth}
+        />
+      ) : null}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { SrtEntry } from '../types';
 export function usePlayback(srtEntries: SrtEntry[], audioUrl?: string) {
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioDuration, setAudioDuration] = useState(0);
   const playbackRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -15,19 +16,28 @@ export function usePlayback(srtEntries: SrtEntry[], audioUrl?: string) {
       } else {
         audioRef.current.src = audioUrl;
       }
+      audioRef.current.onloadedmetadata = () => {
+        setAudioDuration(Number.isFinite(audioRef.current?.duration) ? audioRef.current!.duration : 0);
+      };
       audioRef.current.load();
     } else {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
       }
+      setAudioDuration(0);
     }
   }, [audioUrl]);
 
-  const totalDuration = useMemo(() => {
+  const subtitleDuration = useMemo(() => {
     if (srtEntries.length === 0) return 0;
     return srtEntries[srtEntries.length - 1].endSeconds;
   }, [srtEntries]);
+
+  const totalDuration = useMemo(
+    () => Math.max(subtitleDuration, audioDuration),
+    [audioDuration, subtitleDuration]
+  );
 
   // Sync state and playback
   useEffect(() => {

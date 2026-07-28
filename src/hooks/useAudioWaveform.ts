@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const WAVEFORM_BUCKETS = 160;
+const WAVEFORM_BUCKETS = 480;
 
 interface UseAudioWaveformResult {
   samples: number[];

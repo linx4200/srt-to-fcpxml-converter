@@ -1,20 +1,20 @@
 import { motion } from 'motion/react';
-import { SrtEntry, SubtitleStyle } from '../../../types';
+import { SubtitleStyle } from '../../../types';
 import { FCP_RESOLUTION, UI_LOGICAL_RESOLUTION } from '../../../constants';
 import { getFontPixelSize } from '../../../utils';
 
 interface PreviewSubtitleProps {
-  currentEntry?: SrtEntry;
+  text: string;
   style: SubtitleStyle;
   containerHeight?: number;
 }
 
 export function PreviewSubtitle({
-  currentEntry,
+  text,
   style,
   containerHeight = UI_LOGICAL_RESOLUTION.portrait.height,
 }: PreviewSubtitleProps) {
-  if (!currentEntry) {
+  if (!text) {
     return (
       <div className="text-white/20 text-sm italic">
         Upload SRT to see preview
@@ -32,7 +32,7 @@ export function PreviewSubtitle({
 
   return (
     <motion.div
-      key={currentEntry.id}
+      key={text}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="text-center whitespace-pre-wrap"
@@ -45,7 +45,7 @@ export function PreviewSubtitle({
         lineHeight: 1,
       }}
     >
-      {currentEntry.text}
+      {text}
     </motion.div>
   );
 }

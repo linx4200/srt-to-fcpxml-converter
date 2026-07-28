@@ -1,49 +1,47 @@
-import React, { useEffect, useState } from 'react';
-import { usePlayback } from './hooks/usePlayback';
-import { parseSrt, generateFcpxml, splitSubtitlesByWidth } from './utils';
-import { SrtEntry, SubtitleStyle } from './types';
+import React, { useEffect, useMemo, useState } from 'react';
+import { TimelineEditor } from './components/editor/TimelineEditor';
 import { Header } from './components/layout/Header';
-import { SettingsPanel } from './components/settings/SettingsPanel';
-import { PreviewPanel } from './components/preview/PreviewPanel';
 import { message } from './components/message';
-import { FCP_RESOLUTION } from './constants';
+import { PreviewPanel } from './components/preview/PreviewPanel';
+import { SettingsPanel } from './components/settings/SettingsPanel';
+import { usePlayback } from './hooks/usePlayback';
 import { useI18n } from './i18n';
 import { syncSeo } from './seo';
+import { EditingSessionState, SrtEntry, SubtitleStyle } from './types';
+import { generateFcpxml, getEntryAtTime, parseSrt, reflowTimelineEntries } from './utils';
+
+const INITIAL_STYLE: SubtitleStyle = {
+  textColor: '#ffffff',
+  backgroundColor: '#000000',
+  backgroundOpacity: 0.6,
+  borderRadius: 8,
+  paddingX: 8,
+  paddingY: 4,
+  fontSize: 35,
+  orientation: 'portrait',
+  platform: 'none',
+  fps: 60,
+};
+
+const INITIAL_EDITING_SESSION: EditingSessionState = {
+  hasVisited: false,
+  zoom: 1.2,
+  scrollLeft: 0,
+  playhead: 0,
+  selectedClipId: null,
+};
 
 export default function App() {
   const { language, t } = useI18n();
-  const [sourceEntries, setSourceEntries] = useState<SrtEntry[]>([]);
   const [timelineEntries, setTimelineEntries] = useState<SrtEntry[]>([]);
-  const [fileName, setFileName] = useState<string>('');
-  const [audioUrl, setAudioUrl] = useState<string>('');
-  const [audioFileName, setAudioFileName] = useState<string>('');
+  const [fileName, setFileName] = useState('');
+  const [audioUrl, setAudioUrl] = useState('');
+  const [audioFileName, setAudioFileName] = useState('');
   const [audioFile, setAudioFile] = useState<File | null>(null);
-
-  const [style, setStyle] = useState<SubtitleStyle>({
-    textColor: '#ffffff',
-    backgroundColor: '#000000',
-    backgroundOpacity: 0.6,
-    borderRadius: 8,
-    paddingX: 8,
-    paddingY: 4,
-    fontSize: 35,
-    orientation: 'portrait',
-    platform: 'none',
-    fps: 60,
-  });
-
-  const splitEntries = (entries: SrtEntry[]) => {
-    const resolution = style.orientation === 'portrait'
-      ? FCP_RESOLUTION.portrait
-      : FCP_RESOLUTION.landscape;
-
-    return splitSubtitlesByWidth(
-      entries,
-      style,
-      resolution.width,
-      resolution.height
-    );
-  };
+  const [style, setStyle] = useState<SubtitleStyle>(INITIAL_STYLE);
+  const [isEditingMode, setIsEditingMode] = useState(false);
+  const [selectedClipId, setSelectedClipId] = useState<number | null>(null);
+  const [editingSession, setEditingSession] = useState<EditingSessionState>(INITIAL_EDITING_SESSION);
 
   const {
     currentTime,
@@ -51,42 +49,69 @@ export default function App() {
     isPlaying,
     setIsPlaying,
     totalDuration,
-    currentEntry
+    currentEntry,
   } = usePlayback(timelineEntries, audioUrl);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const canEditTimeline = timelineEntries.length > 0 && audioFile !== null;
+
+  const sortedTimelineEntries = useMemo(
+    () => timelineEntries.slice().sort((left, right) => left.startSeconds - right.startSeconds || left.endSeconds - right.endSeconds || left.id - right.id),
+    [timelineEntries]
+  );
+
+  const replaceTimelineEntries = (nextEntries: SrtEntry[]) => {
+    setTimelineEntries(nextEntries.slice().sort((left, right) => left.startSeconds - right.startSeconds || left.endSeconds - right.endSeconds || left.id - right.id));
+  };
+
+  const saveEditingSession = (overrides: Partial<EditingSessionState> = {}) => {
+    setEditingSession((previous) => ({
+      ...previous,
+      hasVisited: true,
+      playhead: currentTime,
+      selectedClipId,
+      ...overrides,
+    }));
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     setFileName(file.name);
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      const parsed = parseSrt(content);
-      setSourceEntries(parsed);
-      setTimelineEntries(splitEntries(parsed));
+    reader.onload = (loadEvent) => {
+      const content = loadEvent.target?.result as string;
+      const parsedEntries = parseSrt(content);
+      replaceTimelineEntries(reflowTimelineEntries(parsedEntries, style));
       setCurrentTime(0);
       setIsPlaying(false);
+      setSelectedClipId(null);
+      setIsEditingMode(false);
+      setEditingSession(INITIAL_EDITING_SESSION);
       message.success(t('uploadSuccess'));
     };
     reader.readAsText(file);
   };
 
-  const handleSplitSubtitles = () => {
-    if (sourceEntries.length === 0) return;
+  const handleReflowAllSubtitles = () => {
+    if (timelineEntries.length === 0) return;
+    const shouldContinue = window.confirm(t('confirmReflow'));
+    if (!shouldContinue) return;
+
     try {
-      setTimelineEntries(splitEntries(sourceEntries));
-      setCurrentTime(0);
-      setIsPlaying(false);
+      replaceTimelineEntries(reflowTimelineEntries(sortedTimelineEntries, style));
+      if (isEditingMode) {
+        saveEditingSession();
+      }
       message.success(t('splitSuccess'));
     } catch (error) {
-      console.error('Failed to split subtitles:', error);
+      console.error('Failed to reflow subtitles:', error);
       message.error(t('splitError'));
     }
   };
 
-  const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleAudioUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     if (audioUrl) URL.revokeObjectURL(audioUrl);
@@ -97,18 +122,48 @@ export default function App() {
 
   const handleAudioClear = () => {
     if (audioUrl) URL.revokeObjectURL(audioUrl);
+    if (isEditingMode) {
+      saveEditingSession();
+      setIsEditingMode(false);
+      setSelectedClipId(null);
+    }
     setAudioFile(null);
     setAudioUrl('');
     setAudioFileName('');
+    setIsPlaying(false);
   };
 
   const handleClearAll = () => {
-    setSourceEntries([]);
-    setTimelineEntries([]);
+    replaceTimelineEntries([]);
     setFileName('');
     setCurrentTime(0);
     setIsPlaying(false);
+    setIsEditingMode(false);
+    setSelectedClipId(null);
+    setEditingSession(INITIAL_EDITING_SESSION);
     handleAudioClear();
+  };
+
+  const handleEnterEditingMode = () => {
+    if (!canEditTimeline) return;
+
+    if (editingSession.hasVisited) {
+      setCurrentTime(editingSession.playhead);
+      const restoredClip =
+        sortedTimelineEntries.find((entry) => entry.id === editingSession.selectedClipId) ??
+        getEntryAtTime(sortedTimelineEntries, editingSession.playhead);
+      setSelectedClipId(restoredClip?.id ?? null);
+    } else {
+      setSelectedClipId(null);
+    }
+
+    setIsEditingMode(true);
+  };
+
+  const handleExitEditingMode = () => {
+    saveEditingSession();
+    setIsEditingMode(false);
+    setSelectedClipId(null);
   };
 
   useEffect(() => {
@@ -122,39 +177,68 @@ export default function App() {
         tagName === 'textarea' ||
         target?.isContentEditable;
 
-      if (isTypingTarget || timelineEntries.length === 0) return;
+      if (isTypingTarget || sortedTimelineEntries.length === 0) return;
 
       event.preventDefault();
-      setIsPlaying((prev) => !prev);
+      setIsPlaying((previous) => !previous);
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [timelineEntries.length, setIsPlaying]);
+  }, [setIsPlaying, sortedTimelineEntries.length]);
 
   useEffect(() => {
     syncSeo(language);
   }, [language]);
 
+  useEffect(() => {
+    if (audioFile === null && isEditingMode) {
+      setIsEditingMode(false);
+      setSelectedClipId(null);
+    }
+  }, [audioFile, isEditingMode]);
+
   const downloadFcpxml = () => {
-    if (timelineEntries.length === 0) return;
-    const xml = generateFcpxml(timelineEntries, style);
+    if (sortedTimelineEntries.length === 0) return;
+    const xml = generateFcpxml(sortedTimelineEntries, style);
     const blob = new Blob([xml], { type: 'application/xml' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName.replace(/\.[^/.]+$/, "") + '.fcpxml';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = fileName.replace(/\.[^/.]+$/, '') + '.fcpxml';
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
     URL.revokeObjectURL(url);
     message.success(t('downloadStarted'));
   };
 
+  if (isEditingMode && audioFile) {
+    return (
+      <TimelineEditor
+        entries={sortedTimelineEntries}
+        style={style}
+        audioFile={audioFile}
+        currentTime={currentTime}
+        totalDuration={totalDuration}
+        isPlaying={isPlaying}
+        selectedClipId={selectedClipId}
+        session={editingSession}
+        onPlayPause={() => setIsPlaying(!isPlaying)}
+        onSetIsPlaying={setIsPlaying}
+        onTimeUpdate={setCurrentTime}
+        onEntriesChange={replaceTimelineEntries}
+        onSelectedClipIdChange={setSelectedClipId}
+        onSessionChange={setEditingSession}
+        onExit={handleExitEditingMode}
+      />
+    );
+  }
+
   return (
     <div className="h-screen w-screen bg-[#0f0f0f] text-white flex flex-col overflow-hidden font-sans">
       <Header
-        canExport={timelineEntries.length > 0}
+        canExport={sortedTimelineEntries.length > 0}
         onExport={downloadFcpxml}
       />
 
@@ -167,12 +251,12 @@ export default function App() {
           audioFileName={audioFileName}
           onAudioSelect={handleAudioUpload}
           onAudioClear={handleAudioClear}
-          isSubtitleUploaded={timelineEntries.length > 0}
-          onSplitSubtitles={handleSplitSubtitles}
+          isSubtitleUploaded={sortedTimelineEntries.length > 0}
+          onSplitSubtitles={handleReflowAllSubtitles}
         />
+
         <PreviewPanel
-          srtEntries={timelineEntries}
-          audioFile={audioFile}
+          srtEntries={sortedTimelineEntries}
           style={style}
           currentEntry={currentEntry}
           currentTime={currentTime}
@@ -180,7 +264,9 @@ export default function App() {
           isPlaying={isPlaying}
           onPlayPause={() => setIsPlaying(!isPlaying)}
           onTimeUpdate={setCurrentTime}
-          onEntriesChange={setTimelineEntries}
+          canEditTimeline={canEditTimeline}
+          onEditTimeline={handleEnterEditingMode}
+          editTimelineDisabledReason={t('editTimelineNeedsAudio')}
         />
       </main>
     </div>
