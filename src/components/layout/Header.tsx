@@ -1,15 +1,33 @@
 import { Type, Download, Github } from 'lucide-react';
+import { message } from '../message';
 import { useI18n } from '../../i18n';
-
-interface HeaderProps {
-  canExport: boolean;
-  onExport: () => void;
-}
+import { useAppStore } from '../../store/useAppStore';
+import { generateFcpxml } from '../../utils';
 
 const GITHUB_REPO_URL = 'https://github.com/linx4200/srt-to-fcpxml-converter';
 
-export function Header({ canExport, onExport }: HeaderProps) {
+export function Header() {
   const { language, setLanguage, t } = useI18n();
+  const workingTimeline = useAppStore((state) => state.workingTimeline);
+  const style = useAppStore((state) => state.style);
+  const subtitleFileName = useAppStore((state) => state.subtitleFileName);
+  const canExport = workingTimeline.length > 0;
+
+  const downloadFcpxml = () => {
+    if (!canExport) return;
+
+    const xml = generateFcpxml(workingTimeline, style);
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = subtitleFileName.replace(/\.[^/.]+$/, '') + '.fcpxml';
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(url);
+    message.success(t('downloadStarted'));
+  };
 
   return (
     <header className="min-h-14 border-b border-white/10 flex items-center justify-between px-6 py-3 bg-[#1a1a1a] shrink-0 gap-4 flex-wrap">
@@ -53,7 +71,7 @@ export function Header({ canExport, onExport }: HeaderProps) {
           </button>
         </div>
         <button
-          onClick={onExport}
+          onClick={downloadFcpxml}
           disabled={!canExport}
           className="flex w-40 items-center justify-center gap-2 bg-theme-primary hover:bg-theme-primary-soft hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-black px-4 py-1.5 rounded-full text-sm font-medium transition-all"
         >

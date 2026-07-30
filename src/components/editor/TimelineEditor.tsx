@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useAudioWaveform } from '../../hooks/useAudioWaveform';
 import { useI18n } from '../../i18n';
+import { useAppStore } from '../../store/useAppStore';
 import { EditingSessionState, SrtEntry, SubtitleStyle } from '../../types';
 import {
   cutSelectedClipAtPlayhead,
@@ -43,7 +44,6 @@ interface TimelineEditorProps {
   onEntriesChange: (entries: SrtEntry[]) => void;
   onSelectedClipIdChange: (clipId: number | null) => void;
   onSessionChange: (session: EditingSessionState) => void;
-  onExit: () => void;
 }
 
 type TrimState = {
@@ -66,9 +66,9 @@ export function TimelineEditor({
   onEntriesChange,
   onSelectedClipIdChange,
   onSessionChange,
-  onExit,
 }: TimelineEditorProps) {
   const { t } = useI18n();
+  const exitSubtitleEditingMode = useAppStore((state) => state.exitSubtitleEditingMode);
   const viewportRef = useRef<HTMLDivElement>(null);
   const [editingClipId, setEditingClipId] = useState<number | null>(null);
   const [draftText, setDraftText] = useState('');
@@ -225,7 +225,7 @@ export function TimelineEditor({
     if (editingClipId !== null) {
       commitEditing();
     }
-    onExit();
+    exitSubtitleEditingMode(currentTime);
   };
 
   const handleDeleteSelected = () => {

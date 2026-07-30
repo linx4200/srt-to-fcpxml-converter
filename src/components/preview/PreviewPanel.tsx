@@ -2,6 +2,7 @@ import { Eye, Waves } from 'lucide-react';
 import { SrtEntry, SubtitleStyle } from '../../types';
 import { PreviewPlayer } from './player/PreviewPlayer';
 import { useI18n } from '../../i18n';
+import { useAppStore } from '../../store/useAppStore';
 
 interface PreviewPanelProps {
   srtEntries: SrtEntry[];
@@ -12,9 +13,6 @@ interface PreviewPanelProps {
   isPlaying: boolean;
   onPlayPause: () => void;
   onTimeUpdate: (time: number) => void;
-  canEditTimeline: boolean;
-  onEditTimeline: () => void;
-  editTimelineDisabledReason: string;
 }
 
 export function PreviewPanel({
@@ -26,11 +24,18 @@ export function PreviewPanel({
   isPlaying,
   onPlayPause,
   onTimeUpdate,
-  canEditTimeline,
-  onEditTimeline,
-  editTimelineDisabledReason,
 }: PreviewPanelProps) {
   const { t } = useI18n();
+  const audioFile = useAppStore((state) => state.audioFile);
+  const enterSubtitleEditingMode = useAppStore((state) => state.enterSubtitleEditingMode);
+  const canEditTimeline = srtEntries.length > 0 && audioFile !== null;
+
+  const handleEnterEditingMode = () => {
+    const result = enterSubtitleEditingMode();
+    if (result.restoredPlayhead !== null) {
+      onTimeUpdate(result.restoredPlayhead);
+    }
+  };
 
   return (
     <section className="flex-1 bg-[#101010] flex flex-col items-center justify-center p-8 lg:p-10 gap-8 relative overflow-hidden">
@@ -43,10 +48,10 @@ export function PreviewPanel({
           </span>
         </div>
 
-        <div title={canEditTimeline ? '' : editTimelineDisabledReason}>
+        <div title={canEditTimeline ? '' : t('editTimelineNeedsAudio')}>
           <button
             type="button"
-            onClick={onEditTimeline}
+            onClick={handleEnterEditingMode}
             disabled={!canEditTimeline}
             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
           >
