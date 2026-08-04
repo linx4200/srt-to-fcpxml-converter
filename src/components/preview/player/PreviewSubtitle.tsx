@@ -9,6 +9,7 @@ interface PreviewSubtitleProps {
   containerHeight?: number;
 }
 
+/* 按 FCP 参考分辨率缩放当前字幕，尽量让浏览器预览贴近导出结果。 */
 export function PreviewSubtitle({
   text,
   style,
@@ -37,9 +38,11 @@ export function PreviewSubtitle({
       animate={{ opacity: 1, y: 0 }}
       className="text-center whitespace-pre-wrap"
       style={{
-        color: style.textColor,
+        // 背景色和圆角暂不启用，因为 FCPXML 当前不输出自动字幕背景；
         // backgroundColor: `${style.backgroundColor}${Math.round(style.backgroundOpacity * 255).toString(16).padStart(2, '0')}`,
         // borderRadius: `${style.borderRadius * scale}px`,
+        color: style.textColor,
+        // 保留 style 字段是为了未来恢复预览能力时有一致的数据入口。
         padding: `${style.paddingY * scale}px ${style.paddingX * scale}px`,
         fontSize: `${fontSize * scale}px`,
         lineHeight: 1,

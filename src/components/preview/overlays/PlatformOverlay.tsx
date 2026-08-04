@@ -12,6 +12,7 @@ interface PlatformOverlayProps {
   totalDuration?: number;
 }
 
+/* 根据当前平台选择渲染对应预览浮层，并按预览画面宽度等比缩放。 */
 export function PlatformOverlay({
   platform,
   orientation,
@@ -21,7 +22,7 @@ export function PlatformOverlay({
 }: PlatformOverlayProps) {
   const isPortrait = orientation === 'portrait';
   const refWidth = isPortrait ? UI_LOGICAL_RESOLUTION.portrait.width : UI_LOGICAL_RESOLUTION.landscape.width;
-  // 保持平台 UI 与预览画面的逻辑分辨率一致，避免缩放后越界。
+  /* 保持平台 UI 与预览画面的逻辑分辨率一致，避免缩放后越界。 */
   const refHeight = isPortrait ? refWidth * (16 / 9) : refWidth * (9 / 16);
   const scale = containerWidth / refWidth;
 
@@ -43,6 +44,7 @@ export function PlatformOverlay({
   );
 }
 
+/* 渲染平台底部扩展栏，它位于视频区域之外，用于模拟真实 App 底栏占位。 */
 export function PlatformBottomOverlay({
   platform,
   orientation,
@@ -54,12 +56,12 @@ export function PlatformBottomOverlay({
   const refWidth = isPortrait ? UI_LOGICAL_RESOLUTION.portrait.width : UI_LOGICAL_RESOLUTION.landscape.width;
   const scale = containerWidth / refWidth;
 
-  // 底部扩展栏需要处于 9:16 视频区域之外，因此这里按逻辑分辨率为不同平台预留高度。
+  /* 底部扩展栏需要处于 9:16 视频区域之外，因此这里按逻辑分辨率为不同平台预留高度。 */
   const bottomBarHeight =
     platform === 'xhs' ? xhsBottomHeightSpacing * 4 : platform === 'douyin' ? douyinBottomHeightSpacing * 4 : 0;
 
   return (
-    // 外层 div 预留放大后的尺寸
+    /* 外层 div 预留放大后的尺寸。 */
     <div
       className="relative w-full pointer-events-none h-10"
       style={{ paddingBottom: `${(bottomBarHeight / refWidth) * 100}%` }}

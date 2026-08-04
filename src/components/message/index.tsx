@@ -30,6 +30,7 @@ let queue: MessageRecord[] = [];
 function renderMessages() {
   if (typeof document === 'undefined') return;
 
+  // 确保全局 message 容器存在，并把当前队列渲染到独立 React root。
   if (!container) {
     container = document.createElement('div');
     container.id = 'global-message-root';
@@ -48,6 +49,7 @@ function renderMessages() {
   );
 }
 
+/* 把字符串、ReactNode 或配置对象统一成内部 message 记录。 */
 function normalizeOptions(
   type: MessageType,
   options: MessageOptions,
@@ -70,6 +72,7 @@ function normalizeOptions(
   };
 }
 
+/* 判断调用方是否传入了带 content/duration 的配置对象。 */
 function isMessageConfig(options: MessageOptions): options is MessageConfig {
   return (
     typeof options === 'object' &&
@@ -79,6 +82,7 @@ function isMessageConfig(options: MessageOptions): options is MessageConfig {
   );
 }
 
+/* 推入一条全局提示，并返回可手动关闭该提示的函数。 */
 function openMessage(
   type: MessageType,
   options: MessageOptions,
@@ -94,11 +98,13 @@ function openMessage(
   };
 }
 
+/* 清空所有全局提示。 */
 function destroyAll() {
   queue = [];
   renderMessages();
 }
 
+/* 全局提示视口，负责把消息队列映射为可自动消失的提示项。 */
 function MessageViewport({
   messages,
   onClose,
@@ -119,6 +125,7 @@ function MessageViewport({
   );
 }
 
+/* 单条提示的进入/退出动画和自动关闭生命周期。 */
 function MessageItem({
   message,
   onClose,

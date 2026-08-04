@@ -9,6 +9,7 @@ interface EditableSubtitleTimelineProps {
   onEntriesChange: (entries: SrtEntry[]) => void;
 }
 
+/* 渲染可点击和可编辑的 Subtitle Timeline，用于预览区的轻量文本校对。 */
 export function EditableSubtitleTimeline({
   entries,
   currentTime,
@@ -21,14 +22,14 @@ export function EditableSubtitleTimeline({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [draftText, setDraftText] = useState('');
 
-  // Find active entry index
+  /* 根据当前播放时间定位正在显示的 Subtitle Clip。 */
   const activeIndex = entries.findIndex(
     (entry, index) =>
       currentTime >= entry.startSeconds &&
       (currentTime < entry.endSeconds || (index === entries.length - 1 && currentTime <= entry.endSeconds))
   );
 
-  // Auto-scroll to active entry
+  /* 当前 Subtitle Clip 变化时自动滚动到可视区域的 35% 位置。 */
   useEffect(() => {
     if (activeRef.current && scrollRef.current) {
       const container = scrollRef.current;
@@ -51,22 +52,26 @@ export function EditableSubtitleTimeline({
     }
   }, [activeIndex]);
 
+  /* 将秒数格式化为 MM:SS，用于紧凑时间线标签。 */
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  /* 开始编辑指定 Subtitle Clip，并把现有文本复制到本地草稿。 */
   const beginEditing = (index: number) => {
     setEditingIndex(index);
     setDraftText(entries[index]?.text ?? '');
   };
 
+  /* 取消本地草稿，不修改 Working Timeline。 */
   const cancelEditing = () => {
     setEditingIndex(null);
     setDraftText('');
   };
 
+  /* 提交轻量文本编辑；空文本需要确认后删除并延长前一个 Subtitle Clip。 */
   const commitEditing = (index: number) => {
     const entry = entries[index];
     if (!entry) {
@@ -103,6 +108,7 @@ export function EditableSubtitleTimeline({
     cancelEditing();
   };
 
+  /* Enter 提交当前文本，Escape 放弃当前草稿。 */
   const handleEditorKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>, index: number) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -135,7 +141,7 @@ export function EditableSubtitleTimeline({
 
         {entries.map((entry, index) => {
           const isActive = index === activeIndex;
-          // Past entries are dimmed
+          /* 已播放过的 Subtitle Clip 在列表中降噪显示。 */
           const isPast = currentTime > entry.endSeconds;
 
           return (

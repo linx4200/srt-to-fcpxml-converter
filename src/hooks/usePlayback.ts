@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { SrtEntry } from '../types';
 
 export function usePlayback(srtEntries: SrtEntry[], audioUrl?: string) {
+
+  // 实时播放状态保留在 hook 内：currentTime 会随动画帧高频变化，并且需要和浏览器 Audio 元素同步。
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioDuration, setAudioDuration] = useState(0);
@@ -29,6 +31,27 @@ export function usePlayback(srtEntries: SrtEntry[], audioUrl?: string) {
     }
   }, [audioUrl]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== 'Space') return;
+
+      const target = event.target as HTMLElement | null;
+      const tagName = target?.tagName?.toLowerCase();
+      const isTypingTarget =
+        tagName === 'input' ||
+        tagName === 'textarea' ||
+        target?.isContentEditable;
+
+      if (isTypingTarget || srtEntries.length === 0) return;
+
+      event.preventDefault();
+      setIsPlaying((previous) => !previous);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [srtEntries.length]);
+
   const subtitleDuration = useMemo(() => {
     if (srtEntries.length === 0) return 0;
     return srtEntries[srtEntries.length - 1].endSeconds;
@@ -42,7 +65,7 @@ export function usePlayback(srtEntries: SrtEntry[], audioUrl?: string) {
   // Sync state and playback
   useEffect(() => {
     const audio = audioRef.current;
-    
+
     if (isPlaying) {
       if (audio) {
         audio.currentTime = currentTime;
@@ -80,7 +103,7 @@ export function usePlayback(srtEntries: SrtEntry[], audioUrl?: string) {
           playbackRef.current = requestAnimationFrame(tick);
         }
       };
-      
+
       playbackRef.current = requestAnimationFrame(syncPlayback);
     } else {
       if (audio) audio.pause();

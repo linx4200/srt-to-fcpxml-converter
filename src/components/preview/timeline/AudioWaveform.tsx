@@ -10,6 +10,7 @@ interface AudioWaveformProps {
   isLoading?: boolean;
 }
 
+/* 渲染参考音频 Waveform，并支持点击后按比例执行 Timeline Seek。 */
 export function AudioWaveform({
   samples,
   audioDuration,
@@ -20,6 +21,7 @@ export function AudioWaveform({
 }: AudioWaveformProps) {
   const { t } = useI18n();
 
+  /* 把点击位置归一化为时间，避免 Waveform 宽度变化影响 seek 精度。 */
   const handleSeek = (event: MouseEvent<HTMLDivElement>) => {
     if (timelineDuration <= 0) return;
 

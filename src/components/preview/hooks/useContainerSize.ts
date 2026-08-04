@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { UI_LOGICAL_RESOLUTION } from '../../../constants';
 
+/* 观察预览容器尺寸，让字幕缩放和平台浮层能按真实渲染尺寸计算。 */
 export function useContainerSize() {
   const [width, setWidth] = useState(UI_LOGICAL_RESOLUTION.portrait.width);
   const [height, setHeight] = useState(UI_LOGICAL_RESOLUTION.portrait.height);

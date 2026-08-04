@@ -31,28 +31,8 @@ export default function App() {
     currentEntry,
   } = usePlayback(workingTimeline, audioUrl);
 
+  /* 统一切换播放状态，让预览和 Waveform Timeline 共用同一套播放控制。 */
   const handlePlayPause = () => setIsPlaying(!isPlaying);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code !== 'Space') return;
-
-      const target = event.target as HTMLElement | null;
-      const tagName = target?.tagName?.toLowerCase();
-      const isTypingTarget =
-        tagName === 'input' ||
-        tagName === 'textarea' ||
-        target?.isContentEditable;
-
-      if (isTypingTarget || workingTimeline.length === 0) return;
-
-      event.preventDefault();
-      setIsPlaying((previous) => !previous);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setIsPlaying, workingTimeline.length]);
 
   useEffect(() => {
     syncSeo(language);

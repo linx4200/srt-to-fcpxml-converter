@@ -12,6 +12,7 @@ interface PlaybackControlsProps {
   maxWidth?: string;
 }
 
+/* 提供预览播放器的时间显示、拖动 seek 和上一条/下一条 Subtitle Clip 导航。 */
 export function PlaybackControls({
   srtEntries,
   currentTime,
@@ -25,6 +26,7 @@ export function PlaybackControls({
 
   if (srtEntries.length === 0) return null;
 
+  /* 将秒数格式化为 HH:MM:SS.mmm，方便用户校对字幕时间。 */
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);

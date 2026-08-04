@@ -6,6 +6,7 @@ interface XhsOverlayProps {
   totalDuration: number;
 }
 
+/* 模拟小红书视频页浮层，用于检查字幕与平台 UI 的遮挡关系。 */
 export function XhsOverlay({ currentTime, totalDuration }: XhsOverlayProps) {
   const progress = totalDuration > 0 ? Math.min(Math.max(currentTime / totalDuration, 0), 1) : 0;
 
@@ -85,6 +86,7 @@ export function XhsOverlay({ currentTime, totalDuration }: XhsOverlayProps) {
   );
 }
 
+/* 渲染小红书视频区域外的底部互动栏占位。 */
 export function XhsBottomBar() {
   return (
     <motion.div

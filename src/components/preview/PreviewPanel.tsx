@@ -15,6 +15,7 @@ interface PreviewPanelProps {
   onTimeUpdate: (time: number) => void;
 }
 
+/* 组织 Preview Workspace 的标题、进入 Subtitle Editing Mode 的入口和预览播放器。 */
 export function PreviewPanel({
   srtEntries,
   style,
@@ -30,6 +31,7 @@ export function PreviewPanel({
   const enterSubtitleEditingMode = useAppStore((state) => state.enterSubtitleEditingMode);
   const canEditTimeline = srtEntries.length > 0 && audioFile !== null;
 
+  /* 进入 Subtitle Editing Mode，并在有历史会话时恢复上次保存的 playhead。 */
   const handleEnterEditingMode = () => {
     const result = enterSubtitleEditingMode();
     if (result.restoredPlayhead !== null) {

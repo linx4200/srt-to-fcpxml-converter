@@ -51,6 +51,7 @@ type TrimState = {
   edge: 'start' | 'end';
 } | null;
 
+/* 提供 Subtitle Editing Mode 的主工作区，集中处理 Waveform Timeline 的选择、编辑、切分、修剪和导航。 */
 export function TimelineEditor({
   entries,
   style,
@@ -110,6 +111,7 @@ export function TimelineEditor({
   useEffect(() => {
     if (!trimState) return;
 
+    /* 拖拽修剪边界时把鼠标位置换算为时间，并交给 utils 维护相邻 Subtitle Clip 约束。 */
     const handleMouseMove = (event: MouseEvent) => {
       const viewport = viewportRef.current;
       if (!viewport) return;
@@ -121,6 +123,7 @@ export function TimelineEditor({
       setIsInteracting(true);
     };
 
+    /* 结束 Free Trim 交互，恢复 Playhead Follow 的资格。 */
     const handleMouseUp = () => {
       setTrimState(null);
       setIsInteracting(false);
@@ -136,6 +139,7 @@ export function TimelineEditor({
   }, [entries, onEntriesChange, pixelsPerSecond, style.fps, trimState]);
 
   useEffect(() => {
+    /* 管理编辑模式快捷键：Escape 退出/取消，Delete/Backspace 删除当前 Clip Selection。 */
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       const isTypingTarget =
@@ -174,6 +178,7 @@ export function TimelineEditor({
     }
   }, [currentTime, entries, onSelectedClipIdChange, selectedClipId]);
 
+  /* 保存 Waveform Timeline 的横向滚动位置，便于下次进入 Subtitle Editing Mode 恢复视口。 */
   const handleViewportScroll = () => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -184,6 +189,7 @@ export function TimelineEditor({
     });
   };
 
+  /* 在时间尺或空白轨道点击时执行 Timeline Seek，不改变 Clip Selection。 */
   const handleSeek = (clientX: number) => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -194,6 +200,7 @@ export function TimelineEditor({
     onTimeUpdate(nextTime);
   };
 
+  /* 双击 Subtitle Clip 时进入 Inline Clip Editing，并暂停播放避免文本编辑被播放跟随打断。 */
   const handleEnterEditing = (clip: SrtEntry) => {
     onSetIsPlaying(false);
     onSelectedClipIdChange(clip.id);
@@ -201,6 +208,7 @@ export function TimelineEditor({
     setDraftText(clip.text);
   };
 
+  /* 提交 Inline Clip Editing；空文本表示删除当前 Subtitle Clip。 */
   const commitEditing = () => {
     if (editingClipId === null) return;
     const nextText = draftText.trim();
@@ -216,11 +224,13 @@ export function TimelineEditor({
     setDraftText('');
   };
 
+  /* 放弃当前 Inline Clip Editing 草稿，不修改 Working Timeline。 */
   const cancelEditing = () => {
     setEditingClipId(null);
     setDraftText('');
   };
 
+  /* 退出 Subtitle Editing Mode 前提交未完成文本，保证 Working Timeline 不丢失草稿。 */
   const handleExit = () => {
     if (editingClipId !== null) {
       commitEditing();
@@ -228,6 +238,7 @@ export function TimelineEditor({
     exitSubtitleEditingMode(currentTime);
   };
 
+  /* 删除当前 Clip Selection，并清理本地编辑草稿。 */
   const handleDeleteSelected = () => {
     if (selectedClipId === null) return;
     onEntriesChange(deleteSelectedClip(entries, selectedClipId));
@@ -236,6 +247,7 @@ export function TimelineEditor({
     setDraftText('');
   };
 
+  /* 将选中 Subtitle Clip 按两条 Logical Preview Lines 拆成两个 Clip。 */
   const handleSplitByLines = () => {
     if (!selectedClip) return;
     const baseId = entries.reduce((maxId, entry) => Math.max(maxId, entry.id), 0);
@@ -244,6 +256,7 @@ export function TimelineEditor({
     onSelectedClipIdChange(baseId + 2);
   };
 
+  /* 在当前 playhead 位置执行 Playhead Cut，生成两个新的 Subtitle Clips。 */
   const handleCutAtPlayhead = () => {
     if (!selectedClip) return;
     const baseId = entries.reduce((maxId, entry) => Math.max(maxId, entry.id), 0);
@@ -252,6 +265,7 @@ export function TimelineEditor({
     onSelectedClipIdChange(baseId + 2);
   };
 
+  /* 跳转到当前 playhead 之前最近的 Subtitle Clip，并同步 Clip Selection。 */
   const handlePreviousClip = () => {
     const previousClip = entries.slice().reverse().find((entry) => entry.startSeconds < currentTime - 0.5);
     if (!previousClip) return;
@@ -259,6 +273,7 @@ export function TimelineEditor({
     onSelectedClipIdChange(previousClip.id);
   };
 
+  /* 跳转到当前 playhead 之后最近的 Subtitle Clip，并同步 Clip Selection。 */
   const handleNextClip = () => {
     const nextClip = entries.find((entry) => entry.startSeconds > currentTime + 0.1);
     if (!nextClip) return;
@@ -266,6 +281,7 @@ export function TimelineEditor({
     onSelectedClipIdChange(nextClip.id);
   };
 
+  /* 调整 Waveform Timeline 缩放，并把倍率保存到编辑会话。 */
   const changeZoom = (delta: number) => {
     const nextZoom = Math.min(Math.max(session.zoom + delta, MIN_ZOOM), MAX_ZOOM);
     onSessionChange({
@@ -274,6 +290,7 @@ export function TimelineEditor({
     });
   };
 
+  /* 将 Working Timeline 转换为渲染用的定位数据，避免 JSX 中重复计算像素位置。 */
   const timelineRows = useMemo(() => {
     return entries.map((entry) => {
       const left = 60 + entry.startSeconds * pixelsPerSecond;

@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 
+/* 渲染干净预览模式的空浮层，保留统一动画和安全区扩展入口。 */
 export function CleanOverlay() {
   return (
     <motion.div 

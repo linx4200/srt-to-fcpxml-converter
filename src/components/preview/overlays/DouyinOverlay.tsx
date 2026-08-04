@@ -12,6 +12,7 @@ import {
   Layers
 } from 'lucide-react';
 
+/* 渲染抖音右侧互动按钮项，支持头像占位和隐藏占位两种形态。 */
 function ActionItem({
   icon,
   count,
@@ -51,6 +52,7 @@ interface DouyinOverlayProps {
   totalDuration: number;
 }
 
+/* 模拟抖音视频页浮层，用于检查字幕与平台 UI 的遮挡关系。 */
 export function DouyinOverlay({ currentTime, totalDuration }: DouyinOverlayProps) {
   const progress = totalDuration > 0 ? Math.min(Math.max(currentTime / totalDuration, 0), 1) : 0;
 
@@ -96,7 +98,7 @@ export function DouyinOverlay({ currentTime, totalDuration }: DouyinOverlayProps
         <ActionItem icon={<MessageCircle size={26} fill="white" />} count="108" />
         <ActionItem icon={<Star size={26} fill="white" />} count="67" />
         <ActionItem icon={<MessageSquareShare size={26} />} count="12" />
-        {/* this is a space placeholder */}
+        {/* 这里保留一个不可见占位，让右侧按钮组与底部信息区保持距离。 */}
         <ActionItem hidden icon={<MessageSquareShare size={26}/>} />
       </div>
 
@@ -125,6 +127,7 @@ export function DouyinOverlay({ currentTime, totalDuration }: DouyinOverlayProps
   );
 }
 
+/* 渲染抖音视频区域外的底部导航栏占位。 */
 export function DouyinBottomBar() {
   return (
     <motion.div
