@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Upload, X } from 'lucide-react';
 import { useI18n } from '../../i18n';
+import { useAppStore } from '../../store/useAppStore';
 
 interface FileUploadProps {
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -10,19 +11,14 @@ interface FileUploadProps {
 export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
   const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const subtitleFileName = useAppStore((state) => state.subtitleFileName);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFileSelect(e);
-    const file = e.target.files?.[0];
-    if (file) {
-      setUploadedFileName(file.name);
-    }
   };
 
   const handleDelete = () => {
     if (window.confirm(t('clearAllConfirm'))) {
-      setUploadedFileName(null);
       onClearAll?.();
     }
   };
@@ -32,14 +28,14 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
         {t('subtitleFile')}
       </label>
-      {uploadedFileName ? (
+      {subtitleFileName ? (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between group">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-8 h-8 rounded-lg bg-theme-primary/20 flex items-center justify-center shrink-0">
               <Upload size={16} className="text-theme-primary" />
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-medium truncate">{uploadedFileName}</p>
+              <p className="text-sm font-medium truncate">{subtitleFileName}</p>
               <p className="text-[10px] text-white/30 uppercase tracking-tighter">{t('srtLoaded')}</p>
             </div>
           </div>

@@ -1,20 +1,20 @@
 import { motion } from 'motion/react';
-import { SubtitleStyle } from '../../../types';
 import { FCP_RESOLUTION, UI_LOGICAL_RESOLUTION } from '../../../constants';
+import { useAppStore } from '../../../store/useAppStore';
 import { getFontPixelSize } from '../../../utils';
 
 interface PreviewSubtitleProps {
   text: string;
-  subtitleStyle: SubtitleStyle;
   containerHeight?: number;
 }
 
 /* 按 FCP 参考分辨率缩放当前字幕，尽量让浏览器预览贴近导出结果。 */
 export function PreviewSubtitle({
   text,
-  subtitleStyle,
   containerHeight = UI_LOGICAL_RESOLUTION.portrait.height,
 }: PreviewSubtitleProps) {
+  const subtitleStyle = useAppStore((state) => state.subtitleStyle);
+
   if (!text) {
     return (
       <div className="text-white/20 text-sm italic">

@@ -1,9 +1,8 @@
 import { Pause, Play } from 'lucide-react';
-import { SrtEntry } from '../../../types';
 import { useI18n } from '../../../i18n';
+import { useAppStore } from '../../../store/useAppStore';
 
 interface PlaybackControlsProps {
-  srtEntries: SrtEntry[];
   currentTime: number;
   totalDuration: number;
   isPlaying: boolean;
@@ -14,7 +13,6 @@ interface PlaybackControlsProps {
 
 /* 提供预览播放器的时间显示、拖动 seek 和上一条/下一条 Subtitle Clip 导航。 */
 export function PlaybackControls({
-  srtEntries,
   currentTime,
   totalDuration,
   isPlaying,
@@ -23,8 +21,9 @@ export function PlaybackControls({
   maxWidth,
 }: PlaybackControlsProps) {
   const { t } = useI18n();
+  const workingTimeline = useAppStore((state) => state.workingTimeline);
 
-  if (srtEntries.length === 0) return null;
+  if (workingTimeline.length === 0) return null;
 
   /* 将秒数格式化为 HH:MM:SS.mmm，方便用户校对字幕时间。 */
   const formatTime = (seconds: number) => {
@@ -71,7 +70,7 @@ export function PlaybackControls({
       <div className="flex items-center justify-center gap-8">
         <button
           onClick={() => {
-            const prev = srtEntries.slice().reverse().find(e => e.startSeconds < currentTime - 0.5);
+            const prev = workingTimeline.slice().reverse().find(e => e.startSeconds < currentTime - 0.5);
             onTimeUpdate(prev ? prev.startSeconds : 0);
           }}
           className="text-white/40 hover:text-white transition-colors text-[9px] font-medium px-2 tracking-wider hover:cursor-pointer"
@@ -88,7 +87,7 @@ export function PlaybackControls({
 
         <button
           onClick={() => {
-            const next = srtEntries.find(e => e.startSeconds > currentTime + 0.1);
+            const next = workingTimeline.find(e => e.startSeconds > currentTime + 0.1);
             if (next) onTimeUpdate(next.startSeconds);
           }}
           className="text-white/40 hover:text-white transition-colors text-[9px] font-medium px-2 tracking-wider hover:cursor-pointer"

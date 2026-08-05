@@ -1,22 +1,20 @@
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
-import { SrtEntry } from '../../../types';
 import { useI18n } from '../../../i18n';
+import { useAppStore } from '../../../store/useAppStore';
 
 interface EditableSubtitleTimelineProps {
-  entries: SrtEntry[];
   currentTime: number;
   onTimeClick: (time: number) => void;
-  onEntriesChange: (entries: SrtEntry[]) => void;
 }
 
 /* 渲染可点击和可编辑的 Subtitle Timeline，用于预览区的轻量文本校对。 */
 export function EditableSubtitleTimeline({
-  entries,
   currentTime,
   onTimeClick,
-  onEntriesChange,
 }: EditableSubtitleTimelineProps) {
   const { t } = useI18n();
+  const entries = useAppStore((state) => state.workingTimeline);
+  const replaceWorkingTimeline = useAppStore((state) => state.replaceWorkingTimeline);
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -96,7 +94,7 @@ export function EditableSubtitleTimeline({
         };
       }
       nextEntries.splice(index, 1);
-      onEntriesChange(nextEntries);
+      replaceWorkingTimeline(nextEntries);
       cancelEditing();
       return;
     }
@@ -104,7 +102,7 @@ export function EditableSubtitleTimeline({
     const nextEntries = entries.map((item, itemIndex) =>
       itemIndex === index ? { ...item, text: nextText } : item
     );
-    onEntriesChange(nextEntries);
+    replaceWorkingTimeline(nextEntries);
     cancelEditing();
   };
 

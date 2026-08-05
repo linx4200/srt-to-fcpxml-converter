@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAppStore } from '../store/useAppStore';
 
 const WAVEFORM_BUCKETS = 480;
 
@@ -8,7 +9,8 @@ interface UseAudioWaveformResult {
   isLoading: boolean;
 }
 
-export function useAudioWaveform(audioFile: File | null): UseAudioWaveformResult {
+export function useAudioWaveform(): UseAudioWaveformResult {
+  const audioFile = useAppStore((state) => state.audioFile);
   const [samples, setSamples] = useState<number[]>([]);
   const [audioDuration, setAudioDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(false);

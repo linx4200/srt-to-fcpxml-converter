@@ -2,14 +2,15 @@ import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Scissors } from 'lucide-react';
 import { useI18n } from '../../i18n';
+import { useAppStore } from '../../store/useAppStore';
 
 interface SplitSubtitlesButtonProps {
-  canSplit: boolean;
   onSplitSubtitles: () => void;
 }
 
-export function SplitSubtitlesButton({ canSplit, onSplitSubtitles }: SplitSubtitlesButtonProps) {
+export function SplitSubtitlesButton({ onSplitSubtitles }: SplitSubtitlesButtonProps) {
   const { t } = useI18n();
+  const canSplit = useAppStore((state) => state.workingTimeline.length > 0);
   const [showTooltip, setShowTooltip] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 

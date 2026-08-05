@@ -1,13 +1,11 @@
 import { SettingButton } from './SettingButton';
 import { useI18n } from '../../i18n';
+import { useAppStore } from '../../store/useAppStore';
 
-interface FpsSettingsProps {
-  fps: 30 | 60;
-  onChange: (fps: 30 | 60) => void;
-}
-
-export function FpsSettings({ fps, onChange }: FpsSettingsProps) {
+export function FpsSettings() {
   const { t } = useI18n();
+  const fps = useAppStore((state) => state.subtitleStyle.fps);
+  const updateSubtitleStyle = useAppStore((state) => state.updateSubtitleStyle);
 
   return (
     <section className="space-y-4">
@@ -17,14 +15,14 @@ export function FpsSettings({ fps, onChange }: FpsSettingsProps) {
       <div className="grid grid-cols-2 gap-2">
         <SettingButton
           isActive={fps === 30}
-          onClick={() => onChange(30)}
+          onClick={() => updateSubtitleStyle({ fps: 30 })}
           className="justify-center"
         >
           <span className="text-xs font-medium">30 FPS</span>
         </SettingButton>
         <SettingButton
           isActive={fps === 60}
-          onClick={() => onChange(60)}
+          onClick={() => updateSubtitleStyle({ fps: 60 })}
           className="justify-center"
         >
           <span className="text-xs font-medium">60 FPS</span>

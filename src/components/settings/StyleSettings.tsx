@@ -1,17 +1,14 @@
 import { useEffect, useState } from 'react';
-import { SubtitleStyle } from '../../types';
 import { useI18n } from '../../i18n';
-
-interface StyleSettingsProps {
-  subtitleStyle: SubtitleStyle;
-  onChange: (subtitleStyle: SubtitleStyle) => void;
-}
+import { useAppStore } from '../../store/useAppStore';
 
 const MIN_FONT_SIZE = 20;
 const MAX_FONT_SIZE = 80;
 
-export function StyleSettings({ subtitleStyle, onChange }: StyleSettingsProps) {
+export function StyleSettings() {
   const { t } = useI18n();
+  const subtitleStyle = useAppStore((state) => state.subtitleStyle);
+  const updateSubtitleStyle = useAppStore((state) => state.updateSubtitleStyle);
   const [fontSizeInput, setFontSizeInput] = useState(String(subtitleStyle.fontSize));
 
   useEffect(() => {
@@ -20,7 +17,7 @@ export function StyleSettings({ subtitleStyle, onChange }: StyleSettingsProps) {
 
   const updateFontSize = (fontSize: number) => {
     const nextFontSize = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, fontSize));
-    onChange({ ...subtitleStyle, fontSize: nextFontSize });
+    updateSubtitleStyle({ fontSize: nextFontSize });
     return nextFontSize;
   };
 
@@ -90,7 +87,7 @@ export function StyleSettings({ subtitleStyle, onChange }: StyleSettingsProps) {
           <input
             type="color"
             value={subtitleStyle.textColor}
-            onChange={(e) => onChange({ ...subtitleStyle, textColor: e.target.value })}
+            onChange={(e) => updateSubtitleStyle({ textColor: e.target.value })}
             className="w-8 h-8 rounded-lg bg-transparent border-none cursor-pointer"
           />
         </div>

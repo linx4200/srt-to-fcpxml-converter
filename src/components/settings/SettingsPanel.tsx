@@ -24,9 +24,6 @@ export function SettingsPanel({
 }: SettingsPanelProps) {
   const { t } = useI18n();
   const workingTimeline = useAppStore((state) => state.workingTimeline);
-  const subtitleStyle = useAppStore((state) => state.subtitleStyle);
-  const audioFileName = useAppStore((state) => state.audioFileName);
-  const setSubtitleStyle = useAppStore((state) => state.setSubtitleStyle);
   const setAudioFile = useAppStore((state) => state.setAudioFile);
   const clearProject = useAppStore((state) => state.clearProject);
   const importSubtitleFile = useAppStore((state) => state.importSubtitleFile);
@@ -94,29 +91,14 @@ export function SettingsPanel({
           onClearAll={handleClearAll}
         />
         <AudioUpload
-          fileName={audioFileName}
-          disabled={!isSubtitleUploaded}
           onAudioSelect={handleAudioSelect}
           onClear={handleAudioClear}
         />
-        <LayoutSettings
-          orientation={subtitleStyle.orientation}
-          onChange={(orientation) => setSubtitleStyle({ ...subtitleStyle, orientation })}
-        />
-        <FpsSettings
-          fps={subtitleStyle.fps}
-          onChange={(fps) => setSubtitleStyle({ ...subtitleStyle, fps })}
-        />
-        <PlatformSettings
-          platform={subtitleStyle.platform}
-          onChange={(platform) => setSubtitleStyle({ ...subtitleStyle, platform })}
-        />
-        <StyleSettings
-          subtitleStyle={subtitleStyle}
-          onChange={setSubtitleStyle}
-        />
+        <LayoutSettings />
+        <FpsSettings />
+        <PlatformSettings />
+        <StyleSettings />
         <SplitSubtitlesButton
-          canSplit={isSubtitleUploaded}
           onSplitSubtitles={handleReflowAllSubtitles}
         />
       </div>

@@ -14,7 +14,6 @@ export default function App() {
   const audioFile = useAppStore((state) => state.audioFile);
   const isEditingMode = useAppStore((state) => state.isEditingMode);
 
-  const setEditingSession = useAppStore((state) => state.setEditingSession);
   const exitSubtitleEditingMode = useAppStore((state) => state.exitSubtitleEditingMode);
 
   const {
@@ -23,7 +22,6 @@ export default function App() {
     isPlaying,
     setIsPlaying,
     totalDuration,
-    currentEntry,
   } = usePlayback();
 
   /* 统一切换播放状态，让预览和 Waveform Timeline 共用同一套播放控制。 */
@@ -48,7 +46,6 @@ export default function App() {
         onPlayPause={handlePlayPause}
         onSetIsPlaying={setIsPlaying}
         onTimeUpdate={setCurrentTime}
-        onSessionChange={setEditingSession}
       />
     );
   }
@@ -65,7 +62,6 @@ export default function App() {
         />
 
         <PreviewPanel
-          currentEntry={currentEntry}
           currentTime={currentTime}
           totalDuration={totalDuration}
           isPlaying={isPlaying}

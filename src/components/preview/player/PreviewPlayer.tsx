@@ -1,4 +1,3 @@
-import { SrtEntry, SubtitleStyle } from '../../../types';
 import { useContainerSize } from '../hooks/useContainerSize';
 import { PlatformBottomOverlay, PlatformOverlay } from '../overlays/PlatformOverlay';
 import horizontalBg from '../preview-bg-horizontal.jpg';
@@ -6,12 +5,10 @@ import portraitBg from '../preview-bg-portrait.jpg';
 import { PlaybackControls } from './PlaybackControls';
 import { PreviewSubtitle } from './PreviewSubtitle';
 import { useI18n } from '../../../i18n';
-import { getRenderedSubtitleText } from '../../../utils';
+import { useAppStore } from '../../../store/useAppStore';
+import { getEntryAtTime, getRenderedSubtitleText } from '../../../utils';
 
 interface PreviewPlayerProps {
-  entries: SrtEntry[];
-  subtitleStyle: SubtitleStyle;
-  currentEntry?: SrtEntry;
   currentTime: number;
   totalDuration: number;
   isPlaying: boolean;
@@ -22,9 +19,6 @@ interface PreviewPlayerProps {
 }
 
 export function PreviewPlayer({
-  entries,
-  subtitleStyle,
-  currentEntry,
   currentTime,
   totalDuration,
   isPlaying,
@@ -34,11 +28,14 @@ export function PreviewPlayer({
   compact = false,
 }: PreviewPlayerProps) {
   const { t } = useI18n();
+  const entries = useAppStore((state) => state.workingTimeline);
+  const subtitleStyle = useAppStore((state) => state.subtitleStyle);
   const { ref: containerRef, width: containerWidth, height: containerHeight } = useContainerSize();
   const playerMaxWidth =
     subtitleStyle.orientation === 'landscape'
       ? compact ? '100%' : 'min(100%, calc(65vh * 16 / 9))'
       : compact ? '100%' : 'min(100%, calc(65vh * 9 / 16))';
+  const currentEntry = getEntryAtTime(entries, currentTime);
   const renderedText = getRenderedSubtitleText(currentEntry, subtitleStyle);
 
   return (
@@ -82,7 +79,6 @@ export function PreviewPlayer({
           >
             <PreviewSubtitle
               text={renderedText}
-              subtitleStyle={subtitleStyle}
               containerHeight={containerHeight}
             />
           </div>
@@ -97,7 +93,6 @@ export function PreviewPlayer({
 
       {showControls ? (
         <PlaybackControls
-          srtEntries={entries}
           currentTime={currentTime}
           totalDuration={totalDuration}
           isPlaying={isPlaying}

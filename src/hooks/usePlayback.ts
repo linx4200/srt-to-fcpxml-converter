@@ -127,20 +127,11 @@ export function usePlayback() {
     }
   }, []);
 
-  const currentEntry = useMemo(() => {
-    return srtEntries.find(
-      (entry, index) =>
-        currentTime >= entry.startSeconds &&
-        (currentTime < entry.endSeconds || (index === srtEntries.length - 1 && currentTime <= entry.endSeconds))
-    );
-  }, [srtEntries, currentTime]);
-
   return {
     currentTime,
     setCurrentTime: handleTimeUpdate,
     isPlaying,
     setIsPlaying,
     totalDuration,
-    currentEntry
   };
 }

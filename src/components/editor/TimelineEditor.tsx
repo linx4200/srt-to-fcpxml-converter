@@ -11,7 +11,7 @@ import {
 import { useAudioWaveform } from '../../hooks/useAudioWaveform';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
-import { EditingSessionState, SrtEntry } from '../../types';
+import { SrtEntry } from '../../types';
 import {
   cutSelectedClipAtPlayhead,
   deleteSelectedClip,
@@ -36,7 +36,6 @@ interface TimelineEditorProps {
   onPlayPause: () => void;
   onSetIsPlaying: (isPlaying: boolean) => void;
   onTimeUpdate: (time: number) => void;
-  onSessionChange: (session: EditingSessionState) => void;
 }
 
 type TrimState = {
@@ -52,15 +51,14 @@ export function TimelineEditor({
   onPlayPause,
   onSetIsPlaying,
   onTimeUpdate,
-  onSessionChange,
 }: TimelineEditorProps) {
   const { t } = useI18n();
 
   const exitSubtitleEditingMode = useAppStore((state) => state.exitSubtitleEditingMode);
   const subtitleStyle = useAppStore((state) => state.subtitleStyle);
   const entries = useAppStore((state) => state.workingTimeline);
-  const audioFile = useAppStore((state) => state.audioFile);
   const session = useAppStore((state) => state.editingSession);
+  const setEditingSession = useAppStore((state) => state.setEditingSession);
   const selectedClipId = useAppStore((state) => state.selectedClipId);
   const setSelectedClipId = useAppStore((state) => state.setSelectedClipId);
   const replaceWorkingTimeline = useAppStore((state) => state.replaceWorkingTimeline);
@@ -70,7 +68,7 @@ export function TimelineEditor({
   const [draftText, setDraftText] = useState('');
   const [trimState, setTrimState] = useState<TrimState>(null);
   const [isInteracting, setIsInteracting] = useState(false);
-  const { samples } = useAudioWaveform(audioFile);
+  const { samples } = useAudioWaveform();
 
   const pixelsPerSecond = BASE_PIXELS_PER_SECOND * session.zoom;
   const timelineWidth = Math.max(totalDuration, 0.1) * pixelsPerSecond + 120;
@@ -178,7 +176,7 @@ export function TimelineEditor({
     const viewport = viewportRef.current;
     if (!viewport) return;
 
-    onSessionChange({
+    setEditingSession({
       ...session,
       scrollLeft: viewport.scrollLeft,
     });
@@ -279,7 +277,7 @@ export function TimelineEditor({
   /* 调整 Waveform Timeline 缩放，并把倍率保存到编辑会话。 */
   const changeZoom = (delta: number) => {
     const nextZoom = Math.min(Math.max(session.zoom + delta, MIN_ZOOM), MAX_ZOOM);
-    onSessionChange({
+    setEditingSession({
       ...session,
       zoom: nextZoom,
     });
@@ -328,9 +326,6 @@ export function TimelineEditor({
               <span>{subtitleStyle.orientation === 'portrait' ? t('portrait') : t('landscape')}</span>
             </div>
             <PreviewPlayer
-              entries={entries}
-              subtitleStyle={subtitleStyle}
-              currentEntry={getEntryAtTime(entries, currentTime)}
               currentTime={currentTime}
               totalDuration={totalDuration}
               isPlaying={isPlaying}
