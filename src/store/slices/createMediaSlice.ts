@@ -7,8 +7,8 @@ export const createMediaSlice: AppSliceCreator<MediaSlice> = (set, get) => ({
   audioFile: null,
   /* 参考音频文件名初始为空，用于设置栏展示。 */
   audioFileName: '',
-  /* 参考音频 object URL 初始为空，由 setAudioFile 创建并由 clearAudio 释放。 */
-  audioUrl: '',
+  /* 参考音频 object URL 初始为 undefined，由 setAudioFile 创建并由 clearAudio 释放。 */
+  audioUrl: undefined,
   /* 保存字幕文件名，不读取或解析文件内容。 */
   setSubtitleFileName: (fileName) => set({ subtitleFileName: fileName }),
   /* 设置新参考音频前先释放旧 object URL，避免浏览器资源泄漏。 */

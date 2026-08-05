@@ -4,6 +4,9 @@
   --color-theme-primary: #ff637e;
   --color-theme-primary-soft: #ff7f95;
   --color-theme-primary-tint: #ff9aac;
+  --color-theme-bg: #0f0f0f;
+  --color-theme-text: #fff;
+  --color-theme-surface: #1a1a1a;
 }
 
 @layer utilities {

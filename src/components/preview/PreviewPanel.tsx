@@ -5,7 +5,6 @@ import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
 
 interface PreviewPanelProps {
-  srtEntries: SrtEntry[];
   currentEntry?: SrtEntry;
   currentTime: number;
   totalDuration: number;
@@ -16,7 +15,6 @@ interface PreviewPanelProps {
 
 /* 组织 Preview Workspace 的标题、进入 Subtitle Editing Mode 的入口和预览播放器。 */
 export function PreviewPanel({
-  srtEntries,
   currentEntry,
   currentTime,
   totalDuration,
@@ -29,6 +27,7 @@ export function PreviewPanel({
   const audioFile = useAppStore((state) => state.audioFile);
   const subtitleStyle = useAppStore((state) => state.subtitleStyle);
   const enterSubtitleEditingMode = useAppStore((state) => state.enterSubtitleEditingMode);
+  const srtEntries = useAppStore((state) => state.workingTimeline);
 
   const canEditTimeline = srtEntries.length > 0 && audioFile !== null;
 

@@ -30,7 +30,7 @@ export function Header() {
   };
 
   return (
-    <header className="min-h-14 border-b border-white/10 flex items-center justify-between px-6 py-3 bg-[#1a1a1a] shrink-0 gap-4 flex-wrap">
+    <header className="min-h-14 border-b border-white/10 flex items-center justify-between px-6 py-3 bg-theme-surface shrink-0 gap-4 flex-wrap">
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 bg-theme-primary rounded-lg flex items-center justify-center">
           <Type size={18} className="text-black" />

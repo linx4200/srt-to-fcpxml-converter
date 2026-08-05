@@ -30,18 +30,12 @@ const MAX_ZOOM = 4;
 const SHORT_CLIP_WIDTH = 150;
 
 interface TimelineEditorProps {
-  entries: SrtEntry[];
-  audioFile: File;
   currentTime: number;
   totalDuration: number;
   isPlaying: boolean;
-  selectedClipId: number | null;
-  session: EditingSessionState;
   onPlayPause: () => void;
   onSetIsPlaying: (isPlaying: boolean) => void;
   onTimeUpdate: (time: number) => void;
-  onEntriesChange: (entries: SrtEntry[]) => void;
-  onSelectedClipIdChange: (clipId: number | null) => void;
   onSessionChange: (session: EditingSessionState) => void;
 }
 
@@ -52,23 +46,24 @@ type TrimState = {
 
 /* 提供 Subtitle Editing Mode 的主工作区，集中处理 Waveform Timeline 的选择、编辑、切分、修剪和导航。 */
 export function TimelineEditor({
-  entries,
-  audioFile,
   currentTime,
   totalDuration,
   isPlaying,
-  selectedClipId,
-  session,
   onPlayPause,
   onSetIsPlaying,
   onTimeUpdate,
-  onEntriesChange,
-  onSelectedClipIdChange,
   onSessionChange,
 }: TimelineEditorProps) {
   const { t } = useI18n();
+
   const exitSubtitleEditingMode = useAppStore((state) => state.exitSubtitleEditingMode);
   const subtitleStyle = useAppStore((state) => state.subtitleStyle);
+  const entries = useAppStore((state) => state.workingTimeline);
+  const audioFile = useAppStore((state) => state.audioFile);
+  const session = useAppStore((state) => state.editingSession);
+  const selectedClipId = useAppStore((state) => state.selectedClipId);
+  const setSelectedClipId = useAppStore((state) => state.setSelectedClipId);
+  const replaceWorkingTimeline = useAppStore((state) => state.replaceWorkingTimeline);
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const [editingClipId, setEditingClipId] = useState<number | null>(null);
@@ -119,7 +114,7 @@ export function TimelineEditor({
       const rect = viewport.getBoundingClientRect();
       const x = event.clientX - rect.left + viewport.scrollLeft - 60;
       const time = Math.max(x / pixelsPerSecond, 0);
-      onEntriesChange(trimClipBoundary(entries, trimState.clipId, trimState.edge, time, subtitleStyle.fps));
+      replaceWorkingTimeline(trimClipBoundary(entries, trimState.clipId, trimState.edge, time, subtitleStyle.fps));
       setIsInteracting(true);
     };
 
@@ -136,7 +131,7 @@ export function TimelineEditor({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [entries, onEntriesChange, pixelsPerSecond, subtitleStyle.fps, trimState]);
+  }, [entries, replaceWorkingTimeline, pixelsPerSecond, subtitleStyle.fps, trimState]);
 
   useEffect(() => {
     /* 管理编辑模式快捷键：Escape 退出/取消，Delete/Backspace 删除当前 Clip Selection。 */
@@ -174,9 +169,9 @@ export function TimelineEditor({
 
   useEffect(() => {
     if (selectedClipId && !entries.some((entry) => entry.id === selectedClipId)) {
-      onSelectedClipIdChange(getEntryAtTime(entries, currentTime)?.id ?? null);
+      setSelectedClipId(getEntryAtTime(entries, currentTime)?.id ?? null);
     }
-  }, [currentTime, entries, onSelectedClipIdChange, selectedClipId]);
+  }, [currentTime, entries, setSelectedClipId, selectedClipId]);
 
   /* 保存 Waveform Timeline 的横向滚动位置，便于下次进入 Subtitle Editing Mode 恢复视口。 */
   const handleViewportScroll = () => {
@@ -203,7 +198,7 @@ export function TimelineEditor({
   /* 双击 Subtitle Clip 时进入 Inline Clip Editing，并暂停播放避免文本编辑被播放跟随打断。 */
   const handleEnterEditing = (clip: SrtEntry) => {
     onSetIsPlaying(false);
-    onSelectedClipIdChange(clip.id);
+    setSelectedClipId(clip.id);
     setEditingClipId(clip.id);
     setDraftText(clip.text);
   };
@@ -219,7 +214,7 @@ export function TimelineEditor({
       return;
     }
 
-    onEntriesChange(updateClipText(entries, editingClipId, nextText));
+    replaceWorkingTimeline(updateClipText(entries, editingClipId, nextText));
     setEditingClipId(null);
     setDraftText('');
   };
@@ -241,8 +236,8 @@ export function TimelineEditor({
   /* 删除当前 Clip Selection，并清理本地编辑草稿。 */
   const handleDeleteSelected = () => {
     if (selectedClipId === null) return;
-    onEntriesChange(deleteSelectedClip(entries, selectedClipId));
-    onSelectedClipIdChange(null);
+    replaceWorkingTimeline(deleteSelectedClip(entries, selectedClipId));
+    setSelectedClipId(null);
     setEditingClipId(null);
     setDraftText('');
   };
@@ -252,8 +247,8 @@ export function TimelineEditor({
     if (!selectedClip) return;
     const baseId = entries.reduce((maxId, entry) => Math.max(maxId, entry.id), 0);
     const nextEntries = splitSelectedClipByLines(entries, selectedClip.id, subtitleStyle);
-    onEntriesChange(nextEntries);
-    onSelectedClipIdChange(baseId + 2);
+    replaceWorkingTimeline(nextEntries);
+    setSelectedClipId(baseId + 2);
   };
 
   /* 在当前 playhead 位置执行 Playhead Cut，生成两个新的 Subtitle Clips。 */
@@ -261,8 +256,8 @@ export function TimelineEditor({
     if (!selectedClip) return;
     const baseId = entries.reduce((maxId, entry) => Math.max(maxId, entry.id), 0);
     const nextEntries = cutSelectedClipAtPlayhead(entries, selectedClip.id, currentTime, subtitleStyle);
-    onEntriesChange(nextEntries);
-    onSelectedClipIdChange(baseId + 2);
+    replaceWorkingTimeline(nextEntries);
+    setSelectedClipId(baseId + 2);
   };
 
   /* 跳转到当前 playhead 之前最近的 Subtitle Clip，并同步 Clip Selection。 */
@@ -270,7 +265,7 @@ export function TimelineEditor({
     const previousClip = entries.slice().reverse().find((entry) => entry.startSeconds < currentTime - 0.5);
     if (!previousClip) return;
     onTimeUpdate(previousClip.startSeconds);
-    onSelectedClipIdChange(previousClip.id);
+    setSelectedClipId(previousClip.id);
   };
 
   /* 跳转到当前 playhead 之后最近的 Subtitle Clip，并同步 Clip Selection。 */
@@ -278,7 +273,7 @@ export function TimelineEditor({
     const nextClip = entries.find((entry) => entry.startSeconds > currentTime + 0.1);
     if (!nextClip) return;
     onTimeUpdate(nextClip.startSeconds);
-    onSelectedClipIdChange(nextClip.id);
+    setSelectedClipId(nextClip.id);
   };
 
   /* 调整 Waveform Timeline 缩放，并把倍率保存到编辑会话。 */
@@ -548,7 +543,7 @@ export function TimelineEditor({
                           <div
                             onClick={(event) => {
                               event.stopPropagation();
-                              onSelectedClipIdChange(entry.id);
+                              setSelectedClipId(entry.id);
                             }}
                             onDoubleClick={(event) => {
                               event.stopPropagation();

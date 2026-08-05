@@ -10,15 +10,10 @@ import { useAppStore } from './store/useAppStore';
 
 export default function App() {
   const { language } = useI18n();
-  const workingTimeline = useAppStore((state) => state.workingTimeline);
-  const style = useAppStore((state) => state.style);
+
   const audioFile = useAppStore((state) => state.audioFile);
-  const audioUrl = useAppStore((state) => state.audioUrl);
   const isEditingMode = useAppStore((state) => state.isEditingMode);
-  const selectedClipId = useAppStore((state) => state.selectedClipId);
-  const editingSession = useAppStore((state) => state.editingSession);
-  const replaceWorkingTimeline = useAppStore((state) => state.replaceWorkingTimeline);
-  const setSelectedClipId = useAppStore((state) => state.setSelectedClipId);
+
   const setEditingSession = useAppStore((state) => state.setEditingSession);
   const exitSubtitleEditingMode = useAppStore((state) => state.exitSubtitleEditingMode);
 
@@ -29,7 +24,7 @@ export default function App() {
     setIsPlaying,
     totalDuration,
     currentEntry,
-  } = usePlayback(workingTimeline, audioUrl);
+  } = usePlayback();
 
   /* 统一切换播放状态，让预览和 Waveform Timeline 共用同一套播放控制。 */
   const handlePlayPause = () => setIsPlaying(!isPlaying);
@@ -47,26 +42,19 @@ export default function App() {
   if (isEditingMode && audioFile) {
     return (
       <TimelineEditor
-        entries={workingTimeline}
-        style={style}
-        audioFile={audioFile}
         currentTime={currentTime}
         totalDuration={totalDuration}
         isPlaying={isPlaying}
-        selectedClipId={selectedClipId}
-        session={editingSession}
         onPlayPause={handlePlayPause}
         onSetIsPlaying={setIsPlaying}
         onTimeUpdate={setCurrentTime}
-        onEntriesChange={replaceWorkingTimeline}
-        onSelectedClipIdChange={setSelectedClipId}
         onSessionChange={setEditingSession}
       />
     );
   }
 
   return (
-    <div className="h-screen w-screen bg-[#0f0f0f] text-white flex flex-col overflow-hidden font-sans">
+    <div className="h-screen w-screen bg-theme-bg text-theme-text flex flex-col overflow-hidden font-sans">
       <Header />
 
       <main className="flex-1 flex overflow-hidden">
@@ -77,8 +65,6 @@ export default function App() {
         />
 
         <PreviewPanel
-          srtEntries={workingTimeline}
-          style={style}
           currentEntry={currentEntry}
           currentTime={currentTime}
           totalDuration={totalDuration}

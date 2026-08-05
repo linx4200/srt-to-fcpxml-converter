@@ -1,12 +1,16 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { SrtEntry } from '../types';
+import { useAppStore } from '../store/useAppStore';
 
-export function usePlayback(srtEntries: SrtEntry[], audioUrl?: string) {
+export function usePlayback() {
 
   // 实时播放状态保留在 hook 内：currentTime 会随动画帧高频变化，并且需要和浏览器 Audio 元素同步。
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioDuration, setAudioDuration] = useState(0);
+
+  const audioUrl = useAppStore((state) => state.audioUrl);
+  const srtEntries = useAppStore((state) => state.workingTimeline);
+
   const playbackRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 

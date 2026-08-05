@@ -33,7 +33,7 @@ export interface MediaSlice {
   /* 参考音频文件名，用于设置栏展示。 */
   audioFileName: string;
   /* 参考音频的浏览器 object URL，生命周期由 media slice 负责释放。 */
-  audioUrl: string;
+  audioUrl?: string;
   /* 记录当前字幕文件名。 */
   setSubtitleFileName: (fileName: string) => void;
   /* 设置参考音频，并替换/释放旧的 object URL。 */
