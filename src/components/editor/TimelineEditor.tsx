@@ -11,7 +11,7 @@ import {
 import { useAudioWaveform } from '../../hooks/useAudioWaveform';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
-import { EditingSessionState, SrtEntry, SubtitleStyle } from '../../types';
+import { EditingSessionState, SrtEntry } from '../../types';
 import {
   cutSelectedClipAtPlayhead,
   deleteSelectedClip,
@@ -31,7 +31,6 @@ const SHORT_CLIP_WIDTH = 150;
 
 interface TimelineEditorProps {
   entries: SrtEntry[];
-  style: SubtitleStyle;
   audioFile: File;
   currentTime: number;
   totalDuration: number;
@@ -54,7 +53,6 @@ type TrimState = {
 /* 提供 Subtitle Editing Mode 的主工作区，集中处理 Waveform Timeline 的选择、编辑、切分、修剪和导航。 */
 export function TimelineEditor({
   entries,
-  style,
   audioFile,
   currentTime,
   totalDuration,
@@ -70,6 +68,8 @@ export function TimelineEditor({
 }: TimelineEditorProps) {
   const { t } = useI18n();
   const exitSubtitleEditingMode = useAppStore((state) => state.exitSubtitleEditingMode);
+  const subtitleStyle = useAppStore((state) => state.subtitleStyle);
+
   const viewportRef = useRef<HTMLDivElement>(null);
   const [editingClipId, setEditingClipId] = useState<number | null>(null);
   const [draftText, setDraftText] = useState('');
@@ -80,7 +80,7 @@ export function TimelineEditor({
   const pixelsPerSecond = BASE_PIXELS_PER_SECOND * session.zoom;
   const timelineWidth = Math.max(totalDuration, 0.1) * pixelsPerSecond + 120;
   const selectedClip = selectedClipId ? entries.find((entry) => entry.id === selectedClipId) ?? null : null;
-  const selectedClipLines = selectedClip ? getLogicalPreviewLines(selectedClip.text, style) : [];
+  const selectedClipLines = selectedClip ? getLogicalPreviewLines(selectedClip.text, subtitleStyle) : [];
   const canSplitByLines = Boolean(selectedClip && selectedClipLines.length === 2 && editingClipId === null);
   const canCutAtPlayhead = Boolean(
     selectedClip &&
@@ -119,7 +119,7 @@ export function TimelineEditor({
       const rect = viewport.getBoundingClientRect();
       const x = event.clientX - rect.left + viewport.scrollLeft - 60;
       const time = Math.max(x / pixelsPerSecond, 0);
-      onEntriesChange(trimClipBoundary(entries, trimState.clipId, trimState.edge, time, style.fps));
+      onEntriesChange(trimClipBoundary(entries, trimState.clipId, trimState.edge, time, subtitleStyle.fps));
       setIsInteracting(true);
     };
 
@@ -136,7 +136,7 @@ export function TimelineEditor({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [entries, onEntriesChange, pixelsPerSecond, style.fps, trimState]);
+  }, [entries, onEntriesChange, pixelsPerSecond, subtitleStyle.fps, trimState]);
 
   useEffect(() => {
     /* 管理编辑模式快捷键：Escape 退出/取消，Delete/Backspace 删除当前 Clip Selection。 */
@@ -251,7 +251,7 @@ export function TimelineEditor({
   const handleSplitByLines = () => {
     if (!selectedClip) return;
     const baseId = entries.reduce((maxId, entry) => Math.max(maxId, entry.id), 0);
-    const nextEntries = splitSelectedClipByLines(entries, selectedClip.id, style);
+    const nextEntries = splitSelectedClipByLines(entries, selectedClip.id, subtitleStyle);
     onEntriesChange(nextEntries);
     onSelectedClipIdChange(baseId + 2);
   };
@@ -260,7 +260,7 @@ export function TimelineEditor({
   const handleCutAtPlayhead = () => {
     if (!selectedClip) return;
     const baseId = entries.reduce((maxId, entry) => Math.max(maxId, entry.id), 0);
-    const nextEntries = cutSelectedClipAtPlayhead(entries, selectedClip.id, currentTime, style);
+    const nextEntries = cutSelectedClipAtPlayhead(entries, selectedClip.id, currentTime, subtitleStyle);
     onEntriesChange(nextEntries);
     onSelectedClipIdChange(baseId + 2);
   };
@@ -330,11 +330,11 @@ export function TimelineEditor({
           <div className="rounded-3xl border border-white/10 bg-white/4 p-3">
             <div className="mb-3 flex items-center justify-between text-[10px] uppercase tracking-[0.24em] text-white/35">
               <span>{t('editingPreview')}</span>
-              <span>{style.orientation === 'portrait' ? t('portrait') : t('landscape')}</span>
+              <span>{subtitleStyle.orientation === 'portrait' ? t('portrait') : t('landscape')}</span>
             </div>
             <PreviewPlayer
               entries={entries}
-              style={style}
+              subtitleStyle={subtitleStyle}
               currentEntry={getEntryAtTime(entries, currentTime)}
               currentTime={currentTime}
               totalDuration={totalDuration}

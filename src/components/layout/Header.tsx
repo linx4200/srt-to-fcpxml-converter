@@ -9,14 +9,14 @@ const GITHUB_REPO_URL = 'https://github.com/linx4200/srt-to-fcpxml-converter';
 export function Header() {
   const { language, setLanguage, t } = useI18n();
   const workingTimeline = useAppStore((state) => state.workingTimeline);
-  const style = useAppStore((state) => state.style);
+  const subtitleStyle = useAppStore((state) => state.subtitleStyle);
   const subtitleFileName = useAppStore((state) => state.subtitleFileName);
   const canExport = workingTimeline.length > 0;
 
   const downloadFcpxml = () => {
     if (!canExport) return;
 
-    const xml = generateFcpxml(workingTimeline, style);
+    const xml = generateFcpxml(workingTimeline, subtitleStyle);
     const blob = new Blob([xml], { type: 'application/xml' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');

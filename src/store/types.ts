@@ -4,11 +4,11 @@ import type { EditingSessionState, SrtEntry, SubtitleStyle } from '../types';
 export interface TimelineSlice {
   /* 当前 Working Timeline，是预览、编辑、Subtitle Reflow 和导出的单一事实来源。 */
   workingTimeline: SrtEntry[];
-  /* 导入 SRT 文本并按当前 style 生成初始 Working Timeline。 */
+  /* 导入 SRT 文本并按当前 SubtitleStyle 生成初始 Working Timeline。 */
   importSrtContent: (content: string) => void;
   /* 用结构性编辑后的 Subtitle Clips 替换整个 Working Timeline。 */
   replaceWorkingTimeline: (entries: SrtEntry[]) => void;
-  /* 基于当前 style 对 Working Timeline 执行 Subtitle Reflow。 */
+  /* 基于当前 SubtitleStyle 对 Working Timeline 执行 Subtitle Reflow。 */
   reflowWorkingTimeline: () => void;
   /* 清空 Working Timeline，通常用于清空项目。 */
   clearWorkingTimeline: () => void;
@@ -16,13 +16,13 @@ export interface TimelineSlice {
 
 export interface StyleSlice {
   /* 字幕样式和导出参数，供预览、Subtitle Reflow 与 FCPXML 生成共享。 */
-  style: SubtitleStyle;
-  /* 整体替换字幕样式，适合组件已持有完整 style 时调用。 */
-  setStyle: (style: SubtitleStyle) => void;
+  subtitleStyle: SubtitleStyle;
+  /* 整体替换字幕样式，适合组件已持有完整 SubtitleStyle 时调用。 */
+  setSubtitleStyle: (subtitleStyle: SubtitleStyle) => void;
   /* 局部更新字幕样式，适合只改一个或几个字段的交互。 */
-  updateStyle: (style: Partial<SubtitleStyle>) => void;
+  updateSubtitleStyle: (subtitleStyle: Partial<SubtitleStyle>) => void;
   /* 恢复默认字幕样式和导出参数。 */
-  resetStyle: () => void;
+  resetSubtitleStyle: () => void;
 }
 
 export interface MediaSlice {

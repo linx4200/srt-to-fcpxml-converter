@@ -26,17 +26,17 @@ export const INITIAL_STYLE: SubtitleStyle = {
 
 export const createStyleSlice: AppSliceCreator<StyleSlice> = (set) => ({
   /* 当前字幕样式和导出参数。 */
-  style: INITIAL_STYLE,
-  /* 直接替换完整 style，供设置面板聚合字段更新时使用。 */
-  setStyle: (style) => set({ style }),
-  /* 合并局部 style 更新，避免调用方重复展开完整对象。 */
-  updateStyle: (style) =>
+  subtitleStyle: INITIAL_STYLE,
+  /* 直接替换完整 SubtitleStyle，供设置面板聚合字段更新时使用。 */
+  setSubtitleStyle: (subtitleStyle) => set({ subtitleStyle }),
+  /* 合并局部 SubtitleStyle 更新，避免调用方重复展开完整对象。 */
+  updateSubtitleStyle: (subtitleStyle) =>
     set((state) => ({
-      style: {
-        ...state.style,
-        ...style,
+      subtitleStyle: {
+        ...state.subtitleStyle,
+        ...subtitleStyle,
       },
     })),
-  /* 恢复默认 style。 */
-  resetStyle: () => set({ style: INITIAL_STYLE }),
+  /* 恢复默认 SubtitleStyle。 */
+  resetSubtitleStyle: () => set({ subtitleStyle: INITIAL_STYLE }),
 });

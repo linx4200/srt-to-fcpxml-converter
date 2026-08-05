@@ -10,7 +10,7 @@ import { getRenderedSubtitleText } from '../../../utils';
 
 interface PreviewPlayerProps {
   entries: SrtEntry[];
-  style: SubtitleStyle;
+  subtitleStyle: SubtitleStyle;
   currentEntry?: SrtEntry;
   currentTime: number;
   totalDuration: number;
@@ -23,7 +23,7 @@ interface PreviewPlayerProps {
 
 export function PreviewPlayer({
   entries,
-  style,
+  subtitleStyle,
   currentEntry,
   currentTime,
   totalDuration,
@@ -36,10 +36,10 @@ export function PreviewPlayer({
   const { t } = useI18n();
   const { ref: containerRef, width: containerWidth, height: containerHeight } = useContainerSize();
   const playerMaxWidth =
-    style.orientation === 'landscape'
+    subtitleStyle.orientation === 'landscape'
       ? compact ? '100%' : 'min(100%, calc(65vh * 16 / 9))'
       : compact ? '100%' : 'min(100%, calc(65vh * 9 / 16))';
-  const renderedText = getRenderedSubtitleText(currentEntry, style);
+  const renderedText = getRenderedSubtitleText(currentEntry, subtitleStyle);
 
   return (
     <div className={`flex flex-col items-center justify-center shrink-0 w-full ${compact ? 'px-0 mt-0' : 'xl:flex-1 mt-12 xl:mt-0 px-2 lg:px-4'}`}>
@@ -54,20 +54,20 @@ export function PreviewPlayer({
           ref={containerRef}
           className="relative bg-zinc-900 shrink-0 w-full"
           style={{
-            aspectRatio: style.orientation === 'portrait' ? '9/16' : '16/9',
+            aspectRatio: subtitleStyle.orientation === 'portrait' ? '9/16' : '16/9',
           }}
         >
           <div className="absolute inset-0 overflow-hidden">
             <img
-              src={style.orientation === 'portrait' ? portraitBg : horizontalBg}
+              src={subtitleStyle.orientation === 'portrait' ? portraitBg : horizontalBg}
               alt={t('previewBackgroundAlt')}
               className="w-full h-full object-cover"
             />
           </div>
 
           <PlatformOverlay
-            platform={style.platform}
-            orientation={style.orientation}
+            platform={subtitleStyle.platform}
+            orientation={subtitleStyle.orientation}
             containerWidth={containerWidth}
             currentTime={currentTime}
             totalDuration={totalDuration}
@@ -77,20 +77,20 @@ export function PreviewPlayer({
             className="absolute left-0 right-0 flex justify-center"
             style={{
               // 72% 而不是 xml 里的 75% 是因为这是根据实际 fcp 里调整的
-              top: style.orientation === 'portrait' ? '72%' : '85%',
+              top: subtitleStyle.orientation === 'portrait' ? '72%' : '85%',
             }}
           >
             <PreviewSubtitle
               text={renderedText}
-              style={style}
+              subtitleStyle={subtitleStyle}
               containerHeight={containerHeight}
             />
           </div>
         </div>
 
         <PlatformBottomOverlay
-          platform={style.platform}
-          orientation={style.orientation}
+          platform={subtitleStyle.platform}
+          orientation={subtitleStyle.orientation}
           containerWidth={containerWidth}
         />
       </div>

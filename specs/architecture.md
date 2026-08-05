@@ -30,7 +30,7 @@
 store 主要维护以下状态：
 
 - 当前 Working Timeline `workingTimeline`。
-- 字幕样式与导出参数 `style`。
+- 字幕样式与导出参数 `subtitleStyle`。
 - 参考音频文件与浏览器 object URL。
 - Subtitle Editing Mode、Clip Selection 和编辑会话状态。
 

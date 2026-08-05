@@ -1,12 +1,11 @@
 import { Eye, Waves } from 'lucide-react';
-import { SrtEntry, SubtitleStyle } from '../../types';
+import { SrtEntry } from '../../types';
 import { PreviewPlayer } from './player/PreviewPlayer';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
 
 interface PreviewPanelProps {
   srtEntries: SrtEntry[];
-  style: SubtitleStyle;
   currentEntry?: SrtEntry;
   currentTime: number;
   totalDuration: number;
@@ -18,7 +17,6 @@ interface PreviewPanelProps {
 /* 组织 Preview Workspace 的标题、进入 Subtitle Editing Mode 的入口和预览播放器。 */
 export function PreviewPanel({
   srtEntries,
-  style,
   currentEntry,
   currentTime,
   totalDuration,
@@ -26,9 +24,12 @@ export function PreviewPanel({
   onPlayPause,
   onTimeUpdate,
 }: PreviewPanelProps) {
+
   const { t } = useI18n();
   const audioFile = useAppStore((state) => state.audioFile);
+  const subtitleStyle = useAppStore((state) => state.subtitleStyle);
   const enterSubtitleEditingMode = useAppStore((state) => state.enterSubtitleEditingMode);
+
   const canEditTimeline = srtEntries.length > 0 && audioFile !== null;
 
   /* 进入 Subtitle Editing Mode，并在有历史会话时恢复上次保存的 playhead。 */
@@ -65,7 +66,7 @@ export function PreviewPanel({
 
       <PreviewPlayer
         entries={srtEntries}
-        style={style}
+        subtitleStyle={subtitleStyle}
         currentEntry={currentEntry}
         currentTime={currentTime}
         totalDuration={totalDuration}

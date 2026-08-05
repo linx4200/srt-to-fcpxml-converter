@@ -3,36 +3,36 @@ import { SubtitleStyle } from '../../types';
 import { useI18n } from '../../i18n';
 
 interface StyleSettingsProps {
-  style: SubtitleStyle;
-  onChange: (style: SubtitleStyle) => void;
+  subtitleStyle: SubtitleStyle;
+  onChange: (subtitleStyle: SubtitleStyle) => void;
 }
 
 const MIN_FONT_SIZE = 20;
 const MAX_FONT_SIZE = 80;
 
-export function StyleSettings({ style, onChange }: StyleSettingsProps) {
+export function StyleSettings({ subtitleStyle, onChange }: StyleSettingsProps) {
   const { t } = useI18n();
-  const [fontSizeInput, setFontSizeInput] = useState(String(style.fontSize));
+  const [fontSizeInput, setFontSizeInput] = useState(String(subtitleStyle.fontSize));
 
   useEffect(() => {
-    setFontSizeInput(String(style.fontSize));
-  }, [style.fontSize]);
+    setFontSizeInput(String(subtitleStyle.fontSize));
+  }, [subtitleStyle.fontSize]);
 
   const updateFontSize = (fontSize: number) => {
     const nextFontSize = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, fontSize));
-    onChange({ ...style, fontSize: nextFontSize });
+    onChange({ ...subtitleStyle, fontSize: nextFontSize });
     return nextFontSize;
   };
 
   const commitFontSizeInput = (value: string) => {
     if (value.trim() === '') {
-      setFontSizeInput(String(style.fontSize));
+      setFontSizeInput(String(subtitleStyle.fontSize));
       return;
     }
 
     const parsedValue = parseInt(value, 10);
     if (Number.isNaN(parsedValue)) {
-      setFontSizeInput(String(style.fontSize));
+      setFontSizeInput(String(subtitleStyle.fontSize));
       return;
     }
 
@@ -74,7 +74,7 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
             min={MIN_FONT_SIZE}
             max={MAX_FONT_SIZE}
             step="1"
-            value={style.fontSize}
+            value={subtitleStyle.fontSize}
             onChange={(e) => {
               const nextValue = parseInt(e.target.value, 10);
               const nextFontSize = updateFontSize(nextValue);
@@ -89,8 +89,8 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
           <span className="text-sm text-white/60">{t('textColor')}</span>
           <input
             type="color"
-            value={style.textColor}
-            onChange={(e) => onChange({ ...style, textColor: e.target.value })}
+            value={subtitleStyle.textColor}
+            onChange={(e) => onChange({ ...subtitleStyle, textColor: e.target.value })}
             className="w-8 h-8 rounded-lg bg-transparent border-none cursor-pointer"
           />
         </div>
@@ -99,8 +99,8 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
           <span className="text-sm text-white/60">Background</span>
           <input
             type="color"
-            value={style.backgroundColor}
-            onChange={(e) => onChange({ ...style, backgroundColor: e.target.value })}
+            value={subtitleStyle.backgroundColor}
+            onChange={(e) => onChange({ ...subtitleStyle, backgroundColor: e.target.value })}
             className="w-8 h-8 rounded-lg bg-transparent border-none cursor-pointer"
           />
         </div>
@@ -112,15 +112,15 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-white/40">
             <span>Opacity</span>
-            <span>{Math.round(style.backgroundOpacity * 100)}%</span>
+            <span>{Math.round(subtitleStyle.backgroundOpacity * 100)}%</span>
           </div>
           <input
             type="range"
             min="0"
             max="1"
             step="0.1"
-            value={style.backgroundOpacity}
-            onChange={(e) => onChange({ ...style, backgroundOpacity: parseFloat(e.target.value) })}
+            value={subtitleStyle.backgroundOpacity}
+            onChange={(e) => onChange({ ...subtitleStyle, backgroundOpacity: parseFloat(e.target.value) })}
             className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
           />
         </div>
@@ -128,14 +128,14 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-white/40">
             <span>Corner Radius</span>
-            <span>{style.borderRadius}px</span>
+            <span>{subtitleStyle.borderRadius}px</span>
           </div>
           <input
             type="range"
             min="0"
             max="40"
-            value={style.borderRadius}
-            onChange={(e) => onChange({ ...style, borderRadius: parseInt(e.target.value) })}
+            value={subtitleStyle.borderRadius}
+            onChange={(e) => onChange({ ...subtitleStyle, borderRadius: parseInt(e.target.value) })}
             className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
           />
         </div>
@@ -144,28 +144,28 @@ export function StyleSettings({ style, onChange }: StyleSettingsProps) {
           <div className="space-y-2">
             <div className="flex justify-between text-xs text-white/40">
               <span>Padding X</span>
-              <span>{style.paddingX}px</span>
+              <span>{subtitleStyle.paddingX}px</span>
             </div>
             <input
               type="range"
               min="0"
               max="60"
-              value={style.paddingX}
-              onChange={(e) => onChange({ ...style, paddingX: parseInt(e.target.value) })}
+              value={subtitleStyle.paddingX}
+              onChange={(e) => onChange({ ...subtitleStyle, paddingX: parseInt(e.target.value) })}
               className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
             />
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-xs text-white/40">
               <span>Padding Y</span>
-              <span>{style.paddingY}px</span>
+              <span>{subtitleStyle.paddingY}px</span>
             </div>
             <input
               type="range"
               min="0"
               max="40"
-              value={style.paddingY}
-              onChange={(e) => onChange({ ...style, paddingY: parseInt(e.target.value) })}
+              value={subtitleStyle.paddingY}
+              onChange={(e) => onChange({ ...subtitleStyle, paddingY: parseInt(e.target.value) })}
               className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
             />
           </div>

@@ -37,7 +37,7 @@ Rejected because it would add provider/reducer boilerplate without clear advanta
 
 ### Use multiple independent zustand stores
 
-Rejected because Working Timeline, style, media, and editing state have real cross-domain workflows such as clearing the project, Subtitle Reflow, and entering Subtitle Editing Mode. Independent stores would scatter those workflows.
+Rejected because Working Timeline, subtitle style, media, and editing state have real cross-domain workflows such as clearing the project, Subtitle Reflow, and entering Subtitle Editing Mode. Independent stores would scatter those workflows.
 
 ## Consequences
 

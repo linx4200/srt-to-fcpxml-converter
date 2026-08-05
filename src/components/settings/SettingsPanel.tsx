@@ -24,9 +24,9 @@ export function SettingsPanel({
 }: SettingsPanelProps) {
   const { t } = useI18n();
   const workingTimeline = useAppStore((state) => state.workingTimeline);
-  const style = useAppStore((state) => state.style);
+  const subtitleStyle = useAppStore((state) => state.subtitleStyle);
   const audioFileName = useAppStore((state) => state.audioFileName);
-  const setStyle = useAppStore((state) => state.setStyle);
+  const setSubtitleStyle = useAppStore((state) => state.setSubtitleStyle);
   const setAudioFile = useAppStore((state) => state.setAudioFile);
   const clearProject = useAppStore((state) => state.clearProject);
   const importSubtitleFile = useAppStore((state) => state.importSubtitleFile);
@@ -100,20 +100,20 @@ export function SettingsPanel({
           onClear={handleAudioClear}
         />
         <LayoutSettings
-          orientation={style.orientation}
-          onChange={(orientation) => setStyle({ ...style, orientation })}
+          orientation={subtitleStyle.orientation}
+          onChange={(orientation) => setSubtitleStyle({ ...subtitleStyle, orientation })}
         />
         <FpsSettings
-          fps={style.fps}
-          onChange={(fps) => setStyle({ ...style, fps })}
+          fps={subtitleStyle.fps}
+          onChange={(fps) => setSubtitleStyle({ ...subtitleStyle, fps })}
         />
         <PlatformSettings
-          platform={style.platform}
-          onChange={(platform) => setStyle({ ...style, platform })}
+          platform={subtitleStyle.platform}
+          onChange={(platform) => setSubtitleStyle({ ...subtitleStyle, platform })}
         />
         <StyleSettings
-          style={style}
-          onChange={setStyle}
+          subtitleStyle={subtitleStyle}
+          onChange={setSubtitleStyle}
         />
         <SplitSubtitlesButton
           canSplit={isSubtitleUploaded}
