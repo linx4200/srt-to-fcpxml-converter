@@ -1,6 +1,7 @@
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { useI18n } from '../../../i18n';
 import { useAppStore } from '../../../store/useAppStore';
+import { deleteClipAndExtendPrevious, updateClipText } from '../../../utils';
 
 interface EditableSubtitleTimelineProps {
   currentTime: number;
@@ -13,11 +14,14 @@ export function EditableSubtitleTimeline({
   onTimeClick,
 }: EditableSubtitleTimelineProps) {
   const { t } = useI18n();
+
   const entries = useAppStore((state) => state.workingTimeline);
   const replaceWorkingTimeline = useAppStore((state) => state.replaceWorkingTimeline);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  const [editingClipId, setEditingClipId] = useState<number | null>(null);
   const [draftText, setDraftText] = useState('');
 
   /* 根据当前播放时间定位正在显示的 Subtitle Clip。 */
@@ -58,21 +62,22 @@ export function EditableSubtitleTimeline({
   };
 
   /* 开始编辑指定 Subtitle Clip，并把现有文本复制到本地草稿。 */
-  const beginEditing = (index: number) => {
-    setEditingIndex(index);
-    setDraftText(entries[index]?.text ?? '');
+  const beginEditing = (clipId: number) => {
+    const clip = entries.find((entry) => entry.id === clipId);
+    setEditingClipId(clipId);
+    setDraftText(clip?.text ?? '');
   };
 
   /* 取消本地草稿，不修改 Working Timeline。 */
   const cancelEditing = () => {
-    setEditingIndex(null);
+    setEditingClipId(null);
     setDraftText('');
   };
 
   /* 提交轻量文本编辑；空文本需要确认后删除并延长前一个 Subtitle Clip。 */
-  const commitEditing = (index: number) => {
-    const entry = entries[index];
-    if (!entry) {
+  const commitEditing = (clipId: number) => {
+    const clip = entries.find((entry) => entry.id === clipId);
+    if (!clip) {
       cancelEditing();
       return;
     }
@@ -81,36 +86,24 @@ export function EditableSubtitleTimeline({
     if (nextText.length === 0) {
       const shouldDelete = window.confirm(t('deleteLineConfirm'));
       if (!shouldDelete) {
-        setDraftText(entry.text);
+        setDraftText(clip.text);
         return;
       }
 
-      const nextEntries = [...entries];
-      if (index > 0) {
-        nextEntries[index - 1] = {
-          ...nextEntries[index - 1],
-          endSeconds: entry.endSeconds,
-          endTime: entry.endTime,
-        };
-      }
-      nextEntries.splice(index, 1);
-      replaceWorkingTimeline(nextEntries);
+      replaceWorkingTimeline(deleteClipAndExtendPrevious(entries, clipId));
       cancelEditing();
       return;
     }
 
-    const nextEntries = entries.map((item, itemIndex) =>
-      itemIndex === index ? { ...item, text: nextText } : item
-    );
-    replaceWorkingTimeline(nextEntries);
+    replaceWorkingTimeline(updateClipText(entries, clipId, nextText));
     cancelEditing();
   };
 
   /* Enter 提交当前文本，Escape 放弃当前草稿。 */
-  const handleEditorKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>, index: number) => {
+  const handleEditorKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>, clipId: number) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      commitEditing(index);
+      commitEditing(clipId);
       return;
     }
 
@@ -144,7 +137,7 @@ export function EditableSubtitleTimeline({
 
           return (
             <div
-              key={index}
+              key={entry.id}
               ref={isActive ? activeRef : null}
               onClick={() => onTimeClick(entry.startSeconds)}
               className={`group flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all duration-500 ease-out ${
@@ -161,13 +154,13 @@ export function EditableSubtitleTimeline({
                 {formatTime(entry.startSeconds)}
               </div>
 
-              {editingIndex === index ? (
+              {editingClipId === entry.id ? (
                 <textarea
                   value={draftText}
                   onChange={(event) => setDraftText(event.target.value)}
                   onClick={(event) => event.stopPropagation()}
-                  onBlur={() => commitEditing(index)}
-                  onKeyDown={(event) => handleEditorKeyDown(event, index)}
+                  onBlur={() => commitEditing(entry.id)}
+                  onKeyDown={(event) => handleEditorKeyDown(event, entry.id)}
                   autoFocus
                   rows={1}
                   className="flex-1 resize-none overflow-hidden rounded-lg border border-theme-primary-soft/30 bg-black/20 px-2 py-1 text-[13px] leading-snug text-white outline-none"
@@ -176,7 +169,7 @@ export function EditableSubtitleTimeline({
                 <button
                   type="button"
                   onClick={() => {
-                    beginEditing(index);
+                    beginEditing(entry.id);
                   }}
                   className={`text-left text-[13px] leading-snug transition-all duration-500 self-start ${
                     isActive

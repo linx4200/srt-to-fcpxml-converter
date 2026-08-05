@@ -139,6 +139,31 @@ export function deleteSelectedClip(entries: SrtEntry[], clipId: number): SrtEntr
   return entries.filter((entry) => entry.id !== clipId);
 }
 
+export function deleteClipAndExtendPrevious(entries: SrtEntry[], clipId: number): SrtEntry[] {
+  const index = entries.findIndex((entry) => entry.id === clipId);
+  if (index < 0) return entries;
+
+  const clip = entries[index];
+  const previousClip = entries[index - 1];
+  if (!previousClip) {
+    return entries.filter((entry) => entry.id !== clipId);
+  }
+
+  const extendedPreviousClip = createClip({
+    id: previousClip.id,
+    startSeconds: previousClip.startSeconds,
+    endSeconds: clip.endSeconds,
+    text: previousClip.text,
+    editState: 'manual',
+  });
+
+  return [
+    ...entries.slice(0, index - 1),
+    extendedPreviousClip,
+    ...entries.slice(index + 1),
+  ];
+}
+
 export function updateClipText(entries: SrtEntry[], clipId: number, text: string): SrtEntry[] {
   return entries.map((entry) =>
     entry.id === clipId
