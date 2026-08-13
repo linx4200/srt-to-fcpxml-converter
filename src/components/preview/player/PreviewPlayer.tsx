@@ -6,7 +6,8 @@ import { PlaybackControls } from './PlaybackControls';
 import { PreviewSubtitle } from './PreviewSubtitle';
 import { useI18n } from '../../../i18n';
 import { useAppStore } from '../../../store/useAppStore';
-import { getEntryAtTime, getRenderedSubtitleText } from '../../../utils';
+import { getTimelineClipAtTime } from '../../../domain/workingTimeline';
+import { getRenderedSubtitleText } from '../../../utils';
 
 interface PreviewPlayerProps {
   currentTime: number;
@@ -35,7 +36,7 @@ export function PreviewPlayer({
     subtitleStyle.orientation === 'landscape'
       ? compact ? '100%' : 'min(100%, calc(65vh * 16 / 9))'
       : compact ? '100%' : 'min(100%, calc(65vh * 9 / 16))';
-  const currentEntry = getEntryAtTime(entries, currentTime);
+  const currentEntry = getTimelineClipAtTime(entries, currentTime);
   const renderedText = getRenderedSubtitleText(currentEntry, subtitleStyle);
 
   return (

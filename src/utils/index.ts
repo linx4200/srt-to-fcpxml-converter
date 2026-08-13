@@ -3,4 +3,3 @@ export * from './srt';
 export * from './subtitleLayout';
 export * from './text';
 export * from './time';
-export * from './timeline';

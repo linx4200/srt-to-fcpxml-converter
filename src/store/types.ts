@@ -1,4 +1,5 @@
 import type { StateCreator } from 'zustand';
+import type { TimelineClipBoundaryEdge } from '../domain/workingTimeline';
 import type { EditingSessionState, SrtEntry, SubtitleStyle } from '../types';
 
 export interface TimelineSlice {
@@ -6,10 +7,24 @@ export interface TimelineSlice {
   workingTimeline: SrtEntry[];
   /* 导入 SRT 文本并按当前 SubtitleStyle 生成初始 Working Timeline。 */
   importSrtContent: (content: string) => void;
-  /* 用结构性编辑后的 Subtitle Clips 替换整个 Working Timeline。 */
-  replaceWorkingTimeline: (entries: SrtEntry[]) => void;
   /* 基于当前 SubtitleStyle 对 Working Timeline 执行 Subtitle Reflow。 */
   reflowWorkingTimeline: () => void;
+  /* 更新一个 Subtitle Clip 文本，并由 Working Timeline domain module 维护 editState。 */
+  updateTimelineClipText: (clipId: number, text: string) => void;
+  /* 删除一个 Subtitle Clip，并清空当前 Clip Selection。 */
+  deleteTimelineClip: (clipId: number) => void;
+  /* 删除一个 Subtitle Clip，并把它的结束时间并入前一个 Subtitle Clip。 */
+  deleteTimelineClipAndExtendPrevious: (clipId: number) => void;
+  /* 按两条 Logical Preview Lines 将一个 Subtitle Clip 拆分为两个 Subtitle Clips。 */
+  splitTimelineClipByLogicalLines: (clipId: number) => void;
+  /* 在当前 playhead 位置执行 Playhead Cut。 */
+  cutTimelineClipAtPlayhead: (clipId: number, playhead: number) => void;
+  /* 执行 Free Trim，并保持相邻 Subtitle Clip 边界约束。 */
+  trimTimelineClipBoundary: (
+    clipId: number,
+    edge: TimelineClipBoundaryEdge,
+    nextTime: number
+  ) => void;
   /* 清空 Working Timeline，通常用于清空项目。 */
   clearWorkingTimeline: () => void;
 }

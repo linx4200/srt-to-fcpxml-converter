@@ -12,15 +12,10 @@ import { useAudioWaveform } from '../../hooks/useAudioWaveform';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
 import { SrtEntry } from '../../types';
+import { getTimelineClipAtTime } from '../../domain/workingTimeline';
 import {
-  cutSelectedClipAtPlayhead,
-  deleteSelectedClip,
   formatTimestamp,
-  getEntryAtTime,
   getLogicalPreviewLines,
-  splitSelectedClipByLines,
-  trimClipBoundary,
-  updateClipText,
 } from '../../utils';
 import { PreviewPlayer } from '../preview/player/PreviewPlayer';
 
@@ -61,7 +56,11 @@ export function TimelineEditor({
   const setEditingSession = useAppStore((state) => state.setEditingSession);
   const selectedClipId = useAppStore((state) => state.selectedClipId);
   const setSelectedClipId = useAppStore((state) => state.setSelectedClipId);
-  const replaceWorkingTimeline = useAppStore((state) => state.replaceWorkingTimeline);
+  const updateTimelineClipText = useAppStore((state) => state.updateTimelineClipText);
+  const deleteTimelineClip = useAppStore((state) => state.deleteTimelineClip);
+  const splitTimelineClipByLogicalLines = useAppStore((state) => state.splitTimelineClipByLogicalLines);
+  const cutTimelineClipAtPlayhead = useAppStore((state) => state.cutTimelineClipAtPlayhead);
+  const trimTimelineClipBoundary = useAppStore((state) => state.trimTimelineClipBoundary);
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const [editingClipId, setEditingClipId] = useState<number | null>(null);
@@ -104,7 +103,7 @@ export function TimelineEditor({
   useEffect(() => {
     if (!trimState) return;
 
-    /* 拖拽修剪边界时把鼠标位置换算为时间，并交给 utils 维护相邻 Subtitle Clip 约束。 */
+    /* 拖拽修剪边界时把鼠标位置换算为时间，并交给 Working Timeline domain module 维护相邻 Subtitle Clip 约束。 */
     const handleMouseMove = (event: MouseEvent) => {
       const viewport = viewportRef.current;
       if (!viewport) return;
@@ -112,7 +111,7 @@ export function TimelineEditor({
       const rect = viewport.getBoundingClientRect();
       const x = event.clientX - rect.left + viewport.scrollLeft - 60;
       const time = Math.max(x / pixelsPerSecond, 0);
-      replaceWorkingTimeline(trimClipBoundary(entries, trimState.clipId, trimState.edge, time, subtitleStyle.fps));
+      trimTimelineClipBoundary(trimState.clipId, trimState.edge, time);
       setIsInteracting(true);
     };
 
@@ -129,7 +128,7 @@ export function TimelineEditor({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [entries, replaceWorkingTimeline, pixelsPerSecond, subtitleStyle.fps, trimState]);
+  }, [pixelsPerSecond, trimState, trimTimelineClipBoundary]);
 
   useEffect(() => {
     /* 管理编辑模式快捷键：Escape 退出/取消，Delete/Backspace 删除当前 Clip Selection。 */
@@ -167,7 +166,7 @@ export function TimelineEditor({
 
   useEffect(() => {
     if (selectedClipId && !entries.some((entry) => entry.id === selectedClipId)) {
-      setSelectedClipId(getEntryAtTime(entries, currentTime)?.id ?? null);
+      setSelectedClipId(getTimelineClipAtTime(entries, currentTime)?.id ?? null);
     }
   }, [currentTime, entries, setSelectedClipId, selectedClipId]);
 
@@ -212,7 +211,7 @@ export function TimelineEditor({
       return;
     }
 
-    replaceWorkingTimeline(updateClipText(entries, editingClipId, nextText));
+    updateTimelineClipText(editingClipId, nextText);
     setEditingClipId(null);
     setDraftText('');
   };
@@ -234,8 +233,7 @@ export function TimelineEditor({
   /* 删除当前 Clip Selection，并清理本地编辑草稿。 */
   const handleDeleteSelected = () => {
     if (selectedClipId === null) return;
-    replaceWorkingTimeline(deleteSelectedClip(entries, selectedClipId));
-    setSelectedClipId(null);
+    deleteTimelineClip(selectedClipId);
     setEditingClipId(null);
     setDraftText('');
   };
@@ -243,19 +241,13 @@ export function TimelineEditor({
   /* 将选中 Subtitle Clip 按两条 Logical Preview Lines 拆成两个 Clip。 */
   const handleSplitByLines = () => {
     if (!selectedClip) return;
-    const baseId = entries.reduce((maxId, entry) => Math.max(maxId, entry.id), 0);
-    const nextEntries = splitSelectedClipByLines(entries, selectedClip.id, subtitleStyle);
-    replaceWorkingTimeline(nextEntries);
-    setSelectedClipId(baseId + 2);
+    splitTimelineClipByLogicalLines(selectedClip.id);
   };
 
   /* 在当前 playhead 位置执行 Playhead Cut，生成两个新的 Subtitle Clips。 */
   const handleCutAtPlayhead = () => {
     if (!selectedClip) return;
-    const baseId = entries.reduce((maxId, entry) => Math.max(maxId, entry.id), 0);
-    const nextEntries = cutSelectedClipAtPlayhead(entries, selectedClip.id, currentTime, subtitleStyle);
-    replaceWorkingTimeline(nextEntries);
-    setSelectedClipId(baseId + 2);
+    cutTimelineClipAtPlayhead(selectedClip.id, currentTime);
   };
 
   /* 跳转到当前 playhead 之前最近的 Subtitle Clip，并同步 Clip Selection。 */

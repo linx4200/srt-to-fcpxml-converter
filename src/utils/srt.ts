@@ -1,7 +1,7 @@
 import { SrtEntry } from '../types';
 import { timeToSeconds } from './time';
-import { createClip } from './timeline';
 import { normalizeClipText } from './text';
+import { createTimelineClip } from '../domain/workingTimeline';
 
 export function parseSrt(content: string): SrtEntry[] {
   const entries: SrtEntry[] = [];
@@ -21,7 +21,7 @@ export function parseSrt(content: string): SrtEntry[] {
     const endTime = timeMatch[2];
     const text = normalizeClipText(lines.slice(2).join('\n'));
 
-    entries.push(createClip({
+    entries.push(createTimelineClip({
       id,
       startSeconds: timeToSeconds(startTime),
       endSeconds: timeToSeconds(endTime),

@@ -1,5 +1,5 @@
 import type { EditingSessionState } from '../../types';
-import { getEntryAtTime } from '../../utils';
+import { getTimelineClipAtTime } from '../../domain/workingTimeline';
 import type { AppSliceCreator, EditingSlice } from '../types';
 
 export const INITIAL_EDITING_SESSION: EditingSessionState = {
@@ -47,7 +47,7 @@ export const createEditingSlice: AppSliceCreator<EditingSlice> = (set, get) => (
     if (editingSession.hasVisited) {
       const restoredClip =
         workingTimeline.find((entry) => entry.id === editingSession.selectedClipId) ??
-        getEntryAtTime(workingTimeline, editingSession.playhead);
+        getTimelineClipAtTime(workingTimeline, editingSession.playhead);
 
       set({
         isEditingMode: true,

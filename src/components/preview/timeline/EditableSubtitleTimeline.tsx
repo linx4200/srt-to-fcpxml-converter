@@ -1,7 +1,6 @@
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { useI18n } from '../../../i18n';
 import { useAppStore } from '../../../store/useAppStore';
-import { deleteClipAndExtendPrevious, updateClipText } from '../../../utils';
 
 interface EditableSubtitleTimelineProps {
   currentTime: number;
@@ -16,7 +15,8 @@ export function EditableSubtitleTimeline({
   const { t } = useI18n();
 
   const entries = useAppStore((state) => state.workingTimeline);
-  const replaceWorkingTimeline = useAppStore((state) => state.replaceWorkingTimeline);
+  const deleteTimelineClipAndExtendPrevious = useAppStore((state) => state.deleteTimelineClipAndExtendPrevious);
+  const updateTimelineClipText = useAppStore((state) => state.updateTimelineClipText);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
@@ -90,12 +90,12 @@ export function EditableSubtitleTimeline({
         return;
       }
 
-      replaceWorkingTimeline(deleteClipAndExtendPrevious(entries, clipId));
+      deleteTimelineClipAndExtendPrevious(clipId);
       cancelEditing();
       return;
     }
 
-    replaceWorkingTimeline(updateClipText(entries, clipId, nextText));
+    updateTimelineClipText(clipId, nextText);
     cancelEditing();
   };
 
