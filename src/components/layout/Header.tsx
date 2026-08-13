@@ -3,7 +3,7 @@ import { message } from '../message';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
 import { getFcpxmlExportSpec } from '../../domain/fcpxmlExport';
-import { generateFcpxml } from '../../utils';
+import { buildFcpxmlExportArtifact } from '../../utils';
 
 const GITHUB_REPO_URL = 'https://github.com/linx4200/srt-to-fcpxml-converter';
 
@@ -18,12 +18,16 @@ export function Header() {
     if (!canExport) return;
 
     const fcpxmlExportSpec = getFcpxmlExportSpec(subtitleStyle);
-    const xml = generateFcpxml(workingTimeline, fcpxmlExportSpec);
-    const blob = new Blob([xml], { type: 'application/xml' });
+    const fcpxmlExportArtifact = buildFcpxmlExportArtifact(
+      workingTimeline,
+      fcpxmlExportSpec,
+      subtitleFileName
+    );
+    const blob = new Blob([fcpxmlExportArtifact.content], { type: fcpxmlExportArtifact.mimeType });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = subtitleFileName.replace(/\.[^/.]+$/, '') + '.fcpxml';
+    anchor.download = fcpxmlExportArtifact.fileName;
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);

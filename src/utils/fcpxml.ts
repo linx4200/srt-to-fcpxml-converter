@@ -1,6 +1,19 @@
 import type { FcpxmlExportSpec } from '../domain/fcpxmlExport';
 import { SrtEntry } from '../types';
 
+const FCPXML_FILE_EXTENSION = '.fcpxml';
+const FCPXML_MIME_TYPE = 'application/xml';
+const UNTITLED_EXPORT_FILE_BASENAME = 'subtitles';
+
+export interface FcpxmlExportArtifact {
+  /* FCPXML 文件内容，由当前 Working Timeline 和导出协议参数生成。 */
+  content: string;
+  /* 浏览器下载时使用的完整文件名，必须包含 .fcpxml 后缀。 */
+  fileName: string;
+  /* 浏览器 Blob 使用的 MIME type，由 FCPXML 导出模块统一定义。 */
+  mimeType: string;
+}
+
 function escapeXml(unsafe: string): string {
   return unsafe.replace(/[<>&"']/g, (c) => {
     switch (c) {
@@ -12,6 +25,25 @@ function escapeXml(unsafe: string): string {
       default: return c;
     }
   });
+}
+
+function getFcpxmlExportFileName(subtitleFileName: string): string {
+  const sourceFileBaseName = subtitleFileName.trim().replace(/\.[^/.]+$/, '');
+  const exportFileBaseName = sourceFileBaseName || UNTITLED_EXPORT_FILE_BASENAME;
+
+  return `${exportFileBaseName}${FCPXML_FILE_EXTENSION}`;
+}
+
+export function buildFcpxmlExportArtifact(
+  entries: SrtEntry[],
+  fcpxmlExportSpec: FcpxmlExportSpec,
+  subtitleFileName: string
+): FcpxmlExportArtifact {
+  return {
+    content: generateFcpxml(entries, fcpxmlExportSpec),
+    fileName: getFcpxmlExportFileName(subtitleFileName),
+    mimeType: FCPXML_MIME_TYPE,
+  };
 }
 
 export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExportSpec): string {
