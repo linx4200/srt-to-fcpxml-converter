@@ -1,5 +1,6 @@
 import { FCP_RESOLUTION } from '../constants';
-import { SrtEntry, SubtitleStyle } from '../types';
+import type { SubtitleLayoutSpec } from '../domain/subtitleStyle';
+import { SrtEntry } from '../types';
 import { normalizeClipText } from './text';
 
 const SAFE_WIDTH_RATIO = 0.7;
@@ -14,27 +15,27 @@ type FontMetricsOptions = {
   useOffset?: boolean;
 };
 
-export function getReferenceResolution(style: SubtitleStyle) {
-  return style.orientation === 'portrait'
+export function getReferenceResolution(subtitleLayoutSpec: SubtitleLayoutSpec) {
+  return subtitleLayoutSpec.orientation === 'portrait'
     ? FCP_RESOLUTION.portrait
     : FCP_RESOLUTION.landscape;
 }
 
-export function getClipSafeWidth(style: SubtitleStyle) {
-  return getReferenceResolution(style).width * SAFE_WIDTH_RATIO;
+export function getClipSafeWidth(subtitleLayoutSpec: SubtitleLayoutSpec) {
+  return getReferenceResolution(subtitleLayoutSpec).width * SAFE_WIDTH_RATIO;
 }
 
 export function getLogicalPreviewLines(
   text: string,
-  style: SubtitleStyle,
-  videoWidth = getReferenceResolution(style).width,
-  videoHeight = getReferenceResolution(style).height
+  subtitleLayoutSpec: SubtitleLayoutSpec,
+  videoWidth = getReferenceResolution(subtitleLayoutSpec).width,
+  videoHeight = getReferenceResolution(subtitleLayoutSpec).height
 ): string[] {
   const normalizedText = normalizeClipText(text);
   if (!normalizedText) return [];
 
   const maxWidth = videoWidth * SAFE_WIDTH_RATIO;
-  const { height: fontPixelSize } = getFontPixelSize(style.fontSize, videoHeight);
+  const { height: fontPixelSize } = getFontPixelSize(subtitleLayoutSpec.fontSize, videoHeight);
   const hardSegments = normalizedText.split('\n');
   const logicalLines: string[] = [];
 
@@ -69,12 +70,12 @@ export function getLogicalPreviewLines(
 
 export function getRenderedSubtitleText(
   entry: SrtEntry | undefined,
-  style: SubtitleStyle,
-  videoWidth = getReferenceResolution(style).width,
-  videoHeight = getReferenceResolution(style).height
+  subtitleLayoutSpec: SubtitleLayoutSpec,
+  videoWidth = getReferenceResolution(subtitleLayoutSpec).width,
+  videoHeight = getReferenceResolution(subtitleLayoutSpec).height
 ): string {
   if (!entry) return '';
-  return getLogicalPreviewLines(entry.text, style, videoWidth, videoHeight).join('\n');
+  return getLogicalPreviewLines(entry.text, subtitleLayoutSpec, videoWidth, videoHeight).join('\n');
 }
 
 export function getFontPixelSize(

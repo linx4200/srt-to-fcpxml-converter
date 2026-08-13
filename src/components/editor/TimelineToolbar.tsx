@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
+import { getSubtitleLayoutSpec } from '../../domain/subtitleStyle';
 import { getLogicalPreviewLines } from '../../utils';
 import { MAX_ZOOM, MIN_ZOOM } from './timelineGeometry';
 
@@ -40,8 +41,9 @@ export function TimelineToolbar({
   const splitTimelineClipByLogicalLines = useAppStore((state) => state.splitTimelineClipByLogicalLines);
   const cutTimelineClipAtPlayhead = useAppStore((state) => state.cutTimelineClipAtPlayhead);
 
+  const subtitleLayoutSpec = getSubtitleLayoutSpec(subtitleStyle);
   const selectedClip = selectedClipId ? entries.find((entry) => entry.id === selectedClipId) ?? null : null;
-  const selectedClipLines = selectedClip ? getLogicalPreviewLines(selectedClip.text, subtitleStyle) : [];
+  const selectedClipLines = selectedClip ? getLogicalPreviewLines(selectedClip.text, subtitleLayoutSpec) : [];
   const canSplitByLines = Boolean(selectedClip && selectedClipLines.length === 2 && editingClipId === null);
   const canCutAtPlayhead = Boolean(
     selectedClip &&

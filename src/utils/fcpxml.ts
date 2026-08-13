@@ -1,5 +1,5 @@
-import { SrtEntry, SubtitleStyle } from '../types';
-import { FCP_RESOLUTION } from '../constants';
+import type { FcpxmlExportSpec } from '../domain/fcpxmlExport';
+import { SrtEntry } from '../types';
 
 function escapeXml(unsafe: string): string {
   return unsafe.replace(/[<>&"']/g, (c) => {
@@ -14,15 +14,14 @@ function escapeXml(unsafe: string): string {
   });
 }
 
-export function generateFcpxml(entries: SrtEntry[], style: SubtitleStyle): string {
-  const frameRate = style.fps;
+export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExportSpec): string {
+  const frameRate = fcpxmlExportSpec.frameRate;
   const duration = entries.length > 0 ? entries[entries.length - 1].endSeconds : 0;
   const totalFrames = Math.round(duration * frameRate);
 
   const fpsScale = frameRate * 100; // 3000 for 30fps, 6000 for 60fps
 
-  const width = style.orientation === 'landscape' ? FCP_RESOLUTION.landscape.width : FCP_RESOLUTION.portrait.width;
-  const height = style.orientation === 'landscape' ? FCP_RESOLUTION.landscape.height : FCP_RESOLUTION.portrait.height;
+  const { width, height } = fcpxmlExportSpec.format;
 
   const hexToRgb = (hex: string) => {
     const r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -31,7 +30,7 @@ export function generateFcpxml(entries: SrtEntry[], style: SubtitleStyle): strin
     return `${r.toFixed(2)} ${g.toFixed(2)} ${b.toFixed(2)}`;
   };
 
-  const textColor = hexToRgb(style.textColor);
+  const textColor = hexToRgb(fcpxmlExportSpec.titleStyle.textColor);
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE fcpxml>
@@ -71,7 +70,7 @@ export function generateFcpxml(entries: SrtEntry[], style: SubtitleStyle): strin
     // 它的底层机制是：【数值 1 代表 1% 的画幅尺寸】，即传 100 代表 100%。
     // FCPX 检查器中的原点 (0,0) 在屏幕正中央，Y 轴向下为负值。
     // 如果想要竖屏文字距离顶部 75%，相当于让它向下偏离正中心 25%，对应的数值就是 -25
-    const posY = style.orientation === 'portrait'
+    const posY = fcpxmlExportSpec.format.orientation === 'portrait'
       ? -25
       : -35; // 横屏底部 15% (即距离顶部 85%)，偏离中心 35% -> -35
 
@@ -81,7 +80,7 @@ export function generateFcpxml(entries: SrtEntry[], style: SubtitleStyle): strin
                                 <text-style ref="ts${index}">${escapedText}</text-style>
                             </text>
                             <text-style-def id="ts${index}">
-                                <text-style font="PingFang SC" fontSize="${style.fontSize}" fontFace="Regular" fontColor="${textColor} 1" alignment="center"/>
+                                <text-style font="PingFang SC" fontSize="${fcpxmlExportSpec.titleStyle.fontSize}" fontFace="Regular" fontColor="${textColor} 1" alignment="center"/>
                             </text-style-def>
                             <adjust-transform position="0 ${posY}"/>
                         </title>`;

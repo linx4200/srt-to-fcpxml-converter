@@ -7,6 +7,7 @@ import { PreviewSubtitle } from './PreviewSubtitle';
 import { useI18n } from '../../../i18n';
 import { useAppStore } from '../../../store/useAppStore';
 import { getTimelineClipAtTime } from '../../../domain/workingTimeline';
+import { getSubtitleLayoutSpec, getSubtitleRenderSpec } from '../../../domain/subtitleStyle';
 import { getRenderedSubtitleText } from '../../../utils';
 
 interface PreviewPlayerProps {
@@ -31,13 +32,15 @@ export function PreviewPlayer({
   const { t } = useI18n();
   const entries = useAppStore((state) => state.workingTimeline);
   const subtitleStyle = useAppStore((state) => state.subtitleStyle);
+  const subtitleLayoutSpec = getSubtitleLayoutSpec(subtitleStyle);
+  const subtitleRenderSpec = getSubtitleRenderSpec(subtitleStyle);
   const { ref: containerRef, width: containerWidth, height: containerHeight } = useContainerSize();
   const playerMaxWidth =
     subtitleStyle.orientation === 'landscape'
       ? compact ? '100%' : 'min(100%, calc(65vh * 16 / 9))'
       : compact ? '100%' : 'min(100%, calc(65vh * 9 / 16))';
   const currentEntry = getTimelineClipAtTime(entries, currentTime);
-  const renderedText = getRenderedSubtitleText(currentEntry, subtitleStyle);
+  const renderedText = getRenderedSubtitleText(currentEntry, subtitleLayoutSpec);
 
   return (
     <div className={`flex flex-col items-center justify-center shrink-0 w-full ${compact ? 'px-0 mt-0' : 'xl:flex-1 mt-12 xl:mt-0 px-2 lg:px-4'}`}>
@@ -80,6 +83,7 @@ export function PreviewPlayer({
           >
             <PreviewSubtitle
               text={renderedText}
+              subtitleRenderSpec={subtitleRenderSpec}
               containerHeight={containerHeight}
             />
           </div>

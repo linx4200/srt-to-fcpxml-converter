@@ -8,6 +8,7 @@ import {
   updateTimelineClipText,
 } from '../../domain/workingTimeline';
 import type { WorkingTimelineCommandResult } from '../../domain/workingTimeline';
+import { getSubtitleReflowSpec, getTimelineFrameSpec } from '../../domain/subtitleStyle';
 import { parseSrt } from '../../utils';
 import type { AppSliceCreator, TimelineSlice } from '../types';
 
@@ -33,7 +34,7 @@ export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) =>
     const parsedEntries = parseSrt(content);
     const result = reflowWorkingTimelineDomain({
       workingTimeline: parsedEntries,
-      subtitleStyle: get().subtitleStyle,
+      subtitleReflowSpec: getSubtitleReflowSpec(get().subtitleStyle),
     });
     applyWorkingTimelineResult(set, result);
   },
@@ -41,7 +42,7 @@ export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) =>
   reflowWorkingTimeline: () => {
     const result = reflowWorkingTimelineDomain({
       workingTimeline: get().workingTimeline,
-      subtitleStyle: get().subtitleStyle,
+      subtitleReflowSpec: getSubtitleReflowSpec(get().subtitleStyle),
     });
     applyWorkingTimelineResult(set, result);
   },
@@ -62,12 +63,12 @@ export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) =>
     });
     applyWorkingTimelineResult(set, result);
   },
-  /* 按当前 SubtitleStyle 的 Logical Preview Lines 执行 Clip Split。 */
+  /* 按当前字幕布局 spec 的 Logical Preview Lines 执行 Clip Split。 */
   splitTimelineClipByLogicalLines: (clipId) => {
     const result = splitTimelineClipByLogicalLines({
       workingTimeline: get().workingTimeline,
       clipId,
-      subtitleStyle: get().subtitleStyle,
+      subtitleReflowSpec: getSubtitleReflowSpec(get().subtitleStyle),
     });
     applyWorkingTimelineResult(set, result);
   },
@@ -77,7 +78,7 @@ export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) =>
       workingTimeline: get().workingTimeline,
       clipId,
       playhead,
-      subtitleStyle: get().subtitleStyle,
+      timelineFrameSpec: getTimelineFrameSpec(get().subtitleStyle),
     });
     applyWorkingTimelineResult(set, result);
   },

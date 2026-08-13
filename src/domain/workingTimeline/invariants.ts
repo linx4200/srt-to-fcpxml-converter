@@ -1,4 +1,5 @@
-import type { SrtEntry, SubtitleStyle } from '../../types';
+import type { SrtEntry } from '../../types';
+import type { TimelineFrameRate } from '../subtitleStyle';
 import { normalizeClipText } from '../../utils/text';
 import { quantizeToFrame, secondsToTime } from '../../utils/time';
 import type { CreateTimelineClipInput, TimelineSegment } from './types';
@@ -48,7 +49,7 @@ export function splitClipDurationByText(
   startSeconds: number,
   endSeconds: number,
   parts: string[],
-  fps: SubtitleStyle['fps']
+  fps: TimelineFrameRate
 ): TimelineSegment[] {
   const frameCount = Math.max(1, Math.round((endSeconds - startSeconds) * fps));
   const startFrame = Math.round(startSeconds * fps);
@@ -85,6 +86,6 @@ export function splitClipDurationByText(
 }
 
 /* 把任意秒数吸附到当前 fps 的帧边界，是所有结构性时间编辑的基础 invariant。 */
-export function quantizeTimelineTime(seconds: number, fps: SubtitleStyle['fps']): number {
+export function quantizeTimelineTime(seconds: number, fps: TimelineFrameRate): number {
   return quantizeToFrame(seconds, fps);
 }

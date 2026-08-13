@@ -21,20 +21,20 @@ import type {
 
 export function reflowWorkingTimeline({
   workingTimeline,
-  subtitleStyle,
+  subtitleReflowSpec,
 }: WorkingTimelineStyleCommandInput): WorkingTimelineCommandResult {
-  const { width, height } = getReferenceResolution(subtitleStyle);
+  const { width, height } = getReferenceResolution(subtitleReflowSpec);
   let nextId = 1;
   const nextEntries: SrtEntry[] = [];
 
   for (const entry of workingTimeline) {
-    const logicalLines = getLogicalPreviewLines(entry.text, subtitleStyle, width, height);
+    const logicalLines = getLogicalPreviewLines(entry.text, subtitleReflowSpec, width, height);
     if (logicalLines.length <= 1) {
       nextEntries.push(
         createTimelineClip({
           id: nextId++,
-          startSeconds: quantizeTimelineTime(entry.startSeconds, subtitleStyle.fps),
-          endSeconds: quantizeTimelineTime(entry.endSeconds, subtitleStyle.fps),
+          startSeconds: quantizeTimelineTime(entry.startSeconds, subtitleReflowSpec.fps),
+          endSeconds: quantizeTimelineTime(entry.endSeconds, subtitleReflowSpec.fps),
           text: logicalLines[0] ?? normalizeClipText(entry.text),
           editState: 'reflowed',
         })
@@ -46,7 +46,7 @@ export function reflowWorkingTimeline({
       entry.startSeconds,
       entry.endSeconds,
       logicalLines,
-      subtitleStyle.fps
+      subtitleReflowSpec.fps
     );
 
     for (let index = 0; index < logicalLines.length; index += 1) {
@@ -70,20 +70,20 @@ export function reflowWorkingTimeline({
 export function splitTimelineClipByLogicalLines({
   workingTimeline,
   clipId,
-  subtitleStyle,
+  subtitleReflowSpec,
 }: SplitTimelineClipByLogicalLinesInput): WorkingTimelineCommandResult {
   const index = workingTimeline.findIndex((entry) => entry.id === clipId);
   if (index < 0) return { workingTimeline };
 
   const clip = workingTimeline[index];
-  const logicalLines = getLogicalPreviewLines(clip.text, subtitleStyle);
+  const logicalLines = getLogicalPreviewLines(clip.text, subtitleReflowSpec);
   if (logicalLines.length !== 2) return { workingTimeline };
 
   const splitSegments = splitClipDurationByText(
     clip.startSeconds,
     clip.endSeconds,
     logicalLines,
-    subtitleStyle.fps
+    subtitleReflowSpec.fps
   );
 
   const replacement = logicalLines.map((line, lineIndex) =>
@@ -112,14 +112,14 @@ export function cutTimelineClipAtPlayhead({
   workingTimeline,
   clipId,
   playhead,
-  subtitleStyle,
+  timelineFrameSpec,
 }: CutTimelineClipAtPlayheadInput): WorkingTimelineCommandResult {
   const index = workingTimeline.findIndex((entry) => entry.id === clipId);
   if (index < 0) return { workingTimeline };
 
   const clip = workingTimeline[index];
-  const cutTime = quantizeTimelineTime(playhead, subtitleStyle.fps);
-  const frameDuration = 1 / subtitleStyle.fps;
+  const cutTime = quantizeTimelineTime(playhead, timelineFrameSpec.fps);
+  const frameDuration = 1 / timelineFrameSpec.fps;
 
   if (cutTime <= clip.startSeconds || cutTime >= clip.endSeconds) {
     return { workingTimeline };

@@ -2,6 +2,7 @@ import { Type, Download, Github } from 'lucide-react';
 import { message } from '../message';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
+import { getFcpxmlExportSpec } from '../../domain/fcpxmlExport';
 import { generateFcpxml } from '../../utils';
 
 const GITHUB_REPO_URL = 'https://github.com/linx4200/srt-to-fcpxml-converter';
@@ -16,7 +17,8 @@ export function Header() {
   const downloadFcpxml = () => {
     if (!canExport) return;
 
-    const xml = generateFcpxml(workingTimeline, subtitleStyle);
+    const fcpxmlExportSpec = getFcpxmlExportSpec(subtitleStyle);
+    const xml = generateFcpxml(workingTimeline, fcpxmlExportSpec);
     const blob = new Blob([xml], { type: 'application/xml' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');

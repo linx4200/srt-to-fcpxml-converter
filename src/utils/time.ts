@@ -1,4 +1,4 @@
-import { SubtitleStyle } from '../types';
+import type { TimelineFrameRate } from '../domain/subtitleStyle';
 
 export function timeToSeconds(time: string): number {
   const [hms, ms] = time.split(',');
@@ -22,6 +22,6 @@ export function formatTimestamp(seconds: number): string {
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
 }
 
-export function quantizeToFrame(seconds: number, fps: SubtitleStyle['fps']) {
+export function quantizeToFrame(seconds: number, fps: TimelineFrameRate) {
   return Math.round(seconds * fps) / fps;
 }
