@@ -165,37 +165,6 @@ export function deleteTimelineClip({
   };
 }
 
-export function deleteTimelineClipAndExtendPrevious({
-  workingTimeline,
-  clipId,
-}: WorkingTimelineClipCommandInput): WorkingTimelineCommandResult {
-  const index = workingTimeline.findIndex((entry) => entry.id === clipId);
-  if (index < 0) return { workingTimeline };
-
-  const clip = workingTimeline[index];
-  const previousClip = workingTimeline[index - 1];
-  if (!previousClip) {
-    return deleteTimelineClip({ workingTimeline, clipId });
-  }
-
-  const extendedPreviousClip = createTimelineClip({
-    id: previousClip.id,
-    startSeconds: previousClip.startSeconds,
-    endSeconds: clip.endSeconds,
-    text: previousClip.text,
-    editState: 'manual',
-  });
-
-  return {
-    workingTimeline: sortWorkingTimeline([
-      ...workingTimeline.slice(0, index - 1),
-      extendedPreviousClip,
-      ...workingTimeline.slice(index + 1),
-    ]),
-    selectedClipId: extendedPreviousClip.id,
-  };
-}
-
 export function updateTimelineClipText({
   workingTimeline,
   clipId,

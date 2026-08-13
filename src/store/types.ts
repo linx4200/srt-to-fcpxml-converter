@@ -13,8 +13,6 @@ export interface TimelineSlice {
   updateTimelineClipText: (clipId: number, text: string) => void;
   /* 删除一个 Subtitle Clip，并清空当前 Clip Selection。 */
   deleteTimelineClip: (clipId: number) => void;
-  /* 删除一个 Subtitle Clip，并把它的结束时间并入前一个 Subtitle Clip。 */
-  deleteTimelineClipAndExtendPrevious: (clipId: number) => void;
   /* 按两条 Logical Preview Lines 将一个 Subtitle Clip 拆分为两个 Subtitle Clips。 */
   splitTimelineClipByLogicalLines: (clipId: number) => void;
   /* 在当前 playhead 位置执行 Playhead Cut。 */

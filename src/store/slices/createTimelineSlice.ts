@@ -1,7 +1,6 @@
 import {
   cutTimelineClipAtPlayhead,
   deleteTimelineClip,
-  deleteTimelineClipAndExtendPrevious,
   reflowWorkingTimeline as reflowWorkingTimelineDomain,
   sortWorkingTimeline,
   splitTimelineClipByLogicalLines,
@@ -58,14 +57,6 @@ export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) =>
   /* 删除当前 Subtitle Clip，并由 domain result 明确清理 Clip Selection。 */
   deleteTimelineClip: (clipId) => {
     const result = deleteTimelineClip({
-      workingTimeline: get().workingTimeline,
-      clipId,
-    });
-    applyWorkingTimelineResult(set, result);
-  },
-  /* 轻量校对删除空文本时，把删除 Clip 的时长并入前一个 Subtitle Clip。 */
-  deleteTimelineClipAndExtendPrevious: (clipId) => {
-    const result = deleteTimelineClipAndExtendPrevious({
       workingTimeline: get().workingTimeline,
       clipId,
     });
