@@ -1,4 +1,5 @@
 import type { ClipEditState, SrtEntry } from '../../types';
+import type { SubtitleStyle } from '../../types';
 
 export type TimelineClipBoundaryEdge = 'start' | 'end';
 
@@ -13,6 +14,35 @@ export interface CreateTimelineClipInput {
 export interface TimelineSegment {
   startSeconds: number;
   endSeconds: number;
+}
+
+export interface WorkingTimelineStyleCommandInput {
+  workingTimeline: SrtEntry[];
+  subtitleStyle: SubtitleStyle;
+}
+
+export interface WorkingTimelineClipCommandInput {
+  workingTimeline: SrtEntry[];
+  clipId: number;
+}
+
+export interface UpdateTimelineClipTextInput extends WorkingTimelineClipCommandInput {
+  text: string;
+}
+
+export interface SplitTimelineClipByLogicalLinesInput extends WorkingTimelineClipCommandInput {
+  subtitleStyle: SubtitleStyle;
+}
+
+export interface CutTimelineClipAtPlayheadInput extends WorkingTimelineClipCommandInput {
+  playhead: number;
+  subtitleStyle: SubtitleStyle;
+}
+
+export interface TrimTimelineClipBoundaryInput extends WorkingTimelineClipCommandInput {
+  edge: TimelineClipBoundaryEdge;
+  nextTime: number;
+  fps: SubtitleStyle['fps'];
 }
 
 export interface WorkingTimelineCommandResult {
