@@ -47,10 +47,22 @@ export interface MediaSlice {
   audioFileName: string;
   /* 参考音频的浏览器 object URL，生命周期由 media slice 负责释放。 */
   audioUrl?: string;
+  /* 当前参考音频解码出的 Waveform 采样，供 Waveform Timeline 展示。 */
+  waveformSamples: number[];
+  /* 当前 Waveform 对应的音频时长，来自 Web Audio 解码结果。 */
+  waveformAudioDuration: number;
+  /* Waveform 解码是否正在进行，用于后续展示加载态或禁用相关交互。 */
+  isWaveformLoading: boolean;
+  /* 当前 Waveform 派生自哪个参考音频文件，用于避免同一文件重复解码。 */
+  waveformSourceAudioFile: File | null;
+  /* Waveform 解码请求序号，用于忽略过期的异步解码结果。 */
+  waveformDecodeRequestId: number;
   /* 记录当前字幕文件名。 */
   setSubtitleFileName: (fileName: string) => void;
   /* 设置参考音频，并替换/释放旧的 object URL。 */
   setAudioFile: (file: File) => void;
+  /* 根据当前参考音频解码 Waveform，并由 media slice 维护解码生命周期。 */
+  decodeAudioWaveform: () => Promise<void>;
   /* 清空参考音频，并释放当前 object URL。 */
   clearAudio: () => void;
   /* 清空媒体相关状态，包括字幕文件名和参考音频。 */

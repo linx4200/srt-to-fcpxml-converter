@@ -31,7 +31,7 @@ store 主要维护以下状态：
 
 - 当前 Working Timeline `workingTimeline`。
 - 字幕样式与导出参数 `subtitleStyle`。
-- 参考音频文件与浏览器 object URL。
+- 参考音频文件、浏览器 object URL 与 Waveform 解码状态。
 - Subtitle Editing Mode、Clip Selection 和编辑会话状态。
 
 播放状态、当前播放时间和总时长仍由 `hooks/usePlayback.ts` 封装，因为它们依赖浏览器 `Audio` 实例、`requestAnimationFrame` 和手动 seek 副作用。
@@ -42,9 +42,9 @@ store 主要维护以下状态：
 - `components/preview/`：负责字幕预览、播放控制、平台浮层和字幕渲染。
 - `components/editor/TimelineEditor.tsx`：负责独立的波形时间线编辑模式。
 - `hooks/usePlayback.ts`：封装播放时间、音频同步和当前字幕片段计算。
-- `hooks/useAudioWaveform.ts`：基于 Web Audio API 解码参考音频并生成波形采样。
-- `store/`：负责 Working Timeline、字幕样式、媒体文件状态、Subtitle Editing Mode 和 Clip Selection 的跨组件状态管理。
-- `utils/`：负责 SRT 解析、文本归一化、字幕预览布局计算、时间量化和 Working Timeline 结构性编辑操作。
+- `hooks/useAudioWaveform.ts`：作为 Waveform 解码的 React 生命周期 adapter，在参考音频变化时触发 media slice action。
+- `store/`：负责 Working Timeline、字幕样式、媒体文件状态、Waveform 解码状态、Subtitle Editing Mode 和 Clip Selection 的跨组件状态管理。
+- `utils/`：负责 SRT 解析、文本归一化、字幕预览布局计算、时间量化、Waveform 采样和 Working Timeline 结构性编辑操作。
 - `utils/fcpxml.ts`：负责将当前工作时间线生成 FCPXML。
 - `i18n.tsx` 与 `seo.ts`：分别负责双语文案和页面 SEO 元数据同步。
 
@@ -75,7 +75,7 @@ store 主要维护以下状态：
 
 工作时间线是系统内部最重要的数据结构。导入、自动重排、手动编辑和导出都不会维护各自独立的数据副本，而是持续更新同一组 `SrtEntry`。因此，用户在预览和时间线编辑中看到的字幕内容，就是最终导出 FCPXML 的数据来源。
 
-音频数据只参与播放和波形展示。音频文件会被转换为浏览器 object URL 供播放使用，并通过 Web Audio API 生成波形采样；这些数据不会写入 FCPXML，也不会改变字幕导出的结构。
+音频数据只参与播放和 Waveform 展示。音频文件会被转换为浏览器 object URL 供播放使用，并由 media slice 触发 Web Audio API 解码生成 Waveform 采样；这些数据不会写入 FCPXML，也不会改变字幕导出的结构。
 
 ## 4. 关键设计决策
 
@@ -102,6 +102,12 @@ Web 预览的目标是尽量接近 Final Cut Pro 中的字幕位置和尺寸，�
 参考音频用于播放同步和波形展示，帮助用户检查字幕节奏和位置。它不会被嵌入导出的 FCPXML，也不会作为项目媒体资源写入 XML。
 
 这个设计让导出文件保持简单：FCPXML 只描述字幕标题片段，用户仍然在 Final Cut Pro 中管理真实视频和音频素材。
+
+### Waveform 解码归 media slice 所有
+
+Waveform 是参考音频派生出的展示数据，不是独立的字幕编辑事实来源。media slice 负责保存 Waveform 采样、解码音频时长、加载状态和来源音频文件，并在参考音频变化时复用同源解码结果或忽略过期的异步解码结果。
+
+`utils/waveform.ts` 只负责纯解码和采样算法，`useAudioWaveform.ts` 只作为 React 生命周期 adapter 触发解码。`TimelineEditor` 消费 Waveform 结果来渲染 Waveform Timeline，但不直接拥有 Web Audio API 细节。
 
 ### FCPXML 使用 Custom Title 模板
 
