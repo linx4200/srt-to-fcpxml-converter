@@ -8,6 +8,9 @@ interface FileUploadProps {
   onClearAll?: () => void;
 }
 
+/* 上传区固定高度，避免空态和已上传态切换时设置栏抖动。 */
+const COMPACT_UPLOAD_AREA_HEIGHT_CLASS = 'h-16';
+
 export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
   const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -24,13 +27,13 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
   };
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-2">
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
         {t('subtitleFile')}
       </label>
       {subtitleFileName ? (
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between group">
-          <div className="flex items-center gap-3 overflow-hidden">
+        <div className={`bg-white/5 border border-white/10 rounded-2xl p-3 flex items-center justify-between group ${COMPACT_UPLOAD_AREA_HEIGHT_CLASS}`}>
+          <div className="flex min-w-0 items-center gap-3 overflow-hidden">
             <div className="w-8 h-8 rounded-lg bg-theme-primary/20 flex items-center justify-center shrink-0">
               <Upload size={16} className="text-theme-primary" />
             </div>
@@ -49,12 +52,12 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
       ) : (
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 hover:border-theme-primary/50 hover:bg-theme-primary/5 cursor-pointer transition-all group"
+          className={`border-2 border-dashed border-white/10 rounded-2xl p-3 flex items-center gap-3 hover:border-theme-primary/50 hover:bg-theme-primary/5 cursor-pointer transition-all group ${COMPACT_UPLOAD_AREA_HEIGHT_CLASS}`}
         >
-          <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-theme-primary/20 transition-all">
-            <Upload size={20} className="text-white/40 group-hover:text-theme-primary" />
+          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-theme-primary/20 transition-all">
+            <Upload size={16} className="text-white/40 group-hover:text-theme-primary" />
           </div>
-          <div className="text-center">
+          <div className="min-w-0 text-left">
             <p className="text-sm font-medium">{t('uploadSrt')}</p>
             <p className="text-xs text-white/30 mt-1">{t('dragAndDrop')}</p>
           </div>
