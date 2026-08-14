@@ -1,117 +1,213 @@
 # Agentic Coding Guidelines
 
-## Document-Driven Workflow
+本文件面向在本仓库工作的 agent。执行任务时，优先遵守本文件；如果本文件与 `specs` 冲突，先停止并向 owner 确认，不要自行取舍。
 
-开始较大改动前，先阅读 `./specs` 下的相关文档，确认项目目标、架构边界、术语和已知约束。
+## 0. 执行优先级
 
-本项目偏好使用 ADR 记录关键技术决策。需要说明“为什么选 A 不选 B”时，应写清楚：
+1. 用户本轮明确要求。
+2. 本文件 `AGENTS.md`。
+3. `specs/` 下的项目文档、`CONTEXT.md` 术语表和 ADR。
+4. 现有代码结构、命名和视觉风格。
+
+遇到冲突时，按以下方式处理：
+
+- 如果只是实现细节不明确，先阅读相关代码和 `specs`，再做保守判断。
+- 如果会改变架构边界、数据来源、用户流程或文档约定，必须先向 owner 确认。
+- 确认后的结论需要同步更新相关 `specs` 文档；如已有冲突记录文档，也要记录冲突点和最终决定。
+
+## 1. 开始任务前
+
+较大改动前，必须先阅读 `./specs` 下的相关文档，确认项目目标、架构边界、标准术语和已知约束。
+
+优先检查：
+
+- `specs/architecture.md`：项目目标、模块职责、数据流和核心架构边界。
+- 相关功能目录下的 `CONTEXT.md`：标准术语和禁止使用的同义词。
+- `specs/adr/`：已经接受的关键技术决策。
+
+如果相关 `CONTEXT.md` 定义了术语，中文说明和代码注释中也必须保留英文标准名称，例如 `Working Timeline`、`Subtitle Clip`、`Subtitle Reflow`、`Waveform Timeline`、`Subtitle Editing Mode`。
+
+## 2. 方案设计与确认
+
+涉及方案设计、架构调整、状态模型变化或大范围 UI 变更时，按阶段推进：
+
+1. 先构想实现思路，并向 owner 说明关键取舍。
+2. owner 确认方案后，再拆分任务。
+3. owner 确认任务拆分后，再逐项执行。
+
+每一步都需要 owner 确认后才能进入下一步。不要在未确认方案或任务拆分的情况下直接推进大范围实现。
+
+需要解释“为什么选 A 不选 B”时，优先写 ADR。ADR 必须包含：
 
 - 决策背景和当时约束。
 - 被采纳的方案及其理由。
 - 被否决的备选方案及否决原因。
 - 该决策带来的影响、代价和后续注意事项。
 
-如果相关 `CONTEXT.md` 文件定义了术语，必须使用其中的标准名称。即使在中文文档或中文说明中，也要保留定义过的英文术语，例如 `Working Timeline`、`Subtitle Clip`、`Subtitle Reflow`。
+## 3. 项目边界
 
-## 方案设计
+本项目是纯浏览器运行的 SRT 到 FCPXML 转换与字幕编辑工具。
 
-涉及方案设计时，先构想实现思路，并与 owner 确认；确认后再拆分任务，并再次与 owner 确认；随后按子任务逐条执行。
+必须尊重以下边界：
 
-每一步都需要 owner 确认后，才能进入下一步。不要在未确认方案或任务拆分的情况下直接推进大范围实现。
+- 不引入服务端处理字幕、音频或导出任务。
+- 不导入或解析真实视频文件。
+- 不直接编辑 Final Cut Pro 工程文件，只生成可导入的 FCPXML。
+- 浏览器预览尽量接近 Final Cut Pro 效果，但不承诺像素级一致。
+- 参考音频只用于播放同步和 `Waveform` 展示，不写入 FCPXML。
 
-## Design
+## 4. 架构原则
 
-新增或修改界面时，需要保持与现有视觉风格一致。
+核心架构边界：
+
+- `Working Timeline` 是预览、编辑、`Subtitle Reflow` 和导出的单一事实来源。
+- UI 组件负责用户交互、展示、确认框、toast 和播放状态协同。
+- 跨组件状态由 `store` 管理。
+- `Subtitle Clip` 的结构性变更应交给 `store` action、`utils` 层或已有业务逻辑边界处理。
+- 纯结构性算法放在 `utils`，不要散落在组件中。
+- FCPXML 生成逻辑保持在 `src/utils/fcpxml.ts`。
+
+字幕编辑相关改动禁止维护另一份可变的时间线副本。不要在组件、本地 hook 或独立 store 中复制并修改 `Working Timeline`。
+
+## 5. 状态管理 / 数据层
+
+引入或调整跨组件数据层时，优先使用一个 root store 统一组合领域 slice。不要写成一个巨大的 store 文件，也不要拆成多个彼此独立的 store。
+
+具体文件职责以 `specs/architecture.md` 和相关 ADR 为准，不要在 `AGENTS.md` 中重复维护完整文件说明。
+
+zustand 相关改动必须保持以下约束：
+
+- 保留 `src/store/useAppStore.ts` 作为 root store 统一入口。
+- 按真实业务领域维护 slice 边界，不要按页面、组件或临时任务拆 slice。
+- 跨领域 action 可以通过 root store 读取其他 slice 状态，但不要让 UI 组件承担结构性数据编排。
+- 涉及 `Working Timeline` 的修改必须保持单一事实来源，不要在组件、本地 hook 或独立 store 中维护另一份可变副本。
+
+Store 内核心数据结构必须用中文注释说明其含义，尤其是 `Working Timeline`、媒体资源生命周期、编辑会话状态和导出参数。
+
+## 6. 交互命令归属
+
+用户动作对应的 command 优先放在触发该动作的已有组件中。不要为了“瘦身”父组件而创建没有稳定业务含义的中转 hook 或 command wrapper。
+
+按交互入口划分 command 归属：
+
+| 交互入口 | 负责的命令 |
+| --- | --- |
+| `Header` | 顶部栏按钮触发的命令，例如 FCPXML 导出 |
+| `SettingsPanel` | 字幕文件导入、参考音频管理、清空项目、`Subtitle Reflow` |
+| `PreviewPanel` | Preview Workspace 中进入 `Subtitle Editing Mode` |
+| `TimelineEditor` | `Waveform Timeline` 内的编辑、退出和局部时间线操作 |
+
+抽取 hook 的前提：
+
+- 代表可复用的稳定能力；或
+- 封装浏览器副作用、订阅生命周期或资源生命周期，例如播放同步、波形解码、尺寸观察。
+
+不要创建只被一个父组件调用、只是集中搬运多个组件命令的 `useXxxCommands`。
+
+## 7. 组件化
+
+优先遵循项目已有目录结构、组件边界、状态组织方式和命名风格。
+
+组件拆分原则：
+
+- 相对独立的界面或行为应拆成组件。
+- 不欢迎单一大组件，尤其是一个组件文件膨胀到几百行并混合多种职责。
+- 拆分必须以真实职责为边界，不为了拆分而拆分。
+- 组件命名要表达它负责的界面或行为。
+
+数据传递原则：
+
+- 不需要复用的组件，如果需要的数据可以从 store 获取，优先直接从 store 获取，不必从父组件层层传 props。
+- 自定义 hook 需要的数据如果可以从 store 获取，优先直接从 store 获取。
+- 只有父组件拥有真实上下文、组合状态或局部生命周期时，才通过 props 传入。
+
+## 8. 通用代码规则
+
+优先遵循项目已有目录结构、组件边界、状态组织方式和命名风格。
+
+magic number 规则适用于 TS、TSX、CSS 和 Tailwind className 中的数值。除非数值是语言或框架约定中显而易见的值，否则必须提取为语义化命名的变量或常量，并用中文注释说明具体含义。
+
+## 9. 界面与样式
 
 只需要考虑桌面端体验，不需要为移动端做额外适配。
 
-## Coding Rules
+新增或修改界面时：
 
-1. 只需要考虑桌面端，不需要考虑移动端。
-2. 元素做 layout 时，要尽量利用父元素的可用空间，避免无意义的固定宽高或浪费容器空间。
-3. 优先遵循项目已有目录结构、组件边界、状态组织方式和命名风格。
-4. 字幕编辑相关改动必须尊重 `Working Timeline` 作为单一事实来源的架构边界。
-5. UI 组件可以拥有其交互入口对应的命令编排；结构性数据变更应交给 `store` action、`utils` 层或已有业务逻辑边界处理。
-6. magic number 必须使用语义化命名的变量定义，并注释其具体含义。
+- 保持与现有视觉风格一致。
+- layout 尽量利用父元素的可用空间，避免无意义的固定宽高或浪费容器空间。
+- 涉及 UI 或视觉调整时，优先使用 `src/index.css` 内的 `@theme` 颜色定义。
+- 组件结构要克制：一层 `div` + `flex` 能完成的布局，不要拆成两层 `div` 再叠加 `flex` + `grid`。
+- 样式要避免重复：父组件样式已经能继承或自然作用到子组件时，子组件不要重复声明同类样式。
 
-### todo: domain-driven
+写 Tailwind `className` 时：
 
-### 状态管理 / 数据层
+- 简单元素保持短 className，不要为了格式化而拆散。
+- 复杂样式优先使用多行字符串。
+- 多行 className 按职责分组：布局/尺寸、间距、边框/背景、文字/排版、交互状态与响应式变体。
 
-当引入跨组件数据层时，优先使用一个 root store 统一组合领域 slice，而不是写成一个巨大的 store 文件，也不是拆成多个彼此独立的 store。
+## 10. 多语言与用户可见文案
 
-例如使用 zustand 时，推荐目录结构：
+项目存在多语言文案时，新增或修改用户可见文案必须同步考虑所有已支持语言，不要只改一种语言。
 
-- `src/store/useAppStore.ts`：组合所有 slice，提供统一入口。
-- `src/store/slices/createTimelineSlice.ts`：管理 `Working Timeline`，以及与 `Subtitle Clip` 结构变更相关的 action。
-- `src/store/slices/createStyleSlice.ts`：管理字幕样式和导出参数。
-- `src/store/slices/createMediaSlice.ts`：管理源字幕文件名、参考音频文件、音频 object URL 及资源释放。
-- `src/store/slices/createEditingSlice.ts`：管理 `Subtitle Editing Mode`、`Clip Selection` 和编辑会话状态。
+用户可见文案必须优先符合用户直觉，保持简洁、贴切功能、易理解。不要为了复用 `CONTEXT.md` 中面向开发者的标准术语，而牺牲界面文案的可读性。
 
-slice 的边界要按真实业务领域划分。跨领域 action 可以通过 root store 读取其他 slice 状态，但应避免让 UI 组件承担结构性数据编排。涉及 `Working Timeline` 的修改仍必须保持单一事实来源，不要在组件、本地 hook 或独立 store 中维护另一份可变副本。
+涉及术语时：
 
-### 交互命令归属
+- 代码、开发文档、注释、props、store 字段、action 和 utils 参数应优先使用相关 `CONTEXT.md` 中定义的英文标准名称。
+- UI 文案可以使用更自然的用户语言，但不能制造与功能含义冲突的说法。
+- 同一业务概念在开发语境中应保持命名一致。
 
-用户动作对应的 command 应优先放在触发该动作的已有组件中，而不是为了“瘦身”父组件创建一个没有稳定业务含义的中转 hook 或 command wrapper。
+## 11. 命名规范
 
-判断归属时按交互入口划分：
+命名必须表达业务语义，避免使用过泛变量名。
 
-- `Header` 拥有顶部栏按钮触发的命令，例如 FCPXML 导出。
-- `SettingsPanel` 拥有设置栏里的文件导入、参考音频管理、清空项目和 `Subtitle Reflow`。
-- `PreviewPanel` 拥有 Preview Workspace 中进入 `Subtitle Editing Mode` 的命令。
-- `TimelineEditor` 拥有 Waveform Timeline 内的编辑、退出和局部时间线操作。
+当状态、props、action 或局部变量承载明确业务含义时，命名必须直接体现该业务领域。不要使用 `style`、`data`、`value`、`item`、`state` 等过泛名称，除非上下文已经足够明确且不会与框架或 API 保留概念混淆。
 
-抽取 hook 的前提是它代表可复用的稳定能力，或封装浏览器副作用/订阅生命周期，例如播放同步、波形解码、尺寸观察。不要创建只被一个父组件调用、只是把多个已有组件命令集中搬家的 `useXxxCommands`。如果 command 需要跨 slice 更新状态，应由组件调用语义化的 store action；组件负责交互流程、确认框、toast 和播放状态协同，store 负责数据状态变更，`utils` 负责纯结构性算法。
+示例：
 
-### 组件化
+```ts
+const subtitleStyle = useAppStore((state) => state.subtitleStyle);
+```
 
-如果一个元素或功能相对独立，则优先拆成组件。不欢迎单一大组件，尤其是一个组件文件膨胀到几百行并混合多种职责。
+字幕样式应命名为 `subtitleStyle`，对应 action 应命名为 `setSubtitleStyle`、`updateSubtitleStyle`、`resetSubtitleStyle`，不要写成 `style`、`setStyle`。
 
-拆分组件时应以真实职责为边界，不为了拆分而拆分。组件命名要表达它负责的界面或行为。例如 `./src/utils` 的文件组织方式。
-
-不需要复用的组件，如果它需要的数据可以从 store 中获取，那么优先直接从 store 中获取，而不是使用 props 从父组件中传入。
-自定义的 hook 要的数据如果可以从 store 中获取，那么优先直接从 store 中获取。
-
-### 注释规范
-
-如果单个函数内涉及复杂逻辑，必须为关键流程添加逐行注释，解释每一步为什么这样处理，而不只是重复代码本身。例如 `./src/utils/fcpxml.ts` 里的 `generateFcpxml` 函数。
-
-简单赋值、直观渲染和已有模式下的常规代码不需要添加噪声注释。
-
-Store 内核心的数据结构必须添加注释说明其含义。组件的核心 state 和函数也需要添加。
+## 12. 注释规范
 
 中文注释优先。
 
-定义说明性质的 `/* */` 形式的注释优先。流程说明优先 `//`
+注释使用原则：
 
-### 多语言约束
+- 简单赋值、直观渲染和已有模式下的常规代码不需要噪声注释。
+- 单个函数内涉及复杂逻辑时，必须为关键流程添加注释，解释“为什么这样处理”，不要只重复代码本身。
+- Store 内核心数据结构必须添加说明性质注释。
+- 组件的核心 state 和关键函数需要添加注释。
+- 定义说明性质的注释优先使用 `/* */`。
+- 流程说明优先使用 `//`。
 
-项目存在多语言文案时，新增用户可见文案必须同步考虑所有已支持语言，不要只改一种语言。
+复杂函数可以参考 `src/utils/fcpxml.ts` 中 `generateFcpxml` 的注释密度。
 
-涉及术语时，优先使用相关 `CONTEXT.md` 中定义的英文标准名称；中文说明可以补充解释，但不要发明新的同义词。
+## 13. 验证
 
+功能改动完成后，跑：
 
-### 样式
-
-- 组件结构要克制：一层 `div` + `flex` 能完成的布局，不要拆成两层 `div` 再叠加 `flex` + `grid`。
-- 样式要避免重复：父组件的样式已经能继承或自然作用到子组件时，子组件不要重复声明同类样式，例如父子组件都写相同的背景色。
-- 写 Tailwind `className` 时，复杂样式优先使用多行字符串，并按职责分组排列：布局/尺寸、间距、边框/背景、文字/排版、交互状态与响应式变体；但不要为了多行而把简单元素的 props 全部拆开，短 className 和少量 props 应保持紧凑。
-- 涉及 UI 或视觉调整时，必须优先使用 `src/index.css` 内的 `@theme` 颜色定义。
-
-### 命名规范
-
-命名必须表达业务语义，避免使用过泛变量名
-当状态、props、action 或局部变量承载明确业务含义时，命名必须直接体现该业务领域，不要使用 style、data、value、item、state 等过泛名称，除非上下文已经足够明确且不会与框架/API 保留概念混淆。
-例如字幕样式应命名为 subtitleStyle，对应 action 应命名为 setSubtitleStyle、updateSubtitleStyle、resetSubtitleStyle，而不是 style、setStyle。这样调用方即使只看到：
-const subtitleStyle = useAppStore((state) => state.subtitleStyle);
-也能直接理解它表示字幕样式，而不是 React inline style、CSS 样式或其他通用样式对象。
-涉及跨组件 store 字段、组件 props、utils 参数和文档描述时，应保持同一业务概念的命名一致。
-
-## 验证功能
-
-功能改动完成后，跑 lint 和 build 成功即可：
-
-- `npm run lint`
-- `npm run build`
+```bash
+npm run lint
+npm run build
+```
 
 不需要启动本地服务，也不需要为了验证而运行 `npm run dev`。
+
+纯文档改动不需要跑 lint 和 build；至少检查 Markdown 结构和最终 diff。
+
+## 14. 文档更新
+
+如果代码改动改变了以下内容，必须同步更新相关 `specs`：
+
+- 项目目标、范围或非目标。
+- 架构边界或模块职责。
+- `Working Timeline`、`Subtitle Clip`、`Subtitle Reflow` 等标准术语。
+- 状态管理方式、数据流或核心业务流程。
+- 已接受的技术决策或其影响。
+- 文件职责说明；这类内容应放在 `specs`，不要长期维护在 `AGENTS.md`。
+
+如果改动与 `specs` 内容冲突，必须先和 owner 确认冲突点。得到结论后，再更新对应文档，并在已有冲突记录文档中记录冲突和最终决定。
