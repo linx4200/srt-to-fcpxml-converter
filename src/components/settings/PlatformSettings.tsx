@@ -14,16 +14,27 @@ export function PlatformSettings() {
       <label className="text-xs font-bold text-white/40 uppercase tracking-widest block">
         {t('overlay')}
       </label>
-      <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-3 gap-2">
         {platforms.map((p) => (
           <SettingButton
             key={p}
             isActive={platform === p}
             onClick={() => updateSubtitleStyle({ platform: p })}
+            className="w-full justify-center px-2"
           >
-              {p === 'none' && <span className="text-xs font-medium">{t('overlayClean')}</span>}
-              {p === 'xhs' && <><span className="text-xs font-medium">🍠</span><span className="text-xs font-medium">{t('overlayRednote')}</span></>}
-              {p === 'douyin' && <><Music2 size={15} /><span className="text-xs font-medium">{t('overlayTiktok')}</span></>}
+            {p === 'none' && <span className="text-xs font-medium">{t('overlayClean')}</span>}
+            {p === 'xhs' && (
+              <>
+                <span className="text-xs font-medium">🍠</span>
+                <span className="text-xs font-medium">{t('overlayRednote')}</span>
+              </>
+            )}
+            {p === 'douyin' && (
+              <>
+                <Music2 size={15} />
+                <span className="text-xs font-medium">{t('overlayTiktok')}</span>
+              </>
+            )}
           </SettingButton>
         ))}
       </div>
