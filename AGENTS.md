@@ -189,7 +189,7 @@ const subtitleStyle = useAppStore((state) => state.subtitleStyle);
 
 ## 13. 验证
 
-功能改动完成后，跑：
+会影响运行逻辑、类型、构建产物或用户交互行为的功能改动完成后，跑：
 
 ```bash
 npm run lint
@@ -198,7 +198,7 @@ npm run build
 
 不需要启动本地服务，也不需要为了验证而运行 `npm run dev`。
 
-纯文档改动不需要跑 lint 和 build；至少检查 Markdown 结构和最终 diff。
+纯文档改动、文案修改、注释调整，或其他不影响功能的展示性改动，不需要跑 lint 和 build；至少检查 Markdown 结构和最终 diff。
 
 ## 14. 文档更新
 

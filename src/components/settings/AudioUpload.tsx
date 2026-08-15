@@ -71,6 +71,7 @@ export function AudioUpload({ onAudioSelect, onClear }: AudioUploadProps) {
           />
         </div>
       )}
+      <p className="text-[11px] leading-relaxed text-white/35">{t('audioEditHint')}</p>
     </section>
   );
 }
