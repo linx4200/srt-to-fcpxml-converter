@@ -10,6 +10,8 @@ export function usePlayback() {
 
   const audioUrl = useAppStore((state) => state.audioUrl);
   const srtEntries = useAppStore((state) => state.workingTimeline);
+  const isEditingMode = useAppStore((state) => state.isEditingMode);
+  const setSelectedClipId = useAppStore((state) => state.setSelectedClipId);
 
   const playbackRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -49,12 +51,15 @@ export function usePlayback() {
       if (isTypingTarget || srtEntries.length === 0) return;
 
       event.preventDefault();
+      if (isEditingMode) {
+        setSelectedClipId(null);
+      }
       setIsPlaying((previous) => !previous);
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [srtEntries.length]);
+  }, [isEditingMode, setSelectedClipId, srtEntries.length]);
 
   const subtitleDuration = useMemo(() => {
     if (srtEntries.length === 0) return 0;

@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 interface InlineClipTextareaProps {
   draftText: string;
   rows: number;
@@ -16,8 +18,19 @@ export function InlineClipTextarea({
   onCommit,
   onCancel,
 }: InlineClipTextareaProps) {
+  const focusTextareaAtTextEnd = useCallback((textareaElement: HTMLTextAreaElement | null) => {
+    if (!textareaElement) {
+      return;
+    }
+
+    const textEndPosition = textareaElement.value.length;
+    textareaElement.focus();
+    textareaElement.setSelectionRange(textEndPosition, textEndPosition);
+  }, []);
+
   return (
     <textarea
+      ref={focusTextareaAtTextEnd}
       value={draftText}
       onChange={(event) => onDraftTextChange(event.target.value)}
       onBlur={onCommit}
@@ -32,7 +45,6 @@ export function InlineClipTextarea({
         }
       }}
       rows={rows}
-      autoFocus
       className={className}
     />
   );

@@ -3,6 +3,11 @@ import type { SrtEntry } from '../../types';
 import { formatTimestamp } from '../../utils';
 import { InlineClipTextarea } from './InlineClipTextarea';
 
+/* 普通 Subtitle Clip 在 Waveform Timeline 中的固定高度。 */
+const SUBTITLE_CLIP_HEIGHT_PX = 56;
+/* Inline Clip Editing 打开时为 textarea 预留的固定高度。 */
+const EDITING_SUBTITLE_CLIP_HEIGHT_PX = 104;
+
 interface SubtitleClipProps {
   entry: SrtEntry;
   left: number;
@@ -42,12 +47,13 @@ export function SubtitleClip({
   const showPopover = isSelected && isShort;
   const trimStartLabel = formatTimestamp(entry.startSeconds);
   const trimEndLabel = formatTimestamp(entry.endSeconds);
+  const clipHeight = isEditing ? EDITING_SUBTITLE_CLIP_HEIGHT_PX : SUBTITLE_CLIP_HEIGHT_PX;
 
   return (
     <div
       data-clip="true"
       className="absolute bottom-0"
-      style={{ left, width: `${width}px` }}
+      style={{ left, width: `${width}px`, height: `${clipHeight}px` }}
     >
       {showPopover ? (
         <div className="absolute bottom-[calc(100%+10px)] left-0 min-w-[180px] max-w-[320px] rounded-2xl border border-white/10 bg-[#141414] px-3 py-2 shadow-2xl">
@@ -82,7 +88,7 @@ export function SubtitleClip({
         } ${isDimmed ? 'opacity-30' : 'opacity-100'}`}
         style={{
           width: `${width}px`,
-          height: isEditing ? '104px' : '56px',
+          height: `${clipHeight}px`,
         }}
       >
         {isSelected ? (

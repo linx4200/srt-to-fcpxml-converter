@@ -51,6 +51,7 @@ export function WaveformTimelineViewport({
 }: WaveformTimelineViewportProps) {
   const session = useAppStore((state) => state.editingSession);
   const setEditingSession = useAppStore((state) => state.setEditingSession);
+  const setSelectedClipId = useAppStore((state) => state.setSelectedClipId);
   const timelineWidth = getTimelineWidth(totalDuration, pixelsPerSecond);
 
   useLayoutEffect(() => {
@@ -100,7 +101,7 @@ export function WaveformTimelineViewport({
     });
   };
 
-  /* 在时间尺或空白轨道点击时执行 Timeline Seek，不改变 Clip Selection。 */
+  /* 在时间尺或空白轨道点击时执行 Timeline Seek。 */
   const handleSeek = (clientX: number) => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -132,6 +133,10 @@ export function WaveformTimelineViewport({
             className="relative h-80 cursor-pointer"
             onMouseDown={(event) => {
               if ((event.target as HTMLElement).closest('[data-clip="true"]')) return;
+              if (editingClipId !== null) {
+                onCommitEditing();
+              }
+              setSelectedClipId(null);
               handleSeek(event.clientX);
             }}
           >
