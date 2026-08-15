@@ -1,4 +1,4 @@
-import { RefObject, useEffect } from 'react';
+import { RefObject, useLayoutEffect } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import type { SrtEntry } from '../../types';
 import { SubtitleTrack } from './SubtitleTrack';
@@ -53,7 +53,7 @@ export function WaveformTimelineViewport({
   const setEditingSession = useAppStore((state) => state.setEditingSession);
   const timelineWidth = getTimelineWidth(totalDuration, pixelsPerSecond);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
 
@@ -62,15 +62,23 @@ export function WaveformTimelineViewport({
     }
   }, [session.scrollLeft, viewportRef]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isPlaying || isFreeTrimInteracting || editingClipId !== null) return;
 
     const viewport = viewportRef.current;
     if (!viewport) return;
 
     const anchor = viewport.clientWidth * PLAYHEAD_FOLLOW_ANCHOR_RATIO;
-    const targetScrollLeft = Math.max(currentTime * pixelsPerSecond - anchor, 0);
-    viewport.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
+    const maxScrollLeft = Math.max(viewport.scrollWidth - viewport.clientWidth, 0);
+    const targetScrollLeft = Math.min(
+      Math.max(getTimelineX(currentTime, pixelsPerSecond) - anchor, 0),
+      maxScrollLeft
+    );
+
+    if (Math.abs(viewport.scrollLeft - targetScrollLeft) > 1) {
+      // 播放时 currentTime 已按动画帧推进；反复启动 smooth scroll 会让浏览器动画队列追不上 playhead。
+      viewport.scrollLeft = targetScrollLeft;
+    }
   }, [
     currentTime,
     editingClipId,
@@ -84,6 +92,7 @@ export function WaveformTimelineViewport({
   const handleViewportScroll = () => {
     const viewport = viewportRef.current;
     if (!viewport) return;
+    if (isPlaying) return;
 
     setEditingSession({
       ...session,
