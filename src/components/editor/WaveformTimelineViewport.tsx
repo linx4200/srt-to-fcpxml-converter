@@ -1,8 +1,6 @@
 import { RefObject, useEffect } from 'react';
-import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
 import type { SrtEntry } from '../../types';
-import { formatTimestamp } from '../../utils';
 import { SubtitleTrack } from './SubtitleTrack';
 import { TimeRuler } from './TimeRuler';
 import { WaveformLayer } from './WaveformLayer';
@@ -51,7 +49,6 @@ export function WaveformTimelineViewport({
   onBeginFreeTrim,
   onTimeUpdate,
 }: WaveformTimelineViewportProps) {
-  const { t } = useI18n();
   const session = useAppStore((state) => state.editingSession);
   const setEditingSession = useAppStore((state) => state.setEditingSession);
   const timelineWidth = getTimelineWidth(totalDuration, pixelsPerSecond);
@@ -109,22 +106,13 @@ export function WaveformTimelineViewport({
   };
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[#0d0d0d] px-4 py-5 flex-1 min-h-0">
-      <div className="mb-3 flex items-center justify-between text-[11px] font-medium text-white/45">
-        <span>{t('timelineEditorTitle')}</span>
-        <span className="font-mono">{formatTimestamp(currentTime)}</span>
-      </div>
-
+    <div className="h-full min-h-0">
       <div
         ref={viewportRef}
         onScroll={handleViewportScroll}
-        className="h-full overflow-x-auto overflow-y-hidden rounded-[24px] border border-white/8 bg-black/20 scrollbar-hide"
+        className="h-full overflow-x-auto overflow-y-hidden bg-black/20 scrollbar-hide"
       >
         <div style={{ width: `${timelineWidth}px` }} className="relative min-h-full">
-          <div className="sticky left-0 z-10 flex h-10 items-end bg-gradient-to-r from-black/80 via-black/30 to-transparent pl-4 text-[10px] text-white/35">
-            00:00:00.000
-          </div>
-
           <TimeRuler
             totalDuration={totalDuration}
             pixelsPerSecond={pixelsPerSecond}
@@ -132,7 +120,7 @@ export function WaveformTimelineViewport({
           />
 
           <div
-            className="relative h-[320px] cursor-pointer"
+            className="relative h-80 cursor-pointer"
             onMouseDown={(event) => {
               if ((event.target as HTMLElement).closest('[data-clip="true"]')) return;
               handleSeek(event.clientX);

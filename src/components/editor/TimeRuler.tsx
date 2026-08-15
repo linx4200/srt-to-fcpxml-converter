@@ -15,7 +15,7 @@ export function TimeRuler({
 }: TimeRulerProps) {
   return (
     <div
-      className="relative h-[72px] border-b border-white/6"
+      className="relative h-18 border-b border-white/6"
       onMouseDown={(event) => onSeek(event.clientX)}
     >
       {Array.from({ length: Math.ceil(totalDuration) + 1 }, (_, second) => {
@@ -28,7 +28,7 @@ export function TimeRuler({
           >
             <div className="h-4 w-px bg-white/20" />
             <div className="mt-2 -translate-x-1/2 text-[10px] font-mono text-white/35">
-              {formatTimestamp(second).slice(3, 11)}
+              {formatTimestamp(second, true).slice(3, 11)}
             </div>
           </div>
         );

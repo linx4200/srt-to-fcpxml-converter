@@ -117,34 +117,40 @@ export function TimelineEditor({
           </div>
         </div>
 
-        <div className="min-w-0 flex flex-col gap-4">
-          <TimelineToolbar
-            currentTime={currentTime}
-            isPlaying={isPlaying}
-            editingClipId={editingClipId}
-            onPlayPause={onPlayPause}
-            onTimeUpdate={onTimeUpdate}
-            onExit={handleExit}
-          />
+        <div className="min-w-0 min-h-0 flex flex-col">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-theme-surface/40">
+            <div className="border-b border-white/8 px-4 py-3">
+              <TimelineToolbar
+                currentTime={currentTime}
+                isPlaying={isPlaying}
+                editingClipId={editingClipId}
+                onPlayPause={onPlayPause}
+                onTimeUpdate={onTimeUpdate}
+                onExit={handleExit}
+              />
+            </div>
 
-          <WaveformTimelineViewport
-            viewportRef={viewportRef}
-            samples={samples}
-            currentTime={currentTime}
-            totalDuration={totalDuration}
-            isPlaying={isPlaying}
-            pixelsPerSecond={pixelsPerSecond}
-            editingClipId={editingClipId}
-            isFreeTrimInteracting={isFreeTrimInteracting}
-            draftText={draftText}
-            onDraftTextChange={setDraftText}
-            onCommitEditing={commitEditing}
-            onCancelEditing={cancelEditing}
-            onEnterEditing={handleEnterEditing}
-            onDeleteSelected={handleDeleteSelected}
-            onBeginFreeTrim={beginFreeTrim}
-            onTimeUpdate={onTimeUpdate}
-          />
+            <div className="min-h-0 flex-1 px-4 py-4">
+              <WaveformTimelineViewport
+                viewportRef={viewportRef}
+                samples={samples}
+                currentTime={currentTime}
+                totalDuration={totalDuration}
+                isPlaying={isPlaying}
+                pixelsPerSecond={pixelsPerSecond}
+                editingClipId={editingClipId}
+                isFreeTrimInteracting={isFreeTrimInteracting}
+                draftText={draftText}
+                onDraftTextChange={setDraftText}
+                onCommitEditing={commitEditing}
+                onCancelEditing={cancelEditing}
+                onEnterEditing={handleEnterEditing}
+                onDeleteSelected={handleDeleteSelected}
+                onBeginFreeTrim={beginFreeTrim}
+                onTimeUpdate={onTimeUpdate}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </section>

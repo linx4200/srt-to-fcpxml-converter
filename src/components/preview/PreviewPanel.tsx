@@ -1,4 +1,4 @@
-import { Eye, Waves } from 'lucide-react';
+import { Eye, Pencil } from 'lucide-react';
 import { PreviewPlayer } from './player/PreviewPlayer';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
@@ -36,8 +36,8 @@ export function PreviewPanel({
   };
 
   return (
-    <section className="flex-1 bg-[#101010] flex flex-col items-center justify-center p-8 lg:p-10 gap-8 relative overflow-hidden">
-      <div className="w-full max-w-5xl flex items-center justify-between gap-4 flex-wrap">
+    <section className="flex-1 bg-[#101010] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      <div className="w-full flex items-center justify-start gap-4 flex-wrap">
         <div className="flex items-center gap-2 text-white/30">
           <Eye size={16} />
           <span className="text-xs font-medium uppercase tracking-widest">{t('previewTitle')}</span>
@@ -51,9 +51,9 @@ export function PreviewPanel({
             type="button"
             onClick={handleEnterEditingMode}
             disabled={!canEditTimeline}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
           >
-            <Waves size={15} />
+            <Pencil size={15} />
             {t('editTimeline')}
           </button>
         </div>

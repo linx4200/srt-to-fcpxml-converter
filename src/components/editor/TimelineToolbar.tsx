@@ -9,7 +9,7 @@ import {
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
 import { getSubtitleLayoutSpec } from '../../domain/subtitleStyle';
-import { getLogicalPreviewLines } from '../../utils';
+import { formatTimestamp, getLogicalPreviewLines } from '../../utils';
 import { MAX_ZOOM, MIN_ZOOM } from './timelineGeometry';
 
 interface TimelineToolbarProps {
@@ -102,12 +102,18 @@ export function TimelineToolbar({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-3xl border border-white/10 bg-white/4 px-4 py-3">
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center pr-3 border-r border-white/10">
+        <span className="min-w-24 font-mono text-sm font-medium text-white/60">
+          {formatTimestamp(currentTime)}
+        </span>
+      </div>
+
       <div className="flex items-center gap-2 pr-3 border-r border-white/10">
         <button
           type="button"
           onClick={onExit}
-          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
+          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none"
         >
           <X size={14} />
           {t('exitEditing')}
@@ -118,21 +124,21 @@ export function TimelineToolbar({
         <button
           type="button"
           onClick={handlePreviousClip}
-          className="rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10"
+          className="cursor-pointer rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none"
         >
           {t('prev')}
         </button>
         <button
           type="button"
           onClick={onPlayPause}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-theme-primary text-black transition-transform hover:scale-105"
+          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-theme-primary text-black transition-transform hover:scale-105 focus:outline-none focus-visible:outline-none"
         >
           {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
         </button>
         <button
           type="button"
           onClick={handleNextClip}
-          className="rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10"
+          className="cursor-pointer rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none"
         >
           {t('next')}
         </button>
@@ -141,9 +147,9 @@ export function TimelineToolbar({
       <div className="flex items-center gap-2 pr-3 border-r border-white/10">
         <button
           type="button"
-          onClick={() => changeZoom(-0.25)}
+          onClick={() => changeZoom(-0.2)}
           disabled={session.zoom <= MIN_ZOOM}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10 disabled:opacity-30"
+          className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-30"
         >
           <Minus size={14} />
         </button>
@@ -152,9 +158,9 @@ export function TimelineToolbar({
         </span>
         <button
           type="button"
-          onClick={() => changeZoom(0.25)}
+          onClick={() => changeZoom(0.2)}
           disabled={session.zoom >= MAX_ZOOM}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10 disabled:opacity-30"
+          className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-30"
         >
           <Plus size={14} />
         </button>
@@ -166,7 +172,7 @@ export function TimelineToolbar({
             type="button"
             onClick={handleSplitByLines}
             disabled={!canSplitByLines}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-35"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-35"
           >
             <Scissors size={14} />
             {t('splitByLines')}
@@ -178,7 +184,7 @@ export function TimelineToolbar({
             type="button"
             onClick={handleCutAtPlayhead}
             disabled={!canCutAtPlayhead}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-35"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-35"
           >
             <Scissors size={14} />
             {t('cutAtPlayhead')}

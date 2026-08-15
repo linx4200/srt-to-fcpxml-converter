@@ -43,7 +43,7 @@ export function PreviewPlayer({
   const renderedText = getRenderedSubtitleText(currentEntry, subtitleLayoutSpec);
 
   return (
-    <div className={`flex flex-col items-center justify-center shrink-0 w-full ${compact ? 'px-0 mt-0' : 'xl:flex-1 mt-12 xl:mt-0 px-2 lg:px-4'}`}>
+    <div className={`flex flex-col items-center justify-center shrink-0 w-full ${compact ? 'px-0 mt-0' : 'xl:flex-1 mt-12 xl:mt-0'}`}>
       <div
         className="@container relative shrink-0 flex flex-col w-full shadow-2xl rounded-2xl overflow-hidden bg-[#0a0a0a] transition-all duration-500 ease-in-out border border-white/10"
         style={{
