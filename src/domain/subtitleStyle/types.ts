@@ -1,11 +1,11 @@
-import type { SubtitleStyle } from '../../types';
+import type { SubtitleStyle, TargetVideoOrientation } from '../../types';
 
-export type SubtitleOrientation = SubtitleStyle['orientation'];
+export type { TargetVideoOrientation };
 export type TimelineFrameRate = SubtitleStyle['fps'];
 
 export interface SubtitleLayoutSpec {
-  /* 字幕布局所需的目标视频方向，用于选择参考分辨率和预览比例。 */
-  orientation: SubtitleOrientation;
+  /* 字幕布局所需的 Target Video Orientation，用于选择参考分辨率和预览比例。 */
+  orientation: TargetVideoOrientation;
   /* FCP 字号参数，用于计算 Logical Preview Line 的文字 fitting。 */
   fontSize: number;
 }

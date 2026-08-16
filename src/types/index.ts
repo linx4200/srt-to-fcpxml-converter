@@ -1,4 +1,5 @@
 export type ClipEditState = 'imported' | 'reflowed' | 'manual';
+export type TargetVideoOrientation = 'landscape' | 'portrait';
 
 export interface SrtEntry {
   /* Subtitle Clip 的稳定标识，用于选择、编辑和结构性操作定位。 */
@@ -32,8 +33,8 @@ export interface SubtitleStyle {
   paddingY: number;
   /* FCP 字号参数，是 Subtitle Reflow、预览和导出的共享布局输入。 */
   fontSize: number;
-  /* 目标视频方向，决定预览比例、参考分辨率和导出布局。 */
-  orientation: 'landscape' | 'portrait';
+  /* Target Video Orientation，决定预览比例、参考分辨率和导出布局。 */
+  orientation: TargetVideoOrientation;
   /* 预览中模拟的平台浮层，不写入 FCPXML。 */
   platform: 'none' | 'xhs' | 'douyin';
   /* 时间量化使用的帧率，确保 Working Timeline 操作落在帧边界上。 */

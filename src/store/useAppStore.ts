@@ -27,6 +27,22 @@ export const useAppStore = create<AppStore>()((...args) => ({
       get().saveEditingSession(currentTime);
     }
   },
+  /* 切换 Target Video Orientation 会改变布局规则，因此由 root store 同步更新样式、重排和选择状态。 */
+  changeTargetVideoOrientation: (targetVideoOrientation) => {
+    const [, get] = args;
+    const { subtitleStyle, workingTimeline } = get();
+    if (subtitleStyle.orientation === targetVideoOrientation) return;
+
+    get().updateSubtitleStyle({
+      orientation: targetVideoOrientation,
+      platform: targetVideoOrientation === 'landscape' ? 'none' : subtitleStyle.platform,
+    });
+
+    if (workingTimeline.length > 0) {
+      get().reflowWorkingTimeline();
+      get().setSelectedClipId(null);
+    }
+  },
   /* 清除参考音频前先退出 Subtitle Editing Mode，避免编辑界面依赖已释放的音频资源。 */
   clearReferenceAudio: (currentTime) => {
     const [, get] = args;

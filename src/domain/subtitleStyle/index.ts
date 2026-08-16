@@ -2,9 +2,9 @@ export * from './adapters';
 export type {
   SubtitleBackgroundSpec,
   SubtitleLayoutSpec,
-  SubtitleOrientation,
   SubtitleRenderSpec,
   SubtitleReflowSpec,
+  TargetVideoOrientation,
   TimelineFrameRate,
   TimelineFrameSpec,
 } from './types';

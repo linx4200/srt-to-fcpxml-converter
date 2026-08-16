@@ -1,4 +1,5 @@
 import type { StateCreator } from 'zustand';
+import type { TargetVideoOrientation } from '../domain/subtitleStyle';
 import type { TimelineClipBoundaryEdge } from '../domain/workingTimeline';
 import type { EditingSessionState, SrtEntry, SubtitleStyle } from '../types';
 
@@ -95,6 +96,8 @@ export interface ProjectActions {
   importSubtitleFile: (file: File) => Promise<void>;
   /* 顶层 Subtitle Reflow 命令：重排 Working Timeline，并在编辑模式中保存会话。 */
   reflowSubtitles: (currentTime: number) => void;
+  /* 顶层 Target Video Orientation 切换命令：必要时重排 Working Timeline 并清空 Clip Selection。 */
+  changeTargetVideoOrientation: (targetVideoOrientation: TargetVideoOrientation) => void;
   /* 顶层参考音频清理命令：必要时先退出 Subtitle Editing Mode，再释放音频资源。 */
   clearReferenceAudio: (currentTime: number) => void;
   /* 顶层清空项目命令：清除 Working Timeline、媒体状态和编辑状态。 */

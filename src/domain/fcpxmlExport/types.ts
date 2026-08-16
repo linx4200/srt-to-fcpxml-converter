@@ -1,11 +1,11 @@
-import type { SubtitleOrientation, TimelineFrameRate } from '../subtitleStyle';
+import type { TargetVideoOrientation, TimelineFrameRate } from '../subtitleStyle';
 
 export interface FcpxmlExportSpec {
   /* FCPXML sequence 和 title offset/duration 使用的帧率。 */
   frameRate: TimelineFrameRate;
   /* FCPXML format 资源的画幅信息，由字幕样式中的方向翻译而来。 */
   format: {
-    orientation: SubtitleOrientation;
+    orientation: TargetVideoOrientation;
     width: number;
     height: number;
   };
