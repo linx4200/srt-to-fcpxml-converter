@@ -44,6 +44,10 @@ _Avoid_: Empty slot, missing subtitle
 A timeline-wide action that re-processes **Subtitle Clips** using layout-dependent text fitting rules.
 _Avoid_: Timeline split, clip cut, per-clip split
 
+**Target Video Orientation**:
+The target video direction used by preview, **Subtitle Reflow**, and FCPXML export. Current supported values are portrait `1080x1920` and landscape `1920x1080`.
+_Avoid_: Video layout, screen mode, aspect toggle
+
 **Clip Split**:
 A local timeline action that turns one selected **Subtitle Clip** into two clips by separating its first and second **Logical Preview Line**.
 _Avoid_: Global split, subtitle reflow, playhead cut

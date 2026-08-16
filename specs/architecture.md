@@ -7,8 +7,8 @@
 当前系统覆盖以下核心能力：
 
 - 导入并解析 `.srt` 字幕文件。
-- 基于视频布局、字号和安全宽度对字幕进行自动重排。
-- 在浏览器内预览字幕样式、横竖屏布局和短视频平台浮层。
+- 基于 Target Video Orientation、字号和安全宽度对字幕进行自动重排。
+- 在浏览器内预览字幕样式、Target Video Orientation 和短视频平台浮层。
 - 上传参考音频，基于音频播放和波形辅助检查字幕时间线。
 - 在时间线中编辑字幕文本、拆分字幕片段、按播放头切开片段、修剪片段边界。
 - 将当前工作时间线导出为 Final Cut Pro 兼容的 `.fcpxml` 文件。
@@ -30,7 +30,7 @@
 store 主要维护以下状态：
 
 - 当前 Working Timeline `workingTimeline`。
-- 字幕样式与导出参数 `subtitleStyle`。
+- 字幕样式与导出参数 `subtitleStyle`，其中包含 Target Video Orientation、字号、帧率和平台浮层选择。
 - 参考音频文件、浏览器 object URL 与 Waveform 解码状态。
 - Subtitle Editing Mode、Clip Selection 和编辑会话状态。
 
@@ -38,7 +38,7 @@ store 主要维护以下状态：
 
 主要模块职责如下：
 
-- `components/settings/`：负责字幕文件、音频文件、布局、帧率、平台浮层和字幕样式设置。
+- `components/settings/`：负责字幕文件、音频文件、Target Video Orientation、帧率、平台浮层和字幕样式设置。
 - `components/preview/`：负责字幕预览、播放控制、平台浮层和字幕渲染。
 - `components/editor/TimelineEditor.tsx`：负责独立的波形时间线编辑模式。
 - `hooks/usePlayback.ts`：封装播放时间、音频同步和当前字幕片段计算。
@@ -51,7 +51,7 @@ store 主要维护以下状态：
 `components` 与主界面的对应关系如下：
 
 - 顶部栏：`components/layout/Header.tsx`，承载应用标题、语言切换、外部链接和 FCPXML 导出入口。
-- 左侧设置栏：`components/settings/SettingsPanel.tsx`，组合文件上传、音频上传、布局、帧率、平台浮层、字幕样式和重新排布入口。
+- 左侧设置栏：`components/settings/SettingsPanel.tsx`，组合文件上传、音频上传、Target Video Orientation、帧率、平台浮层、字幕样式和重新排布入口。
 - 右侧预览区：`components/preview/PreviewPanel.tsx`，组织预览标题、进入时间线编辑入口和播放器。
 - 预览播放器：`components/preview/player/PreviewPlayer.tsx`，负责画布比例、背景图、平台浮层、当前字幕和播放控制的整体布局。
 - 平台浮层：`components/preview/overlays/`，负责小红书、抖音或干净预览模式的界面模拟。
@@ -62,18 +62,20 @@ store 主要维护以下状态：
 
 ## 3. 核心数据流
 
-系统的核心数据流围绕当前工作时间线展开。用户上传的 SRT 文件会先被解析为 `SrtEntry[]`，随后按当前字幕样式进行重排，形成用于预览、编辑和导出的 Working Timeline。
+系统的核心数据流围绕当前工作时间线展开。用户上传的 SRT 文件会先被解析为 `SrtEntry[]`，随后按当前字幕样式和 Target Video Orientation 进行重排，形成用于预览、编辑和导出的 Working Timeline。
 
 主流程如下：
 
 1. 用户上传 `.srt` 文件。
 2. `parseSrt` 将文件内容解析为字幕片段。
-3. `reflowTimelineEntries` 根据当前布局、字号、安全宽度和帧率生成新的工作时间线。
+3. `reflowWorkingTimeline` 根据当前 Target Video Orientation、字号、安全宽度和帧率生成新的工作时间线。
 4. `PreviewPlayer` 根据当前播放时间从工作时间线中选择正在显示的字幕片段，并用当前样式渲染预览。
 5. 用户可上传参考音频进入时间线编辑模式，编辑操作会直接回写工作时间线。
 6. 导出时，`generateFcpxml` 读取当前工作时间线和字幕样式，生成 `.fcpxml` 文件。
 
-工作时间线是系统内部最重要的数据结构。导入、自动重排、手动编辑和导出都不会维护各自独立的数据副本，而是持续更新同一组 `SrtEntry`。因此，用户在预览和时间线编辑中看到的字幕内容，就是最终导出 FCPXML 的数据来源。
+工作时间线是系统内部最重要的数据结构。导入、自动重排、Target Video Orientation 切换、手动编辑和导出都不会维护各自独立的数据副本，而是持续更新同一组 `SrtEntry`。因此，用户在预览和时间线编辑中看到的字幕内容，就是最终导出 FCPXML 的数据来源。
+
+当用户在已有 Working Timeline 的情况下切换 Target Video Orientation，系统会先确认该操作会重新排布当前字幕；确认后通过 root store action 更新字幕样式并执行 Subtitle Reflow。取消确认时，Target Video Orientation 和 Working Timeline 都保持不变。没有导入字幕时，Target Video Orientation 可以直接切换。
 
 音频数据只参与播放和 Waveform 展示。音频文件会被转换为浏览器 object URL 供播放使用，并由 media slice 触发 Web Audio API 解码生成 Waveform 采样；这些数据不会写入 FCPXML，也不会改变字幕导出的结构。
 
@@ -87,7 +89,9 @@ store 主要维护以下状态：
 
 ### 前端预览与导出共享布局模型
 
-前端预览和 FCPXML 导出共享同一套核心参数，包括视频方向、参考分辨率、字号、帧率和逻辑换行结果。字幕文本会先根据安全宽度和字号被处理成 Logical Preview Lines，再用于预览展示和自动拆分。
+前端预览和 FCPXML 导出共享同一套核心参数，包括 Target Video Orientation、参考分辨率、字号、帧率和逻辑换行结果。字幕文本会先根据安全宽度和字号被处理成 Logical Preview Lines，再用于预览展示和自动拆分。
+
+Target Video Orientation 当前固定为 portrait `1080x1920` 或 landscape `1920x1080`。它决定浏览器预览比例、Subtitle Reflow 的安全宽度、FCPXML format 资源的宽高，以及导出字幕在目标画幅中的位置。第一版横屏只支持干净预览；小红书和抖音平台浮层仍限定在竖屏预览中。
 
 Web 预览的目标是尽量接近 Final Cut Pro 中的字幕位置和尺寸，但它不是最终渲染的权威来源。Final Cut Pro 的字体引擎、模板渲染和坐标系统与浏览器不同，因此项目明确以 FCP 导入结果为最终准则。
 
