@@ -6,8 +6,9 @@ import { useAppStore } from '../../store/useAppStore';
 export function PlatformSettings() {
   const { t } = useI18n();
   const platform = useAppStore((state) => state.subtitleStyle.platform);
+  const orientation = useAppStore((state) => state.subtitleStyle.orientation);
   const updateSubtitleStyle = useAppStore((state) => state.updateSubtitleStyle);
-  const platforms: ('none' | 'xhs' | 'douyin')[] = ['none', 'xhs', 'douyin'];
+  const platformOptions: ('none' | 'xhs' | 'douyin')[] = ['none', 'xhs', 'douyin'];
 
   return (
     <section className="space-y-4">
@@ -15,28 +16,33 @@ export function PlatformSettings() {
         {t('overlay')}
       </label>
       <div className="grid grid-cols-3 gap-2">
-        {platforms.map((p) => (
-          <SettingButton
-            key={p}
-            isActive={platform === p}
-            onClick={() => updateSubtitleStyle({ platform: p })}
-            className="w-full justify-center px-2"
-          >
-            {p === 'none' && <span className="text-xs font-medium">{t('overlayClean')}</span>}
-            {p === 'xhs' && (
-              <>
-                <span className="text-xs font-medium">🍠</span>
-                <span className="text-xs font-medium">{t('overlayRednote')}</span>
-              </>
-            )}
-            {p === 'douyin' && (
-              <>
-                <Music2 size={15} />
-                <span className="text-xs font-medium">{t('overlayTiktok')}</span>
-              </>
-            )}
-          </SettingButton>
-        ))}
+        {platformOptions.map((platformOption) => {
+          const isLandscapePlatformDisabled = orientation === 'landscape' && platformOption !== 'none';
+
+          return (
+            <SettingButton
+              key={platformOption}
+              isActive={platform === platformOption}
+              onClick={() => updateSubtitleStyle({ platform: platformOption })}
+              disabled={isLandscapePlatformDisabled}
+              className="w-full justify-center px-2"
+            >
+              {platformOption === 'none' && <span className="text-xs font-medium">{t('overlayClean')}</span>}
+              {platformOption === 'xhs' && (
+                <>
+                  <span className="text-xs font-medium">🍠</span>
+                  <span className="text-xs font-medium">{t('overlayRednote')}</span>
+                </>
+              )}
+              {platformOption === 'douyin' && (
+                <>
+                  <Music2 size={15} />
+                  <span className="text-xs font-medium">{t('overlayTiktok')}</span>
+                </>
+              )}
+            </SettingButton>
+          );
+        })}
       </div>
     </section>
   );
