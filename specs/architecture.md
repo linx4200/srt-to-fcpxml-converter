@@ -29,6 +29,7 @@
 
 store 主要维护以下状态：
 
+- 上传后只读的 Imported SRT Snapshot `sourceSrtEntries`，只作为自动重排和重建 Working Timeline 的输入。
 - 当前 Working Timeline `workingTimeline`。
 - 字幕样式与导出参数 `subtitleStyle`，其中包含 Target Video Orientation、字号、帧率和平台浮层选择。
 - 参考音频文件、浏览器 object URL 与 Waveform 解码状态。
@@ -43,7 +44,7 @@ store 主要维护以下状态：
 - `components/editor/TimelineEditor.tsx`：负责独立的波形时间线编辑模式。
 - `hooks/usePlayback.ts`：封装播放时间、音频同步和当前字幕片段计算。
 - `hooks/useAudioWaveform.ts`：作为 Waveform 解码的 React 生命周期 adapter，在参考音频变化时触发 media slice action。
-- `store/`：负责 Working Timeline、字幕样式、媒体文件状态、Waveform 解码状态、Subtitle Editing Mode 和 Clip Selection 的跨组件状态管理。
+- `store/`：负责 Imported SRT Snapshot、Working Timeline、字幕样式、媒体文件状态、Waveform 解码状态、Subtitle Editing Mode 和 Clip Selection 的跨组件状态管理。
 - `utils/`：负责 SRT 解析、文本归一化、字幕预览布局计算、时间量化、Waveform 采样和 Working Timeline 结构性编辑操作。
 - `utils/fcpxml.ts`：负责将当前工作时间线生成 FCPXML。
 - `i18n.tsx` 与 `seo.ts`：分别负责双语文案和页面 SEO 元数据同步。
@@ -62,20 +63,21 @@ store 主要维护以下状态：
 
 ## 3. 核心数据流
 
-系统的核心数据流围绕当前工作时间线展开。用户上传的 SRT 文件会先被解析为 `SrtEntry[]`，随后按当前字幕样式和 Target Video Orientation 进行重排，形成用于预览、编辑和导出的 Working Timeline。
+系统的核心数据流围绕当前工作时间线展开。用户上传的 SRT 文件会先被解析为只读的 Imported SRT Snapshot `sourceSrtEntries`，随后按当前字幕样式和 Target Video Orientation 进行重排，形成用于预览、编辑和导出的 Working Timeline。
 
 主流程如下：
 
 1. 用户上传 `.srt` 文件。
-2. `parseSrt` 将文件内容解析为字幕片段。
-3. `reflowWorkingTimeline` 根据当前 Target Video Orientation、字号、安全宽度和帧率生成新的工作时间线。
+2. `parseSrt` 将文件内容解析为 Imported SRT Snapshot，并保存为 `sourceSrtEntries`。
+3. `reflowWorkingTimeline` 以 `sourceSrtEntries` 为输入，根据当前 Target Video Orientation、字号、安全宽度和帧率生成新的工作时间线。
 4. `PreviewPlayer` 根据当前播放时间从工作时间线中选择正在显示的字幕片段，并用当前样式渲染预览。
 5. 用户可上传参考音频进入时间线编辑模式，编辑操作会直接回写工作时间线。
-6. 导出时，`generateFcpxml` 读取当前工作时间线和字幕样式，生成 `.fcpxml` 文件。
+6. 用户确认执行 Subtitle Reflow 或切换 Target Video Orientation 时，系统再次以 `sourceSrtEntries` 为输入重建 Working Timeline，手动调整过的文本、拆分和换行可能被替换。
+7. 导出时，`generateFcpxml` 读取当前工作时间线和字幕样式，生成 `.fcpxml` 文件。
 
-工作时间线是系统内部最重要的数据结构。导入、自动重排、Target Video Orientation 切换、手动编辑和导出都不会维护各自独立的数据副本，而是持续更新同一组 `SrtEntry`。因此，用户在预览和时间线编辑中看到的字幕内容，就是最终导出 FCPXML 的数据来源。
+工作时间线是系统内部最重要的数据结构。Working Timeline 仍然是预览、编辑和导出的单一事实来源：用户在预览和时间线编辑中看到的字幕内容，就是最终导出 FCPXML 的数据来源。Imported SRT Snapshot 不是第二份可编辑时间线，也不参与预览、编辑或导出；它只保存上传文件解析后的源字幕，用于在导入、Subtitle Reflow 和 Target Video Orientation 切换时重新生成 Working Timeline。
 
-当用户在已有 Working Timeline 的情况下切换 Target Video Orientation，系统会先确认该操作会重新排布当前字幕；确认后通过 root store action 更新字幕样式并执行 Subtitle Reflow。取消确认时，Target Video Orientation 和 Working Timeline 都保持不变。没有导入字幕时，Target Video Orientation 可以直接切换。
+当用户在已有 Working Timeline 的情况下切换 Target Video Orientation，系统会先确认该操作会重新排布当前字幕；确认后通过 root store action 更新字幕样式，并从 Imported SRT Snapshot 执行 Subtitle Reflow，重建 Working Timeline。取消确认时，Target Video Orientation 和 Working Timeline 都保持不变。没有导入字幕时，Target Video Orientation 可以直接切换。
 
 音频数据只参与播放和 Waveform 展示。音频文件会被转换为浏览器 object URL 供播放使用，并由 media slice 触发 Web Audio API 解码生成 Waveform 采样；这些数据不会写入 FCPXML，也不会改变字幕导出的结构。
 
@@ -83,9 +85,9 @@ store 主要维护以下状态：
 
 ### Working Timeline 作为单一事实来源
 
-系统没有同时维护“原始字幕”“预览字幕”“编辑字幕”和“导出字幕”多份数据。上传后的字幕会被转换为当前工作时间线，之后自动重排、文本编辑、片段拆分、播放头切开和边界修剪都直接作用于这份时间线。
+系统没有同时维护“预览字幕”“编辑字幕”和“导出字幕”多份可变数据。上传后的字幕会被保存为只读 Imported SRT Snapshot，并转换为当前工作时间线；之后文本编辑、片段拆分、播放头切开和边界修剪都直接作用于 Working Timeline。用户确认执行全局 Subtitle Reflow 或切换 Target Video Orientation 时，系统会从 Imported SRT Snapshot 重建 Working Timeline，而不是在旧方向已经拆分过的 Subtitle Clips 上继续局部重排。
 
-这个设计降低了状态同步复杂度，也避免用户看到的预览结果与最终导出数据不一致。代价是用户执行重新排布全部字幕时，会改变当前工作时间线，因此该操作需要确认。
+这个设计降低了状态同步复杂度，也避免用户看到的预览结果与最终导出数据不一致。代价是用户执行重新排布全部字幕时，会改变当前 Working Timeline，并可能替换手动调整过的文本、拆分和换行，因此该操作需要确认。
 
 ### 前端预览与导出共享布局模型
 

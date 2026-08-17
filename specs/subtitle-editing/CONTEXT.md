@@ -41,8 +41,12 @@ A span on the timeline where no subtitle is shown by intention.
 _Avoid_: Empty slot, missing subtitle
 
 **Subtitle Reflow**:
-A timeline-wide action that re-processes **Subtitle Clips** using layout-dependent text fitting rules.
+A confirmed timeline-wide action that rebuilds the **Working Timeline** from the **Imported SRT Snapshot** using layout-dependent text fitting rules.
 _Avoid_: Timeline split, clip cut, per-clip split
+
+**Imported SRT Snapshot**:
+A read-only copy of the uploaded SRT after parsing. It is used only as the source input for import-time layout, **Subtitle Reflow**, and **Target Video Orientation** changes.
+_Avoid_: Editable timeline, preview timeline, export source
 
 **Target Video Orientation**:
 The target video direction used by preview, **Subtitle Reflow**, and FCPXML export. Current supported values are portrait `1080x1920` and landscape `1920x1080`.
@@ -65,8 +69,8 @@ The current set of **Subtitle Clips** used as the source of truth for preview, e
 _Avoid_: Original SRT, raw import, temporary preview data
 
 **Clip Boundary Preservation**:
-The constraint that **Subtitle Reflow** may split text within an existing **Subtitle Clip**, but must not merge text from neighboring clips.
-_Avoid_: Full rebuild, cross-clip reflow
+The local editing constraint that timeline operations such as **Free Trim**, **Clip Split**, and **Playhead Cut** must respect neighboring **Subtitle Clip** boundaries. It does not apply to confirmed **Subtitle Reflow**, which rebuilds the **Working Timeline** from the **Imported SRT Snapshot**.
+_Avoid_: Global reflow rule, imported source boundary
 
 **Free Trim**:
 Boundary trimming that follows the dragged position without magnetic snapping, while still respecting neighboring clip boundaries.
