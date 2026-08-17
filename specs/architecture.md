@@ -55,7 +55,7 @@ store 主要维护以下状态：
 - 右侧预览区：`components/preview/PreviewPanel.tsx`，组织预览标题、进入时间线编辑入口和播放器。
 - 预览播放器：`components/preview/player/PreviewPlayer.tsx`，负责画布比例、背景图、平台浮层、当前字幕和播放控制的整体布局。
 - 平台浮层：`components/preview/overlays/`，负责小红书、抖音或干净预览模式的界面模拟。
-- 时间线编辑界面：`components/editor/TimelineEditor.tsx`，进入编辑模式后替换主界面，展示小预览、播放控制、缩放控制、音频波形和字幕片段轨道。
+- 时间线编辑界面：`components/editor/TimelineEditor.tsx`，进入编辑模式后替换主界面，根据 Target Video Orientation 组织编辑预览和 Waveform Timeline；横屏使用上预览、下时间线布局，竖屏保留侧栏预览，播放控制、缩放控制和局部编辑命令跟随 Waveform Timeline。
 - 轻提示：`components/message/`，用于上传成功、重新排布成功、导出开始和错误提示。
 
 架构上的核心边界是：UI 组件只负责用户交互和展示，跨组件状态由 `store` 管理，字幕时间线的结构性变更集中在 `utils` 层，FCPXML 导出逻辑独立在 `utils/fcpxml.ts` 中。这使得预览、编辑和导出可以共享同一份 Working Timeline，同时避免导出协议细节散落在 UI 组件中。

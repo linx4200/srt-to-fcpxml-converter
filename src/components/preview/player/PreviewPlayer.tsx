@@ -18,6 +18,7 @@ interface PreviewPlayerProps {
   onTimeUpdate: (time: number) => void;
   showControls?: boolean;
   compact?: boolean;
+  maxDisplayHeight?: string;
 }
 
 export function PreviewPlayer({
@@ -28,6 +29,7 @@ export function PreviewPlayer({
   onTimeUpdate,
   showControls = true,
   compact = false,
+  maxDisplayHeight,
 }: PreviewPlayerProps) {
   const { t } = useI18n();
   const entries = useAppStore((state) => state.workingTimeline);
@@ -35,10 +37,13 @@ export function PreviewPlayer({
   const subtitleLayoutSpec = getSubtitleLayoutSpec(subtitleStyle);
   const subtitleRenderSpec = getSubtitleRenderSpec(subtitleStyle);
   const { ref: containerRef, width: containerWidth, height: containerHeight } = useContainerSize();
-  const playerMaxWidth =
+  const aspectRatioWidth =
     subtitleStyle.orientation === 'landscape'
-      ? compact ? '100%' : 'min(100%, calc(65vh * 16 / 9))'
-      : compact ? '100%' : 'min(100%, calc(65vh * 9 / 16))';
+      ? `calc(${maxDisplayHeight ?? '65vh'} * 16 / 9)`
+      : `calc(${maxDisplayHeight ?? '65vh'} * 9 / 16)`;
+  const playerMaxWidth = compact && !maxDisplayHeight
+    ? '100%'
+    : `min(100%, ${aspectRatioWidth})`;
   const currentEntry = getTimelineClipAtTime(entries, currentTime);
   const renderedText = getRenderedSubtitleText(currentEntry, subtitleLayoutSpec);
 
