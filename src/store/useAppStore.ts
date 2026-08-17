@@ -11,7 +11,7 @@ export const useAppStore = create<AppStore>()((...args) => ({
   ...createStyleSlice(...args),
   ...createMediaSlice(...args),
   ...createEditingSlice(...args),
-  /* 导入字幕文件的顶层命令，集中处理文件读取、Working Timeline 生成和编辑状态重置。 */
+  /* 导入字幕文件的顶层命令，集中处理文件读取、Imported SRT Snapshot 保存、Working Timeline 生成和编辑状态重置。 */
   importSubtitleFile: async (file) => {
     const [, get] = args;
     const content = await file.text();
@@ -19,7 +19,7 @@ export const useAppStore = create<AppStore>()((...args) => ({
     get().importSrtContent(content);
     get().resetEditingState();
   },
-  /* 执行 Subtitle Reflow，并在编辑模式中保留当前 playhead 会话快照。 */
+  /* 从 Imported SRT Snapshot 执行 Subtitle Reflow，并在编辑模式中保留当前 playhead 会话快照。 */
   reflowSubtitles: (currentTime) => {
     const [, get] = args;
     get().reflowWorkingTimeline();
@@ -27,10 +27,10 @@ export const useAppStore = create<AppStore>()((...args) => ({
       get().saveEditingSession(currentTime);
     }
   },
-  /* 切换 Target Video Orientation 会改变布局规则，因此由 root store 同步更新样式、重排和选择状态。 */
+  /* 切换 Target Video Orientation 会改变布局规则，因此由 root store 同步更新样式、从 Imported SRT Snapshot 重建 Working Timeline 和选择状态。 */
   changeTargetVideoOrientation: (targetVideoOrientation) => {
     const [, get] = args;
-    const { subtitleStyle, workingTimeline } = get();
+    const { subtitleStyle, sourceSrtEntries } = get();
     if (subtitleStyle.orientation === targetVideoOrientation) return;
 
     get().updateSubtitleStyle({
@@ -38,7 +38,7 @@ export const useAppStore = create<AppStore>()((...args) => ({
       platform: targetVideoOrientation === 'landscape' ? 'none' : subtitleStyle.platform,
     });
 
-    if (workingTimeline.length > 0) {
+    if (sourceSrtEntries.length > 0) {
       get().reflowWorkingTimeline();
       get().setSelectedClipId(null);
     }
@@ -51,7 +51,7 @@ export const useAppStore = create<AppStore>()((...args) => ({
     }
     get().clearAudio();
   },
-  /* 清空项目时同步清理 Working Timeline、媒体资源和编辑会话。 */
+  /* 清空项目时同步清理 Imported SRT Snapshot、Working Timeline、媒体资源和编辑会话。 */
   clearProject: () => {
     const [, get] = args;
     get().clearWorkingTimeline();

@@ -7,14 +7,14 @@ import type { TargetVideoOrientation } from '../../domain/subtitleStyle';
 export function LayoutSettings() {
   const { t } = useI18n();
   const orientation = useAppStore((state) => state.subtitleStyle.orientation);
-  const workingTimeline = useAppStore((state) => state.workingTimeline);
+  const sourceSrtEntries = useAppStore((state) => state.sourceSrtEntries);
   const changeTargetVideoOrientation = useAppStore((state) => state.changeTargetVideoOrientation);
 
-  /* 切换 Target Video Orientation 会重排已有 Working Timeline，因此由交互入口负责确认。 */
+  /* 切换 Target Video Orientation 会从 Imported SRT Snapshot 重建 Working Timeline，因此由交互入口负责确认。 */
   const handleTargetVideoOrientationChange = (targetVideoOrientation: TargetVideoOrientation) => {
     if (orientation === targetVideoOrientation) return;
 
-    if (workingTimeline.length > 0) {
+    if (sourceSrtEntries.length > 0) {
       const shouldContinue = window.confirm(t('confirmTargetVideoOrientationChange'));
       if (!shouldContinue) return;
     }

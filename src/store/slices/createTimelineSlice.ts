@@ -27,21 +27,27 @@ function applyWorkingTimelineResult(
 }
 
 export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) => ({
+  /* Imported SRT Snapshot 初始为空，导入后只作为全局重排重建 Working Timeline 的源输入。 */
+  sourceSrtEntries: [],
   /* Working Timeline 初始为空，直到用户导入 SRT。 */
   workingTimeline: [],
-  /* 导入时先解析 SRT，再用当前样式执行 Subtitle Reflow，避免预览与导出使用未布局文本。 */
+  /* 导入时先保存 Imported SRT Snapshot，再用当前样式生成初始 Working Timeline。 */
   importSrtContent: (content) => {
     const parsedEntries = parseSrt(content);
     const result = reflowWorkingTimelineDomain({
-      workingTimeline: parsedEntries,
+      sourceEntries: parsedEntries,
       subtitleReflowSpec: getSubtitleReflowSpec(get().subtitleStyle),
     });
+    set({ sourceSrtEntries: parsedEntries });
     applyWorkingTimelineResult(set, result);
   },
-  /* Subtitle Reflow 必须作用于现有 Working Timeline，保持 Clip Boundary Preservation。 */
+  /* 全局 Subtitle Reflow 从 Imported SRT Snapshot 重建 Working Timeline，允许替换手动调整。 */
   reflowWorkingTimeline: () => {
+    const sourceSrtEntries = get().sourceSrtEntries;
+    if (sourceSrtEntries.length === 0) return;
+
     const result = reflowWorkingTimelineDomain({
-      workingTimeline: get().workingTimeline,
+      sourceEntries: sourceSrtEntries,
       subtitleReflowSpec: getSubtitleReflowSpec(get().subtitleStyle),
     });
     applyWorkingTimelineResult(set, result);
@@ -93,6 +99,6 @@ export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) =>
     });
     applyWorkingTimelineResult(set, result);
   },
-  /* 清空字幕数据时只移除 Working Timeline，媒体和编辑状态由顶层 project action 协调。 */
-  clearWorkingTimeline: () => set({ workingTimeline: [] }),
+  /* 清空字幕数据时移除 Imported SRT Snapshot 和 Working Timeline，媒体和编辑状态由顶层 project action 协调。 */
+  clearWorkingTimeline: () => set({ sourceSrtEntries: [], workingTimeline: [] }),
 });

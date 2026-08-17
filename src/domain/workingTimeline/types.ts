@@ -21,7 +21,8 @@ export interface TimelineSegment {
 }
 
 export interface WorkingTimelineStyleCommandInput {
-  workingTimeline: SrtEntry[];
+  /* 全局重排的源字幕，可以是 Imported SRT Snapshot 或导入时刚解析出的字幕片段。 */
+  sourceEntries: SrtEntry[];
   subtitleReflowSpec: SubtitleReflowSpec;
 }
 

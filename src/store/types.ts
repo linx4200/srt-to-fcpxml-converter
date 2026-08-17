@@ -4,11 +4,13 @@ import type { TimelineClipBoundaryEdge } from '../domain/workingTimeline';
 import type { EditingSessionState, SrtEntry, SubtitleStyle } from '../types';
 
 export interface TimelineSlice {
+  /* 上传 SRT 解析后的只读 Imported SRT Snapshot，只作为导入、确认后的 Subtitle Reflow 和确认后的 Target Video Orientation 切换时重建 Working Timeline 的输入；不参与预览、编辑或导出。 */
+  sourceSrtEntries: SrtEntry[];
   /* 当前 Working Timeline，是预览、编辑、Subtitle Reflow 和导出的单一事实来源。 */
   workingTimeline: SrtEntry[];
-  /* 导入 SRT 文本并按当前 SubtitleStyle 生成初始 Working Timeline。 */
+  /* 导入 SRT 文本，保存 Imported SRT Snapshot，并按当前 SubtitleStyle 生成初始 Working Timeline。 */
   importSrtContent: (content: string) => void;
-  /* 基于当前 SubtitleStyle 对 Working Timeline 执行 Subtitle Reflow。 */
+  /* 基于 Imported SRT Snapshot 和当前 SubtitleStyle 重建 Working Timeline。 */
   reflowWorkingTimeline: () => void;
   /* 更新一个 Subtitle Clip 文本，并由 Working Timeline domain module 维护 editState。 */
   updateTimelineClipText: (clipId: number, text: string) => void;
@@ -24,7 +26,7 @@ export interface TimelineSlice {
     edge: TimelineClipBoundaryEdge,
     nextTime: number
   ) => void;
-  /* 清空 Working Timeline，通常用于清空项目。 */
+  /* 清空 Imported SRT Snapshot 和 Working Timeline，通常用于清空项目。 */
   clearWorkingTimeline: () => void;
 }
 
@@ -92,15 +94,15 @@ export interface EditingSlice {
 }
 
 export interface ProjectActions {
-  /* 顶层字幕导入命令：读取文件、写入文件名、生成 Working Timeline 并重置编辑状态。 */
+  /* 顶层字幕导入命令：读取文件、写入文件名、保存 Imported SRT Snapshot、生成 Working Timeline 并重置编辑状态。 */
   importSubtitleFile: (file: File) => Promise<void>;
-  /* 顶层 Subtitle Reflow 命令：重排 Working Timeline，并在编辑模式中保存会话。 */
+  /* 顶层 Subtitle Reflow 命令：从 Imported SRT Snapshot 重建 Working Timeline，并在编辑模式中保存会话。 */
   reflowSubtitles: (currentTime: number) => void;
-  /* 顶层 Target Video Orientation 切换命令：必要时重排 Working Timeline 并清空 Clip Selection。 */
+  /* 顶层 Target Video Orientation 切换命令：必要时从 Imported SRT Snapshot 重建 Working Timeline 并清空 Clip Selection。 */
   changeTargetVideoOrientation: (targetVideoOrientation: TargetVideoOrientation) => void;
   /* 顶层参考音频清理命令：必要时先退出 Subtitle Editing Mode，再释放音频资源。 */
   clearReferenceAudio: (currentTime: number) => void;
-  /* 顶层清空项目命令：清除 Working Timeline、媒体状态和编辑状态。 */
+  /* 顶层清空项目命令：清除 Imported SRT Snapshot、Working Timeline、媒体状态和编辑状态。 */
   clearProject: () => void;
 }
 

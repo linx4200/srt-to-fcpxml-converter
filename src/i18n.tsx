@@ -79,7 +79,7 @@ const translations = {
     splitByLinesDisabled: '只有当选中字幕在当前逻辑预览中恰好为两行时才可用',
     selectClipToCut: '请先选中一条字幕，再按播放头切开',
     cutAtPlayheadDisabled: '播放头必须落在当前字幕内部，才可以按播放头切开',
-    confirmReflow: '这会按当前样式重新排布全部字幕。继续吗？',
+    confirmReflow: '这会按当前样式重新排布全部字幕，手动调整过的拆分和换行可能变化。继续吗？',
   },
   en: {
     appTitle: 'SRT to FCPXML',
@@ -140,7 +140,7 @@ const translations = {
     splitByLinesDisabled: 'Only available when the selected subtitle resolves to exactly two logical preview lines.',
     selectClipToCut: 'Select a subtitle clip before cutting at the playhead.',
     cutAtPlayheadDisabled: 'The playhead must sit inside the selected clip before you can cut it.',
-    confirmReflow: 'This will reflow all subtitles using the current style. Continue?',
+    confirmReflow: 'This will reflow all subtitles using the current style. Manual splits and line breaks may change. Continue?',
   },
 } as const;
 

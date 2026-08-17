@@ -23,13 +23,13 @@ export function SettingsPanel({
   onStopPlayback,
 }: SettingsPanelProps) {
   const { t } = useI18n();
-  const workingTimeline = useAppStore((state) => state.workingTimeline);
+  const sourceSrtEntries = useAppStore((state) => state.sourceSrtEntries);
   const setAudioFile = useAppStore((state) => state.setAudioFile);
   const clearProject = useAppStore((state) => state.clearProject);
   const importSubtitleFile = useAppStore((state) => state.importSubtitleFile);
   const reflowSubtitles = useAppStore((state) => state.reflowSubtitles);
   const clearReferenceAudio = useAppStore((state) => state.clearReferenceAudio);
-  const isSubtitleUploaded = workingTimeline.length > 0;
+  const isSubtitleUploaded = sourceSrtEntries.length > 0;
 
   /* 读取用户选择的 SRT 文件，导入成功后重置 playhead 和播放状态。 */
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +68,7 @@ export function SettingsPanel({
     onStopPlayback();
   };
 
-  /* 用户确认后对整个 Working Timeline 执行 Subtitle Reflow。 */
+  /* 用户确认后从 Imported SRT Snapshot 重建整个 Working Timeline。 */
   const handleReflowAllSubtitles = () => {
     if (!isSubtitleUploaded) return;
     const shouldContinue = window.confirm(t('confirmReflow'));

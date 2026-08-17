@@ -10,7 +10,7 @@ interface SplitSubtitlesButtonProps {
 
 export function SplitSubtitlesButton({ onSplitSubtitles }: SplitSubtitlesButtonProps) {
   const { t } = useI18n();
-  const canSplit = useAppStore((state) => state.workingTimeline.length > 0);
+  const canSplit = useAppStore((state) => state.sourceSrtEntries.length > 0);
   const [showTooltip, setShowTooltip] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 

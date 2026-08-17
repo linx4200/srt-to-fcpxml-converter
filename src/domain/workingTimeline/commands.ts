@@ -20,14 +20,14 @@ import type {
 } from './types';
 
 export function reflowWorkingTimeline({
-  workingTimeline,
+  sourceEntries,
   subtitleReflowSpec,
 }: WorkingTimelineStyleCommandInput): WorkingTimelineCommandResult {
   const { width, height } = getReferenceResolution(subtitleReflowSpec);
   let nextId = 1;
   const nextEntries: SrtEntry[] = [];
 
-  for (const entry of workingTimeline) {
+  for (const entry of sourceEntries) {
     const logicalLines = getLogicalPreviewLines(entry.text, subtitleReflowSpec, width, height);
     if (logicalLines.length <= 1) {
       nextEntries.push(
