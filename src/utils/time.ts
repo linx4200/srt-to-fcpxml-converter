@@ -14,6 +14,7 @@ export function secondsToTime(seconds: number): string {
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
 }
 
+/* 将秒数格式化为 HH:MM:SS.mmm */
 export function formatTimestamp(seconds: number, dropMicroSecond = false): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);

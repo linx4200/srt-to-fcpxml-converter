@@ -1,6 +1,7 @@
 import { Pause, Play } from 'lucide-react';
 import { useI18n } from '../../../i18n';
 import { useAppStore } from '../../../store/useAppStore';
+import { formatTimestamp as formatTime  } from '../../../utils/time';
 
 interface PlaybackControlsProps {
   currentTime: number;
@@ -25,15 +26,6 @@ export function PlaybackControls({
 
   if (workingTimeline.length === 0) return null;
 
-  /* 将秒数格式化为 HH:MM:SS.mmm，方便用户校对字幕时间。 */
-  const formatTime = (seconds: number) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    const ms = Math.floor((seconds % 1) * 1000);
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
-  };
-
   return (
     <div
       className="mt-4 w-full bg-white/5 px-4 py-2.5 rounded-2xl border border-white/10 space-y-2"
@@ -41,7 +33,7 @@ export function PlaybackControls({
     >
       {/* Timeline Slider */}
       <div className="flex items-center gap-3">
-        <span className="text-[9px] font-mono text-white/40 w-[60px]">{formatTime(currentTime)}</span>
+        <span className="text-[9px] font-mono text-white/40 w-15">{formatTime(currentTime, true)}</span>
         <div className="flex-1 h-1 bg-white/10 rounded-full relative group cursor-pointer flex items-center">
           {/* Active track */}
           <div
@@ -63,7 +55,7 @@ export function PlaybackControls({
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer m-0"
           />
         </div>
-        <span className="text-[9px] font-mono text-white/40 w-[60px] text-right">{formatTime(totalDuration)}</span>
+        <span className="text-[9px] font-mono text-white/40 w-15 text-right">{formatTime(totalDuration, true)}</span>
       </div>
 
       {/* Playback Buttons */}
