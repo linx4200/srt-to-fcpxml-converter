@@ -18,11 +18,11 @@ export interface TimelineFrameSpec {
 export interface SubtitleReflowSpec extends SubtitleLayoutSpec, TimelineFrameSpec {}
 
 export interface SubtitleBackgroundSpec {
-  /* 字幕背景颜色，当前保留给预览/未来导出能力使用。 */
+  /* 字幕背景颜色，用于横屏 FCPXML 背景框，并保留给未来预览背景能力使用。 */
   backgroundColor: string;
-  /* 字幕背景透明度，当前保留给预览/未来导出能力使用。 */
+  /* 字幕背景透明度，用于横屏 FCPXML 背景框，并保留给未来预览背景能力使用。 */
   backgroundOpacity: number;
-  /* 字幕背景圆角半径，当前保留给预览/未来导出能力使用。 */
+  /* 字幕背景圆角半径，用于横屏 FCPXML 背景框，并保留给未来预览背景能力使用。 */
   borderRadius: number;
 }
 

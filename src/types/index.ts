@@ -21,11 +21,11 @@ export interface SrtEntry {
 export interface SubtitleStyle {
   /* 字幕文字颜色，同时用于预览和 FCPXML 导出。 */
   textColor: string;
-  /* 字幕背景颜色，保留给预览/未来导出能力使用。 */
+  /* 字幕背景颜色，用于横屏 FCPXML 背景框，并保留给未来预览背景能力使用。 */
   backgroundColor: string;
-  /* 字幕背景透明度，保留给预览/未来导出能力使用。 */
+  /* 字幕背景透明度，用于横屏 FCPXML 背景框，并保留给未来预览背景能力使用。 */
   backgroundOpacity: number;
-  /* 字幕背景圆角半径，保留给预览/未来导出能力使用。 */
+  /* 字幕背景圆角半径，用于横屏 FCPXML 背景框，并保留给未来预览背景能力使用。 */
   borderRadius: number;
   /* 字幕左右内边距，影响预览字幕盒模型。 */
   paddingX: number;

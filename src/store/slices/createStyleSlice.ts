@@ -6,8 +6,8 @@ export const INITIAL_STYLE: SubtitleStyle = {
   textColor: '#ffffff',
   /* 背景参数当前主要作为保留字段，避免未来启用时缺少默认值。 */
   backgroundColor: '#000000',
-  /* 背景透明度默认值，保留给预览/未来导出能力使用。 */
-  backgroundOpacity: 0.6,
+  /* 横屏 FCPXML 背景框默认透明度，匹配 Final Cut Pro 手动参考样式。 */
+  backgroundOpacity: 0.4,
   /* 背景圆角默认值，保留给预览/未来导出能力使用。 */
   borderRadius: 8,
   /* 字幕左右内边距默认值，参与预览字幕盒模型。 */

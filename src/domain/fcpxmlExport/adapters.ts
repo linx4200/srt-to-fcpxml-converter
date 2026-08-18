@@ -19,5 +19,10 @@ export function getFcpxmlExportSpec(subtitleStyle: SubtitleStyle): FcpxmlExportS
       fontSize: subtitleStyle.fontSize,
       textColor: subtitleStyle.textColor,
     },
+    backgroundStyle: {
+      backgroundColor: subtitleStyle.backgroundColor,
+      backgroundOpacity: subtitleStyle.backgroundOpacity,
+      borderRadius: subtitleStyle.borderRadius,
+    },
   };
 }

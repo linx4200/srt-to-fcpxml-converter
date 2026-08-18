@@ -38,7 +38,7 @@ export function PreviewSubtitle({
       animate={{ opacity: 1, y: 0 }}
       className="text-center whitespace-pre-wrap"
       style={{
-        // 背景色和圆角暂不启用，因为 FCPXML 当前不输出自动字幕背景；
+        // 预览背景暂不启用；横屏 FCPXML 目前用独立矩形生成器输出背景框。
         // backgroundColor: `${subtitleRenderSpec.backgroundColor}${Math.round(subtitleRenderSpec.backgroundOpacity * 255).toString(16).padStart(2, '0')}`,
         // borderRadius: `${subtitleRenderSpec.borderRadius * scale}px`,
         color: subtitleRenderSpec.textColor,
