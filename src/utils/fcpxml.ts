@@ -5,7 +5,7 @@ const FCPXML_FILE_EXTENSION = '.fcpxml';
 const FCPXML_MIME_TYPE = 'application/xml';
 const UNTITLED_EXPORT_FILE_BASENAME = 'subtitles';
 const CUSTOM_TITLE_EFFECT_ID = 'r2';
-const LANDSCAPE_RECTANGLE_EFFECT_ID = 'r3';
+const BACKGROUND_RECTANGLE_EFFECT_ID = 'r3';
 /* FCPXML frameDuration 和 title offset/duration 使用 100/fpsScale 的时间单位。 */
 const FCP_TIME_UNIT_PER_FRAME = 100;
 const FCP_GENERATOR_START_TIME = '3600s';
@@ -15,16 +15,37 @@ const CUSTOM_TITLE_LAYER_POSITION_Y = -25;
 /* FCPXML 里 Custom title 的内部文字位置参数，用于匹配横屏手动调整后的字幕高度。 */
 const LANDSCAPE_CUSTOM_TITLE_TEXT_POSITION = '0 -200';
 
-/* 横屏背景框来自 Final Cut Pro 反导出的矩形生成器坐标，数值是目标画幅归一化坐标。 */
-const LANDSCAPE_BACKGROUND_RECTANGLE = {
-  leftBottom: '0.308493 0.0385199',
-  rightTop: '0.68968 0.112984',
-};
+/*
+ * 不同 Target Video Orientation 的背景框参数来自 Final Cut Pro 反导出的矩形生成器样本。
+ * leftBottom/rightTop 是矩形生成器的归一化坐标，不是 FCPXML 外层 transform 坐标。
+ * roundnessScale 用于把产品层的 borderRadius 像素默认值换算成 FCP 矩形生成器的 Roundness 参数。
+ */
+const BACKGROUND_RECTANGLE_BY_ORIENTATION = {
+  landscape: {
+    /* 横屏背景框约 732px x 80px，位于 1920x1080 画面底部字幕区域。 */
+    leftBottom: '0.308493 0.0385199',
+    rightTop: '0.68968 0.112984',
+    /* 默认 8px borderRadius 对应横屏样本里的 0.01。 */
+    roundnessScale: 800,
+    /* 横屏手动样本通过 Custom title 内部位置参数下移文字。 */
+    shouldWriteTextPositionParam: true,
+    /* 横屏样本的矩形层没有写入 disableDRT，保持样本最小结构。 */
+    shouldWriteRectangleDisableDrt: false,
+  },
+  portrait: {
+    /* 竖屏背景框约 856px x 144px，位于 1080x1920 画面底部字幕区域。 */
+    leftBottom: '0.100612 0.225738',
+    rightTop: '0.893051 0.300731',
+    /* 默认 8px borderRadius 对应竖屏样本里的 0.02。 */
+    roundnessScale: 400,
+    /* 竖屏手动样本没有 Custom title 内部位置参数，保留外层 transform 即可。 */
+    shouldWriteTextPositionParam: false,
+    /* 竖屏样本的矩形层包含 disableDRT，保留以匹配 FCP 反导出结构。 */
+    shouldWriteRectangleDisableDrt: true,
+  },
+} as const;
 
-/* Final Cut Pro 矩形生成器的圆角参数不是像素；默认 8px 对应反导出样本中的 0.01。 */
-const RECTANGLE_ROUNDNESS_SCALE = 800;
-
-const LANDSCAPE_RECTANGLE_EFFECT = {
+const BACKGROUND_RECTANGLE_EFFECT = {
   name: '矩形',
   uid: 'Cloud:D3FDCEBA-B513-4136-B9C9-9D22EE453213',
 };
@@ -125,40 +146,50 @@ function hexToRgbValues(hex: string, precision = 2): string {
   return `${r.toFixed(precision)} ${g.toFixed(precision)} ${b.toFixed(precision)}`;
 }
 
-function buildLandscapeCustomTitleParams(fcpxmlExportSpec: FcpxmlExportSpec): string {
-  if (fcpxmlExportSpec.format.orientation !== 'landscape') return '';
+function buildCustomTitleParams(fcpxmlExportSpec: FcpxmlExportSpec): string {
+  const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
+  // 只有横屏需要写入 Custom title 内部文字位置；竖屏位置由 adjust-transform 保持。
+  const textPositionParam = backgroundRectangle.shouldWriteTextPositionParam
+    ? `
+                            <param name="${CUSTOM_TITLE_TEXT_POSITION_PARAM.name}" key="${CUSTOM_TITLE_TEXT_POSITION_PARAM.key}" value="${LANDSCAPE_CUSTOM_TITLE_TEXT_POSITION}"/>`
+    : '';
 
-  return `
-                            <param name="${CUSTOM_TITLE_TEXT_POSITION_PARAM.name}" key="${CUSTOM_TITLE_TEXT_POSITION_PARAM.key}" value="${LANDSCAPE_CUSTOM_TITLE_TEXT_POSITION}"/>
+  return `${textPositionParam}
                             <param name="${CUSTOM_TITLE_ALIGNMENT_PARAM.name}" key="${CUSTOM_TITLE_ALIGNMENT_PARAM.key}" value="${CUSTOM_TITLE_ALIGNMENT_PARAM.value}"/>
                             <param name="${CUSTOM_TITLE_OUT_SEQUENCING_PARAM.name}" key="${CUSTOM_TITLE_OUT_SEQUENCING_PARAM.key}" value="${CUSTOM_TITLE_OUT_SEQUENCING_PARAM.value}"/>
                             <param name="${CUSTOM_TITLE_DISABLE_DRT_PARAM.name}" key="${CUSTOM_TITLE_DISABLE_DRT_PARAM.key}" value="${CUSTOM_TITLE_DISABLE_DRT_PARAM.value}"/>`;
 }
 
-function buildLandscapeSubtitleBackgroundVideo(
+function buildSubtitleBackgroundVideo(
   fcpxmlExportSpec: FcpxmlExportSpec,
   totalFrames: number,
   fpsScale: number
 ): string {
-  if (fcpxmlExportSpec.format.orientation !== 'landscape' || totalFrames <= 0) return '';
+  if (totalFrames <= 0) return '';
 
   // Final Cut Pro 手动生成的矩形框比 sequence 短一帧；保留这个边界，避免尾帧超出主时间线。
   const backgroundFrameDuration = Math.max(totalFrames - 1, 0);
   if (backgroundFrameDuration === 0) return '';
 
+  const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
   const backgroundDuration = backgroundFrameDuration * FCP_TIME_UNIT_PER_FRAME;
   const backgroundFillColor = hexToRgbValues(fcpxmlExportSpec.backgroundStyle.backgroundColor, 6);
-  const backgroundRoundness = fcpxmlExportSpec.backgroundStyle.borderRadius / RECTANGLE_ROUNDNESS_SCALE;
+  const backgroundRoundness = fcpxmlExportSpec.backgroundStyle.borderRadius / backgroundRectangle.roundnessScale;
+  // 竖屏反导出样本包含矩形层 disableDRT；横屏样本没有该字段，因此按方向保留差异。
+  const rectangleDisableDrtParam = backgroundRectangle.shouldWriteRectangleDisableDrt
+    ? `
+                                <param name="${CUSTOM_TITLE_DISABLE_DRT_PARAM.name}" key="${CUSTOM_TITLE_DISABLE_DRT_PARAM.key}" value="${CUSTOM_TITLE_DISABLE_DRT_PARAM.value}"/>`
+    : '';
 
   return `
-                            <video ref="${LANDSCAPE_RECTANGLE_EFFECT_ID}" lane="-1" offset="0s" name="${LANDSCAPE_RECTANGLE_EFFECT.name}" start="${FCP_GENERATOR_START_TIME}" duration="${backgroundDuration}/${fpsScale}s">
+                            <video ref="${BACKGROUND_RECTANGLE_EFFECT_ID}" lane="-1" offset="0s" name="${BACKGROUND_RECTANGLE_EFFECT.name}" start="${FCP_GENERATOR_START_TIME}" duration="${backgroundDuration}/${fpsScale}s">
                                 <param name="${RECTANGLE_BUILD_IN_PARAM.name}" key="${RECTANGLE_BUILD_IN_PARAM.key}" value="${RECTANGLE_BUILD_IN_PARAM.value}"/>
                                 <param name="${RECTANGLE_BUILD_OUT_PARAM.name}" key="${RECTANGLE_BUILD_OUT_PARAM.key}" value="${RECTANGLE_BUILD_OUT_PARAM.value}"/>
-                                <param name="${RECTANGLE_RIGHT_TOP_PARAM.name}" key="${RECTANGLE_RIGHT_TOP_PARAM.key}" value="${LANDSCAPE_BACKGROUND_RECTANGLE.rightTop}"/>
-                                <param name="${RECTANGLE_LEFT_BOTTOM_PARAM.name}" key="${RECTANGLE_LEFT_BOTTOM_PARAM.key}" value="${LANDSCAPE_BACKGROUND_RECTANGLE.leftBottom}"/>
+                                <param name="${RECTANGLE_RIGHT_TOP_PARAM.name}" key="${RECTANGLE_RIGHT_TOP_PARAM.key}" value="${backgroundRectangle.rightTop}"/>
+                                <param name="${RECTANGLE_LEFT_BOTTOM_PARAM.name}" key="${RECTANGLE_LEFT_BOTTOM_PARAM.key}" value="${backgroundRectangle.leftBottom}"/>
                                 <param name="${RECTANGLE_ROUNDNESS_PARAM.name}" key="${RECTANGLE_ROUNDNESS_PARAM.key}" value="${backgroundRoundness}"/>
                                 <param name="${RECTANGLE_FILL_OPACITY_PARAM.name}" key="${RECTANGLE_FILL_OPACITY_PARAM.key}" value="${fcpxmlExportSpec.backgroundStyle.backgroundOpacity}"/>
-                                <param name="${RECTANGLE_FILL_COLOR_PARAM.name}" key="${RECTANGLE_FILL_COLOR_PARAM.key}" value="${backgroundFillColor}"/>
+                                <param name="${RECTANGLE_FILL_COLOR_PARAM.name}" key="${RECTANGLE_FILL_COLOR_PARAM.key}" value="${backgroundFillColor}"/>${rectangleDisableDrtParam}
                             </video>`;
 }
 
@@ -184,16 +215,14 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
   const { width, height } = fcpxmlExportSpec.format;
   const sequenceDuration = totalFrames * FCP_TIME_UNIT_PER_FRAME;
   const textColor = hexToRgbValues(fcpxmlExportSpec.titleStyle.textColor);
-  const landscapeRectangleEffectResource = fcpxmlExportSpec.format.orientation === 'landscape'
-    ? `
-        <effect id="${LANDSCAPE_RECTANGLE_EFFECT_ID}" name="${LANDSCAPE_RECTANGLE_EFFECT.name}" uid="${LANDSCAPE_RECTANGLE_EFFECT.uid}"/>`
-    : '';
-  const landscapeSubtitleBackgroundVideo = buildLandscapeSubtitleBackgroundVideo(
+  const backgroundRectangleEffectResource = `
+        <effect id="${BACKGROUND_RECTANGLE_EFFECT_ID}" name="${BACKGROUND_RECTANGLE_EFFECT.name}" uid="${BACKGROUND_RECTANGLE_EFFECT.uid}"/>`;
+  const subtitleBackgroundVideo = buildSubtitleBackgroundVideo(
     fcpxmlExportSpec,
     totalFrames,
     fpsScale
   );
-  const landscapeCustomTitleParams = buildLandscapeCustomTitleParams(fcpxmlExportSpec);
+  const customTitleParams = buildCustomTitleParams(fcpxmlExportSpec);
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE fcpxml>
@@ -201,14 +230,14 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
     <resources>
         <format id="r1" frameDuration="100/${fpsScale}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
         <!-- 使用 Custom.moti 是因为它是跨语言、跨版本兼容性最好的基础模板，路径极度稳定且没有预设的冲突动画 -->
-        <effect id="${CUSTOM_TITLE_EFFECT_ID}" name="Custom" uid=".../Titles.localized/Build In:Out.localized/Custom.localized/Custom.moti"/>${landscapeRectangleEffectResource}
+        <effect id="${CUSTOM_TITLE_EFFECT_ID}" name="Custom" uid=".../Titles.localized/Build In:Out.localized/Custom.localized/Custom.moti"/>${backgroundRectangleEffectResource}
     </resources>
     <library>
         <event name="SRT2FCPXML">
             <project name="Subtitles">
                 <sequence duration="${sequenceDuration}/${fpsScale}s" format="r1" tcStart="0s" tcFormat="NDF">
                     <spine>
-                        <gap name="Gap" offset="0s" duration="${sequenceDuration}/${fpsScale}s" start="0s">${landscapeSubtitleBackgroundVideo}`;
+                        <gap name="Gap" offset="0s" duration="${sequenceDuration}/${fpsScale}s" start="0s">${subtitleBackgroundVideo}`;
 
   entries.forEach((entry, index) => {
     // 强制将时间从浮点秒数换算为实际的帧数，再转换回 FCPX 的标准分数表现（如 30fps 下的 100/3000s 制）
@@ -233,7 +262,7 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
     // 它的底层机制是：【数值 1 代表 1% 的画幅尺寸】，即传 100 代表 100%。
     // FCPX 检查器中的原点 (0,0) 在屏幕正中央，Y 轴向下为负值。
     xml += `
-                            <title lane="1" ref="${CUSTOM_TITLE_EFFECT_ID}" offset="${startOffset}/${fpsScale}s" name="${escapedText.substring(0, 20)}" duration="${durOffset}/${fpsScale}s" start="${FCP_GENERATOR_START_TIME}">${landscapeCustomTitleParams}
+                            <title lane="1" ref="${CUSTOM_TITLE_EFFECT_ID}" offset="${startOffset}/${fpsScale}s" name="${escapedText.substring(0, 20)}" duration="${durOffset}/${fpsScale}s" start="${FCP_GENERATOR_START_TIME}">${customTitleParams}
                             <text>
                                 <text-style ref="ts${index}">${escapedText}</text-style>
                             </text>

@@ -14,7 +14,7 @@ export interface FcpxmlExportSpec {
     fontSize: number;
     textColor: string;
   };
-  /* FCPXML landscape 字幕背景框参数，来自全局字幕样式。 */
+  /* FCPXML 字幕背景框参数，来自全局字幕样式，并按 Target Video Orientation 映射到不同矩形框。 */
   backgroundStyle: {
     backgroundColor: string;
     backgroundOpacity: number;
