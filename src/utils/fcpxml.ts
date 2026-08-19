@@ -162,17 +162,13 @@ function buildCustomTitleParams(fcpxmlExportSpec: FcpxmlExportSpec): string {
 
 function buildSubtitleBackgroundVideo(
   fcpxmlExportSpec: FcpxmlExportSpec,
-  totalFrames: number,
+  startOffset: number,
+  durOffset: number,
   fpsScale: number
 ): string {
-  if (totalFrames <= 0) return '';
-
-  // Final Cut Pro 手动生成的矩形框比 sequence 短一帧；保留这个边界，避免尾帧超出主时间线。
-  const backgroundFrameDuration = Math.max(totalFrames - 1, 0);
-  if (backgroundFrameDuration === 0) return '';
+  if (durOffset <= 0) return '';
 
   const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
-  const backgroundDuration = backgroundFrameDuration * FCP_TIME_UNIT_PER_FRAME;
   const backgroundFillColor = hexToRgbValues(fcpxmlExportSpec.backgroundStyle.backgroundColor, 6);
   const backgroundRoundness = fcpxmlExportSpec.backgroundStyle.borderRadius / backgroundRectangle.roundnessScale;
   // 竖屏反导出样本包含矩形层 disableDRT；横屏样本没有该字段，因此按方向保留差异。
@@ -182,7 +178,7 @@ function buildSubtitleBackgroundVideo(
     : '';
 
   return `
-                            <video ref="${BACKGROUND_RECTANGLE_EFFECT_ID}" lane="-1" offset="0s" name="${BACKGROUND_RECTANGLE_EFFECT.name}" start="${FCP_GENERATOR_START_TIME}" duration="${backgroundDuration}/${fpsScale}s">
+                            <video ref="${BACKGROUND_RECTANGLE_EFFECT_ID}" lane="-1" offset="${startOffset}/${fpsScale}s" name="${BACKGROUND_RECTANGLE_EFFECT.name}" start="${FCP_GENERATOR_START_TIME}" duration="${durOffset}/${fpsScale}s">
                                 <param name="${RECTANGLE_BUILD_IN_PARAM.name}" key="${RECTANGLE_BUILD_IN_PARAM.key}" value="${RECTANGLE_BUILD_IN_PARAM.value}"/>
                                 <param name="${RECTANGLE_BUILD_OUT_PARAM.name}" key="${RECTANGLE_BUILD_OUT_PARAM.key}" value="${RECTANGLE_BUILD_OUT_PARAM.value}"/>
                                 <param name="${RECTANGLE_RIGHT_TOP_PARAM.name}" key="${RECTANGLE_RIGHT_TOP_PARAM.key}" value="${backgroundRectangle.rightTop}"/>
@@ -217,11 +213,6 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
   const textColor = hexToRgbValues(fcpxmlExportSpec.titleStyle.textColor);
   const backgroundRectangleEffectResource = `
         <effect id="${BACKGROUND_RECTANGLE_EFFECT_ID}" name="${BACKGROUND_RECTANGLE_EFFECT.name}" uid="${BACKGROUND_RECTANGLE_EFFECT.uid}"/>`;
-  const subtitleBackgroundVideo = buildSubtitleBackgroundVideo(
-    fcpxmlExportSpec,
-    totalFrames,
-    fpsScale
-  );
   const customTitleParams = buildCustomTitleParams(fcpxmlExportSpec);
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -237,7 +228,7 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
             <project name="Subtitles">
                 <sequence duration="${sequenceDuration}/${fpsScale}s" format="r1" tcStart="0s" tcFormat="NDF">
                     <spine>
-                        <gap name="Gap" offset="0s" duration="${sequenceDuration}/${fpsScale}s" start="0s">${subtitleBackgroundVideo}`;
+                        <gap name="Gap" offset="0s" duration="${sequenceDuration}/${fpsScale}s" start="0s">`;
 
   entries.forEach((entry, index) => {
     // 强制将时间从浮点秒数换算为实际的帧数，再转换回 FCPX 的标准分数表现（如 30fps 下的 100/3000s 制）
@@ -256,12 +247,19 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
     const startOffset = startFrames * FCP_TIME_UNIT_PER_FRAME;
     const durOffset = (endFrames - startFrames) * FCP_TIME_UNIT_PER_FRAME;
     const escapedText = escapeXml(entry.text);
+    const subtitleBackgroundVideo = buildSubtitleBackgroundVideo(
+      fcpxmlExportSpec,
+      startOffset,
+      durOffset,
+      fpsScale
+    );
 
     // --- FCPXML 的坐标系到底是什么？ ---
     // 在苹果的 FCPXML 1.9+ 协议里，<adjust-transform> 的 position 并不是绝对像素，也不是 0.0 到 1.0 的浮点比例！
     // 它的底层机制是：【数值 1 代表 1% 的画幅尺寸】，即传 100 代表 100%。
     // FCPX 检查器中的原点 (0,0) 在屏幕正中央，Y 轴向下为负值。
-    xml += `
+    // 每个 Subtitle Clip 输出一段同 offset/duration 的矩形背景，避免字幕空档继续显示底板。
+    xml += `${subtitleBackgroundVideo}
                             <title lane="1" ref="${CUSTOM_TITLE_EFFECT_ID}" offset="${startOffset}/${fpsScale}s" name="${escapedText.substring(0, 20)}" duration="${durOffset}/${fpsScale}s" start="${FCP_GENERATOR_START_TIME}">${customTitleParams}
                             <text>
                                 <text-style ref="ts${index}">${escapedText}</text-style>
