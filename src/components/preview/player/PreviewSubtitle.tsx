@@ -65,6 +65,13 @@ export function PreviewSubtitle({
     subtitleRenderSpec.backgroundOpacity
   );
 
+  /*
+   * Preview rendering 这里刻意模拟 FCPXML 的分层：背景框是独立的矩形生成器，
+   * 字幕文字是独立的 Custom title，二者只是共享同一段 Subtitle Clip 时间。
+   * 因此外层只负责统一定位、尺寸和动画，背景层与文字层必须作为 sibling 渲染；
+   * 如果把 backgroundColor 放在文字容器上，浏览器预览会变成父子盒模型，
+   * 和 FCPXML 导出的实际渲染关系不一致。
+   */
   return (
     <motion.div
       key={text}
