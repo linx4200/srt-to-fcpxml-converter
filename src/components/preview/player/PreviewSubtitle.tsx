@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { FCP_RESOLUTION, UI_LOGICAL_RESOLUTION } from '../../../constants';
 import type { SubtitleRenderSpec } from '../../../domain/subtitleStyle';
 import { getFontPixelSize } from '../../../utils';
@@ -68,40 +67,35 @@ export function PreviewSubtitle({
   /*
    * Preview rendering 这里刻意模拟 FCPXML 的分层：背景框是独立的矩形生成器，
    * 字幕文字是独立的 Custom title，二者只是共享同一段 Subtitle Clip 时间。
-   * 因此外层只负责统一定位、尺寸和动画，背景层与文字层必须作为 sibling 渲染；
+   * 因此外层只负责统一定位锚点和动画，背景层与文字层必须作为 sibling 渲染；
    * 如果把 backgroundColor 放在文字容器上，浏览器预览会变成父子盒模型，
-   * 和 FCPXML 导出的实际渲染关系不一致。
+   * 和 FCPXML 导出的实际渲染关系不一致。文字层也不能被背景框宽度约束，
+   * 否则调窄背景框会触发浏览器软换行，覆盖 Working Timeline 已经计算好的 Logical Preview Lines。
    */
   return (
-    <motion.div
-      key={text}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative"
-      style={{
-        width: `${subtitleRenderSpec.backgroundWidth * scale}px`,
-        height: `${subtitleRenderSpec.backgroundHeight * scale}px`,
-      }}
-    >
+    <div key={text} className="relative h-0 w-0">
       <div
-        className="absolute inset-0"
+        className="absolute left-1/2 top-1/2"
         style={{
           backgroundColor,
           borderRadius: `${subtitleRenderSpec.borderRadius * scale}px`,
+          width: `${subtitleRenderSpec.backgroundWidth * scale}px`,
+          height: `${subtitleRenderSpec.backgroundHeight * scale}px`,
+          transform: 'translate(-50%, -50%)',
         }}
       />
       <div
-        className="absolute left-1/2 top-1/2 text-center whitespace-pre-wrap"
+        className="absolute left-1/2 top-1/2 text-center whitespace-pre"
         style={{
           color: subtitleRenderSpec.textColor,
           fontSize: `${fontSize * scale}px`,
           lineHeight: 1,
           transform: 'translate(-50%, -50%)',
-          overflowWrap: 'break-word',
+          width: 'max-content',
         }}
       >
         {text}
       </div>
-    </motion.div>
+    </div>
   );
 }

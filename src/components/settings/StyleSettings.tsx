@@ -19,7 +19,7 @@ const MAX_FONT_SIZE = 80;
 const PERCENTAGE_DISPLAY_MULTIPLIER = 100;
 /* 背景透明度用 0-1 写入预览和 FCPXML，1% 步进便于细调。 */
 const BACKGROUND_OPACITY_RANGE = { min: 0, max: 1, step: 0.01 } as const;
-/* 圆角是产品层 px 值，导出时会按 Target Video Orientation 换算为 FCP Roundness。 */
+/* 圆角在 preview 中按参考画幅缩放，导出时写成同数值的 FCP Roundness。 */
 const BORDER_RADIUS_RANGE = { min: 0, max: 40, step: 1 } as const;
 /* 背景框宽度使用当前 Target Video Orientation 的 FCP 参考像素，范围覆盖常见单双行字幕底板。 */
 const BACKGROUND_WIDTH_RANGE = { min: 200, max: 1200, step: 10 } as const;

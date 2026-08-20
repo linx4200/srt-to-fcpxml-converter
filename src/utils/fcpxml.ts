@@ -17,6 +17,8 @@ const NORMALIZED_COORDINATE_MAX = 1;
 const NORMALIZED_COORDINATE_PRECISION = 6;
 /* 用宽高的一半从中心点反推 leftBottom/rightTop 坐标。 */
 const RECTANGLE_HALF_SIZE_DIVISOR = 2;
+/* FCPXML 中 Roundness 的 XML value 按当前实测为 Final Cut Pro 检查器 Roundness 数值的五百分之一。 */
+const FCP_ROUNDNESS_XML_SCALE = 500;
 
 /* FCPXML 里 Custom title 的内部文字位置参数，用于匹配横屏手动调整后的字幕高度。 */
 const LANDSCAPE_CUSTOM_TITLE_TEXT_POSITION = '0 -200';
@@ -24,15 +26,12 @@ const LANDSCAPE_CUSTOM_TITLE_TEXT_POSITION = '0 -200';
 /*
  * 不同 Target Video Orientation 的背景框参数来自 Final Cut Pro 反导出的矩形生成器样本。
  * centerX/centerY 是矩形生成器的归一化中心点，不是 FCPXML 外层 transform 坐标。
- * roundnessScale 用于把产品层的 borderRadius 像素默认值换算成 FCP 矩形生成器的 Roundness 参数。
  */
 const BACKGROUND_RECTANGLE_BY_ORIENTATION = {
   landscape: {
     /* 横屏中心点来自 732px x 80px 手动样本，位于 1920x1080 画面底部字幕区域。 */
     centerX: 0.499087,
     centerY: 0.075752,
-    /* 默认 8px borderRadius 对应横屏样本里的 0.01。 */
-    roundnessScale: 800,
     /* 横屏手动样本通过 Custom title 内部位置参数下移文字。 */
     shouldWriteTextPositionParam: true,
     /* 横屏样本的矩形层没有写入 disableDRT，保持样本最小结构。 */
@@ -42,8 +41,6 @@ const BACKGROUND_RECTANGLE_BY_ORIENTATION = {
     /* 竖屏中心点来自 856px x 144px 手动样本，位于 1080x1920 画面底部字幕区域。 */
     centerX: 0.496832,
     centerY: 0.263235,
-    /* 默认 8px borderRadius 对应竖屏样本里的 0.02。 */
-    roundnessScale: 400,
     /* 竖屏手动样本没有 Custom title 内部位置参数，保留外层 transform 即可。 */
     shouldWriteTextPositionParam: false,
     /* 竖屏样本的矩形层包含 disableDRT，保留以匹配 FCP 反导出结构。 */
@@ -203,7 +200,7 @@ function buildSubtitleBackgroundVideo(
   const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
   const backgroundRectangleCoordinates = getBackgroundRectangleCoordinates(fcpxmlExportSpec);
   const backgroundFillColor = hexToRgbValues(fcpxmlExportSpec.backgroundStyle.backgroundColor, 6);
-  const backgroundRoundness = fcpxmlExportSpec.backgroundStyle.borderRadius / backgroundRectangle.roundnessScale;
+  const backgroundRoundness = fcpxmlExportSpec.backgroundStyle.borderRadius / FCP_ROUNDNESS_XML_SCALE;
   // 竖屏反导出样本包含矩形层 disableDRT；横屏样本没有该字段，因此按方向保留差异。
   const rectangleDisableDrtParam = backgroundRectangle.shouldWriteRectangleDisableDrt
     ? `
