@@ -4,16 +4,16 @@ import type { AppSliceCreator, StyleSlice } from '../types';
 export const INITIAL_STYLE: SubtitleStyle = {
   /* 默认使用白色字幕，匹配短视频字幕常见视觉。 */
   textColor: '#ffffff',
-  /* 背景参数当前主要作为保留字段，避免未来启用时缺少默认值。 */
+  /* 默认黑色背景，同时用于预览字幕底板和 FCPXML 背景框。 */
   backgroundColor: '#000000',
-  /* 横屏 FCPXML 背景框默认透明度，匹配 Final Cut Pro 手动参考样式。 */
+  /* 字幕背景默认透明度，匹配 Final Cut Pro 手动参考样式。 */
   backgroundOpacity: 0.4,
-  /* 背景圆角默认值，保留给预览/未来导出能力使用。 */
+  /* 背景圆角默认值，预览会按画幅缩放，导出会按 FCP 参数换算。 */
   borderRadius: 8,
-  /* 字幕左右内边距默认值，参与预览字幕盒模型。 */
-  paddingX: 8,
-  /* 字幕上下内边距默认值，参与预览字幕盒模型。 */
-  paddingY: 4,
+  /* 默认背景框宽度，对应当前竖屏 FCPXML 参考矩形约 856px。 */
+  backgroundWidth: 856,
+  /* 默认背景框高度，对应当前竖屏 FCPXML 参考矩形约 144px。 */
+  backgroundHeight: 144,
   /* 默认 FCP 字号，作为 Subtitle Reflow 和 FCPXML 导出的共享输入。 */
   fontSize: 35,
   /* 默认竖屏布局，贴合短视频导出场景。 */

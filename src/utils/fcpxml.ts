@@ -11,20 +11,26 @@ const FCP_TIME_UNIT_PER_FRAME = 100;
 const FCP_GENERATOR_START_TIME = '3600s';
 /* Custom title 外层 transform 保持参考样本的位置基线，横屏实际文字下移由内部位置参数控制。 */
 const CUSTOM_TITLE_LAYER_POSITION_Y = -25;
+/* 背景框矩形坐标使用 0-1 归一化坐标，输出到 FCPXML 时保留 6 位精度。 */
+const NORMALIZED_COORDINATE_MIN = 0;
+const NORMALIZED_COORDINATE_MAX = 1;
+const NORMALIZED_COORDINATE_PRECISION = 6;
+/* 用宽高的一半从中心点反推 leftBottom/rightTop 坐标。 */
+const RECTANGLE_HALF_SIZE_DIVISOR = 2;
 
 /* FCPXML 里 Custom title 的内部文字位置参数，用于匹配横屏手动调整后的字幕高度。 */
 const LANDSCAPE_CUSTOM_TITLE_TEXT_POSITION = '0 -200';
 
 /*
  * 不同 Target Video Orientation 的背景框参数来自 Final Cut Pro 反导出的矩形生成器样本。
- * leftBottom/rightTop 是矩形生成器的归一化坐标，不是 FCPXML 外层 transform 坐标。
+ * centerX/centerY 是矩形生成器的归一化中心点，不是 FCPXML 外层 transform 坐标。
  * roundnessScale 用于把产品层的 borderRadius 像素默认值换算成 FCP 矩形生成器的 Roundness 参数。
  */
 const BACKGROUND_RECTANGLE_BY_ORIENTATION = {
   landscape: {
-    /* 横屏背景框约 732px x 80px，位于 1920x1080 画面底部字幕区域。 */
-    leftBottom: '0.308493 0.0385199',
-    rightTop: '0.68968 0.112984',
+    /* 横屏中心点来自 732px x 80px 手动样本，位于 1920x1080 画面底部字幕区域。 */
+    centerX: 0.499087,
+    centerY: 0.075752,
     /* 默认 8px borderRadius 对应横屏样本里的 0.01。 */
     roundnessScale: 800,
     /* 横屏手动样本通过 Custom title 内部位置参数下移文字。 */
@@ -33,9 +39,9 @@ const BACKGROUND_RECTANGLE_BY_ORIENTATION = {
     shouldWriteRectangleDisableDrt: false,
   },
   portrait: {
-    /* 竖屏背景框约 856px x 144px，位于 1080x1920 画面底部字幕区域。 */
-    leftBottom: '0.100612 0.225738',
-    rightTop: '0.893051 0.300731',
+    /* 竖屏中心点来自 856px x 144px 手动样本，位于 1080x1920 画面底部字幕区域。 */
+    centerX: 0.496832,
+    centerY: 0.263235,
     /* 默认 8px borderRadius 对应竖屏样本里的 0.02。 */
     roundnessScale: 400,
     /* 竖屏手动样本没有 Custom title 内部位置参数，保留外层 transform 即可。 */
@@ -146,6 +152,32 @@ function hexToRgbValues(hex: string, precision = 2): string {
   return `${r.toFixed(precision)} ${g.toFixed(precision)} ${b.toFixed(precision)}`;
 }
 
+function formatNormalizedCoordinate(value: number): string {
+  const normalizedValue = Math.min(
+    NORMALIZED_COORDINATE_MAX,
+    Math.max(NORMALIZED_COORDINATE_MIN, value)
+  );
+
+  return normalizedValue.toFixed(NORMALIZED_COORDINATE_PRECISION);
+}
+
+function getBackgroundRectangleCoordinates(fcpxmlExportSpec: FcpxmlExportSpec) {
+  const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
+  const halfBackgroundWidth =
+    fcpxmlExportSpec.backgroundStyle.backgroundWidth /
+    fcpxmlExportSpec.format.width /
+    RECTANGLE_HALF_SIZE_DIVISOR;
+  const halfBackgroundHeight =
+    fcpxmlExportSpec.backgroundStyle.backgroundHeight /
+    fcpxmlExportSpec.format.height /
+    RECTANGLE_HALF_SIZE_DIVISOR;
+
+  return {
+    leftBottom: `${formatNormalizedCoordinate(backgroundRectangle.centerX - halfBackgroundWidth)} ${formatNormalizedCoordinate(backgroundRectangle.centerY - halfBackgroundHeight)}`,
+    rightTop: `${formatNormalizedCoordinate(backgroundRectangle.centerX + halfBackgroundWidth)} ${formatNormalizedCoordinate(backgroundRectangle.centerY + halfBackgroundHeight)}`,
+  };
+}
+
 function buildCustomTitleParams(fcpxmlExportSpec: FcpxmlExportSpec): string {
   const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
   // 只有横屏需要写入 Custom title 内部文字位置；竖屏位置由 adjust-transform 保持。
@@ -169,6 +201,7 @@ function buildSubtitleBackgroundVideo(
   if (durOffset <= 0) return '';
 
   const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
+  const backgroundRectangleCoordinates = getBackgroundRectangleCoordinates(fcpxmlExportSpec);
   const backgroundFillColor = hexToRgbValues(fcpxmlExportSpec.backgroundStyle.backgroundColor, 6);
   const backgroundRoundness = fcpxmlExportSpec.backgroundStyle.borderRadius / backgroundRectangle.roundnessScale;
   // 竖屏反导出样本包含矩形层 disableDRT；横屏样本没有该字段，因此按方向保留差异。
@@ -181,8 +214,8 @@ function buildSubtitleBackgroundVideo(
                             <video ref="${BACKGROUND_RECTANGLE_EFFECT_ID}" lane="-1" offset="${startOffset}/${fpsScale}s" name="${BACKGROUND_RECTANGLE_EFFECT.name}" start="${FCP_GENERATOR_START_TIME}" duration="${durOffset}/${fpsScale}s">
                                 <param name="${RECTANGLE_BUILD_IN_PARAM.name}" key="${RECTANGLE_BUILD_IN_PARAM.key}" value="${RECTANGLE_BUILD_IN_PARAM.value}"/>
                                 <param name="${RECTANGLE_BUILD_OUT_PARAM.name}" key="${RECTANGLE_BUILD_OUT_PARAM.key}" value="${RECTANGLE_BUILD_OUT_PARAM.value}"/>
-                                <param name="${RECTANGLE_RIGHT_TOP_PARAM.name}" key="${RECTANGLE_RIGHT_TOP_PARAM.key}" value="${backgroundRectangle.rightTop}"/>
-                                <param name="${RECTANGLE_LEFT_BOTTOM_PARAM.name}" key="${RECTANGLE_LEFT_BOTTOM_PARAM.key}" value="${backgroundRectangle.leftBottom}"/>
+                                <param name="${RECTANGLE_RIGHT_TOP_PARAM.name}" key="${RECTANGLE_RIGHT_TOP_PARAM.key}" value="${backgroundRectangleCoordinates.rightTop}"/>
+                                <param name="${RECTANGLE_LEFT_BOTTOM_PARAM.name}" key="${RECTANGLE_LEFT_BOTTOM_PARAM.key}" value="${backgroundRectangleCoordinates.leftBottom}"/>
                                 <param name="${RECTANGLE_ROUNDNESS_PARAM.name}" key="${RECTANGLE_ROUNDNESS_PARAM.key}" value="${backgroundRoundness}"/>
                                 <param name="${RECTANGLE_FILL_OPACITY_PARAM.name}" key="${RECTANGLE_FILL_OPACITY_PARAM.key}" value="${fcpxmlExportSpec.backgroundStyle.backgroundOpacity}"/>
                                 <param name="${RECTANGLE_FILL_COLOR_PARAM.name}" key="${RECTANGLE_FILL_COLOR_PARAM.key}" value="${backgroundFillColor}"/>${rectangleDisableDrtParam}

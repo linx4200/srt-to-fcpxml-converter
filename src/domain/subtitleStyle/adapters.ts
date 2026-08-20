@@ -33,7 +33,7 @@ export function getSubtitleRenderSpec(subtitleStyle: SubtitleStyle): SubtitleRen
     backgroundColor: subtitleStyle.backgroundColor,
     backgroundOpacity: subtitleStyle.backgroundOpacity,
     borderRadius: subtitleStyle.borderRadius,
-    paddingX: subtitleStyle.paddingX,
-    paddingY: subtitleStyle.paddingY,
+    backgroundWidth: subtitleStyle.backgroundWidth,
+    backgroundHeight: subtitleStyle.backgroundHeight,
   };
 }

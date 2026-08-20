@@ -121,7 +121,7 @@ Waveform 是参考音频派生出的展示数据，不是独立的字幕编辑�
 
 `<title>` 的 `offset` 表示字幕在主时间线上的出现位置，`duration` 表示持续时间；`start` 则是字幕生成器内部的起始时间。当前实现固定使用 `start="3600s"`，避免将外部时间线时间误用为生成器内部时间，导致字幕在 FCP 中存在片段但不显示文字。
 
-FCPXML 会为每个 Subtitle Clip 额外输出一段位于字幕下方的矩形生成器，作为该字幕片段的背景框；背景框与对应 `<title>` 使用相同的 `offset` 和 `duration`，避免 Subtitle Gap 中继续显示底板。背景框使用字幕样式中的背景色、透明度和圆角参数，并根据 Target Video Orientation 选择不同的矩形坐标。横屏字幕标题还会写入 Custom title 的内部文字位置参数，以匹配 Final Cut Pro 手动调整后的底部字幕高度；竖屏字幕标题保留现有外层 `adjust-transform` 位置，不写入该内部位置参数。
+FCPXML 会为每个 Subtitle Clip 额外输出一段位于字幕下方的矩形生成器，作为该字幕片段的背景框；背景框与对应 `<title>` 使用相同的 `offset` 和 `duration`，避免 Subtitle Gap 中继续显示底板。背景框使用字幕样式中的背景色、透明度、圆角、宽度和高度参数，并根据 Target Video Orientation 选择不同的矩形中心点，再按当前背景框宽高换算矩形坐标。横屏字幕标题还会写入 Custom title 的内部文字位置参数，以匹配 Final Cut Pro 手动调整后的底部字幕高度；竖屏字幕标题保留现有外层 `adjust-transform` 位置，不写入该内部位置参数。
 
 ## 5. 已知限制与后续方向
 

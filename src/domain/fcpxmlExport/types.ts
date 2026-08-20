@@ -19,5 +19,7 @@ export interface FcpxmlExportSpec {
     backgroundColor: string;
     backgroundOpacity: number;
     borderRadius: number;
+    backgroundWidth: number;
+    backgroundHeight: number;
   };
 }

@@ -21,16 +21,16 @@ export interface SrtEntry {
 export interface SubtitleStyle {
   /* 字幕文字颜色，同时用于预览和 FCPXML 导出。 */
   textColor: string;
-  /* 字幕背景颜色，用于横屏 FCPXML 背景框，并保留给未来预览背景能力使用。 */
+  /* 字幕背景颜色，同时用于预览和 FCPXML 背景框。 */
   backgroundColor: string;
-  /* 字幕背景透明度，用于横屏 FCPXML 背景框，并保留给未来预览背景能力使用。 */
+  /* 字幕背景透明度，同时用于预览和 FCPXML 背景框。 */
   backgroundOpacity: number;
-  /* 字幕背景圆角半径，用于横屏 FCPXML 背景框，并保留给未来预览背景能力使用。 */
+  /* 字幕背景圆角半径，同时用于预览和 FCPXML 背景框。 */
   borderRadius: number;
-  /* 字幕左右内边距，影响预览字幕盒模型。 */
-  paddingX: number;
-  /* 字幕上下内边距，影响预览字幕盒模型。 */
-  paddingY: number;
+  /* 字幕背景框宽度，单位为当前 Target Video Orientation 的 FCP 参考像素。 */
+  backgroundWidth: number;
+  /* 字幕背景框高度，单位为当前 Target Video Orientation 的 FCP 参考像素。 */
+  backgroundHeight: number;
   /* FCP 字号参数，是 Subtitle Reflow、预览和导出的共享布局输入。 */
   fontSize: number;
   /* Target Video Orientation，决定预览比例、参考分辨率和导出布局。 */
