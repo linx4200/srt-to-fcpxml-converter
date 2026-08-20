@@ -30,6 +30,7 @@ export function getSubtitleRenderSpec(subtitleStyle: SubtitleStyle): SubtitleRen
   return {
     ...getSubtitleLayoutSpec(subtitleStyle),
     textColor: subtitleStyle.textColor,
+    isEnabled: subtitleStyle.isSubtitleBackgroundEnabled,
     backgroundColor: subtitleStyle.backgroundColor,
     backgroundOpacity: subtitleStyle.backgroundOpacity,
     borderRadius: subtitleStyle.borderRadius,

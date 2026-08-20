@@ -4,6 +4,8 @@ import type { AppSliceCreator, StyleSlice } from '../types';
 export const INITIAL_STYLE: SubtitleStyle = {
   /* 默认使用白色字幕，匹配短视频字幕常见视觉。 */
   textColor: '#ffffff',
+  /* 默认启用字幕背景，保持现有预览和 FCPXML 导出效果。 */
+  isSubtitleBackgroundEnabled: true,
   /* 默认黑色背景，同时用于预览字幕底板和 FCPXML 背景框。 */
   backgroundColor: '#000000',
   /* 字幕背景默认透明度，匹配 Final Cut Pro 手动参考样式。 */

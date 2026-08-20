@@ -31,7 +31,7 @@ store 主要维护以下状态：
 
 - 上传后只读的 Imported SRT Snapshot `sourceSrtEntries`，只作为自动重排和重建 Working Timeline 的输入。
 - 当前 Working Timeline `workingTimeline`。
-- 字幕样式与导出参数 `subtitleStyle`，其中包含 Target Video Orientation、字号、帧率和平台浮层选择。
+- 字幕样式与导出参数 `subtitleStyle`，其中包含 Target Video Orientation、字号、帧率、平台浮层选择和字幕背景开关。
 - 参考音频文件、浏览器 object URL 与 Waveform 解码状态。
 - Subtitle Editing Mode、Clip Selection 和编辑会话状态。
 
@@ -121,7 +121,7 @@ Waveform 是参考音频派生出的展示数据，不是独立的字幕编辑�
 
 `<title>` 的 `offset` 表示字幕在主时间线上的出现位置，`duration` 表示持续时间；`start` 则是字幕生成器内部的起始时间。当前实现固定使用 `start="3600s"`，避免将外部时间线时间误用为生成器内部时间，导致字幕在 FCP 中存在片段但不显示文字。
 
-FCPXML 会为每个 Subtitle Clip 额外输出一段位于字幕下方的矩形生成器，作为该字幕片段的背景框；背景框与对应 `<title>` 使用相同的 `offset` 和 `duration`，避免 Subtitle Gap 中继续显示底板。背景框使用字幕样式中的背景色、透明度、圆角、宽度和高度参数，并根据 Target Video Orientation 选择不同的矩形中心点，再按当前背景框宽高换算矩形坐标。横屏字幕标题还会写入 Custom title 的内部文字位置参数，以匹配 Final Cut Pro 手动调整后的底部字幕高度；竖屏字幕标题保留现有外层 `adjust-transform` 位置，不写入该内部位置参数。
+开启字幕背景时，FCPXML 会为每个 Subtitle Clip 额外输出一段位于字幕下方的矩形生成器，作为该字幕片段的背景框；背景框与对应 `<title>` 使用相同的 `offset` 和 `duration`，避免 Subtitle Gap 中继续显示底板。背景框使用字幕样式中的背景色、透明度、圆角、宽度和高度参数，并根据 Target Video Orientation 选择不同的矩形中心点，再按当前背景框宽高换算矩形坐标。关闭字幕背景时，FCPXML 只输出字幕标题片段，不声明矩形生成器资源，也不为 Subtitle Clip 输出背景 `<video>`。横屏字幕标题还会写入 Custom title 的内部文字位置参数，以匹配 Final Cut Pro 手动调整后的底部字幕高度；竖屏字幕标题保留现有外层 `adjust-transform` 位置，不写入该内部位置参数。
 
 ## 5. 已知限制与后续方向
 
@@ -131,7 +131,7 @@ FCPXML 会为每个 Subtitle Clip 额外输出一段位于字幕下方的矩形�
 - 字幕宽度测量依赖浏览器 canvas 和近似 fallback，不同字体、系统和语言下可能存在误差。
 - 当前自动换行主要基于安全宽度和字符测量，尚未针对所有语言的断词规则做专门优化。
 - 时间线编辑暂不支持撤销/重做、磁性吸附、批量选择和批量移动。
-- 导出的 FCPXML 只包含字幕标题片段和对应的字幕背景框生成器，不包含真实视频、音频或完整剪辑工程结构。
+- 导出的 FCPXML 只包含字幕标题片段，以及开启字幕背景时对应的字幕背景框生成器；不包含真实视频、音频或完整剪辑工程结构。
 - 项目当前缺少自动化测试，核心工具函数仍主要依赖人工验证和 TypeScript 静态检查。
 
 后续可以优先演进以下方向：

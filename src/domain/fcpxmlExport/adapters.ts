@@ -20,6 +20,7 @@ export function getFcpxmlExportSpec(subtitleStyle: SubtitleStyle): FcpxmlExportS
       textColor: subtitleStyle.textColor,
     },
     backgroundStyle: {
+      isEnabled: subtitleStyle.isSubtitleBackgroundEnabled,
       backgroundColor: subtitleStyle.backgroundColor,
       backgroundOpacity: subtitleStyle.backgroundOpacity,
       borderRadius: subtitleStyle.borderRadius,

@@ -195,7 +195,7 @@ function buildSubtitleBackgroundVideo(
   durOffset: number,
   fpsScale: number
 ): string {
-  if (durOffset <= 0) return '';
+  if (!fcpxmlExportSpec.backgroundStyle.isEnabled || durOffset <= 0) return '';
 
   const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
   const backgroundRectangleCoordinates = getBackgroundRectangleCoordinates(fcpxmlExportSpec);
@@ -241,8 +241,10 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
   const { width, height } = fcpxmlExportSpec.format;
   const sequenceDuration = totalFrames * FCP_TIME_UNIT_PER_FRAME;
   const textColor = hexToRgbValues(fcpxmlExportSpec.titleStyle.textColor);
-  const backgroundRectangleEffectResource = `
-        <effect id="${BACKGROUND_RECTANGLE_EFFECT_ID}" name="${BACKGROUND_RECTANGLE_EFFECT.name}" uid="${BACKGROUND_RECTANGLE_EFFECT.uid}"/>`;
+  const backgroundRectangleEffectResource = fcpxmlExportSpec.backgroundStyle.isEnabled
+    ? `
+        <effect id="${BACKGROUND_RECTANGLE_EFFECT_ID}" name="${BACKGROUND_RECTANGLE_EFFECT.name}" uid="${BACKGROUND_RECTANGLE_EFFECT.uid}"/>`
+    : '';
   const customTitleParams = buildCustomTitleParams(fcpxmlExportSpec);
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -288,7 +290,7 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
     // 在苹果的 FCPXML 1.9+ 协议里，<adjust-transform> 的 position 并不是绝对像素，也不是 0.0 到 1.0 的浮点比例！
     // 它的底层机制是：【数值 1 代表 1% 的画幅尺寸】，即传 100 代表 100%。
     // FCPX 检查器中的原点 (0,0) 在屏幕正中央，Y 轴向下为负值。
-    // 每个 Subtitle Clip 输出一段同 offset/duration 的矩形背景，避免字幕空档继续显示底板。
+    // 开启字幕背景时，每个 Subtitle Clip 输出一段同 offset/duration 的矩形背景，避免字幕空档继续显示底板。
     xml += `${subtitleBackgroundVideo}
                             <title lane="1" ref="${CUSTOM_TITLE_EFFECT_ID}" offset="${startOffset}/${fpsScale}s" name="${escapedText.substring(0, 20)}" duration="${durOffset}/${fpsScale}s" start="${FCP_GENERATOR_START_TIME}">${customTitleParams}
                             <text>

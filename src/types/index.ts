@@ -21,6 +21,8 @@ export interface SrtEntry {
 export interface SubtitleStyle {
   /* 字幕文字颜色，同时用于预览和 FCPXML 导出。 */
   textColor: string;
+  /* 是否启用字幕背景，关闭时预览和 FCPXML 都不生成背景框。 */
+  isSubtitleBackgroundEnabled: boolean;
   /* 字幕背景颜色，同时用于预览和 FCPXML 背景框。 */
   backgroundColor: string;
   /* 字幕背景透明度，同时用于预览和 FCPXML 背景框。 */

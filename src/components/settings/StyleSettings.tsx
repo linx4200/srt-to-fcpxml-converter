@@ -9,6 +9,7 @@ interface RangeSettingProps {
   max: number;
   step?: number;
   value: number;
+  disabled?: boolean;
   onChange: (value: number) => void;
 }
 
@@ -33,6 +34,7 @@ function RangeSetting({
   max,
   step = 1,
   value,
+  disabled = false,
   onChange,
 }: RangeSettingProps) {
   return (
@@ -47,8 +49,9 @@ function RangeSetting({
         max={max}
         step={step}
         value={value}
+        disabled={disabled}
         onChange={(event) => onChange(Number(event.target.value))}
-        className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+        className="h-1 w-full cursor-pointer appearance-none rounded-lg bg-white/10 accent-theme-primary disabled:cursor-not-allowed disabled:opacity-50"
       />
     </div>
   );
@@ -57,8 +60,11 @@ function RangeSetting({
 export function StyleSettings() {
   const { t } = useI18n();
   const subtitleStyle = useAppStore((state) => state.subtitleStyle);
+  const isSubtitleStyleDisabled = useAppStore((state) => state.sourceSrtEntries.length === 0);
   const updateSubtitleStyle = useAppStore((state) => state.updateSubtitleStyle);
   const [fontSizeInput, setFontSizeInput] = useState(String(subtitleStyle.fontSize));
+  const isBackgroundControlDisabled =
+    isSubtitleStyleDisabled || !subtitleStyle.isSubtitleBackgroundEnabled;
 
   useEffect(() => {
     setFontSizeInput(String(subtitleStyle.fontSize));
@@ -103,6 +109,7 @@ export function StyleSettings() {
                 max={MAX_FONT_SIZE}
                 step="1"
                 value={fontSizeInput}
+                disabled={isSubtitleStyleDisabled}
                 onChange={(e) => setFontSizeInput(e.target.value)}
                 onBlur={(e) => commitFontSizeInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -111,7 +118,7 @@ export function StyleSettings() {
                     e.currentTarget.blur();
                   }
                 }}
-                className="w-16 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-right text-xs text-white outline-none transition focus:border-white/30"
+                className="w-16 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-right text-xs text-white outline-none transition focus:border-white/30 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
           </div>
@@ -121,12 +128,13 @@ export function StyleSettings() {
             max={MAX_FONT_SIZE}
             step="1"
             value={subtitleStyle.fontSize}
+            disabled={isSubtitleStyleDisabled}
             onChange={(e) => {
               const nextValue = parseInt(e.target.value, 10);
               const nextFontSize = updateFontSize(nextValue);
               setFontSizeInput(String(nextFontSize));
             }}
-            className="w-full accent-theme-primary h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+            className="h-1 w-full cursor-pointer appearance-none rounded-lg bg-white/10 accent-theme-primary disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
 
@@ -137,61 +145,85 @@ export function StyleSettings() {
               type="color"
               aria-label={t('textColor')}
               value={subtitleStyle.textColor}
+              disabled={isSubtitleStyleDisabled}
               onChange={(event) => updateSubtitleStyle({ textColor: event.target.value })}
-              className="h-8 w-8 cursor-pointer rounded-lg border-none bg-transparent"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-white/60">{t('backgroundColor')}</span>
-            <input
-              type="color"
-              aria-label={t('backgroundColor')}
-              value={subtitleStyle.backgroundColor}
-              onChange={(event) => updateSubtitleStyle({ backgroundColor: event.target.value })}
-              className="h-8 w-8 cursor-pointer rounded-lg border-none bg-transparent"
+              className="h-8 w-8 cursor-pointer rounded-lg border-none bg-transparent disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
         </div>
 
-        <RangeSetting
-          label={t('backgroundOpacity')}
-          valueLabel={`${Math.round(subtitleStyle.backgroundOpacity * PERCENTAGE_DISPLAY_MULTIPLIER)}%`}
-          min={BACKGROUND_OPACITY_RANGE.min}
-          max={BACKGROUND_OPACITY_RANGE.max}
-          step={BACKGROUND_OPACITY_RANGE.step}
-          value={subtitleStyle.backgroundOpacity}
-          onChange={(backgroundOpacity) => updateSubtitleStyle({ backgroundOpacity })}
-        />
+        <div className="space-y-4 border-t border-white/10 pt-4">
+          <label className="flex items-center justify-between">
+            <span className="text-xs font-medium text-white/60">{t('subtitleBackground')}</span>
+            <input
+              type="checkbox"
+              checked={subtitleStyle.isSubtitleBackgroundEnabled}
+              disabled={isSubtitleStyleDisabled}
+              onChange={(event) =>
+                updateSubtitleStyle({ isSubtitleBackgroundEnabled: event.target.checked })
+              }
+              className="h-4 w-4 cursor-pointer accent-theme-primary disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          </label>
 
-        <RangeSetting
-          label={t('cornerRadius')}
-          valueLabel={`${subtitleStyle.borderRadius}px`}
-          min={BORDER_RADIUS_RANGE.min}
-          max={BORDER_RADIUS_RANGE.max}
-          step={BORDER_RADIUS_RANGE.step}
-          value={subtitleStyle.borderRadius}
-          onChange={(borderRadius) => updateSubtitleStyle({ borderRadius })}
-        />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-white/60">{t('backgroundColor')}</span>
+              <input
+                type="color"
+                aria-label={t('backgroundColor')}
+                value={subtitleStyle.backgroundColor}
+                disabled={isBackgroundControlDisabled}
+                onChange={(event) => updateSubtitleStyle({ backgroundColor: event.target.value })}
+                className="h-8 w-8 cursor-pointer rounded-lg border-none bg-transparent disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
+          </div>
 
-        <div className="grid grid-cols-2 gap-4">
           <RangeSetting
-            label={t('backgroundWidth')}
-            valueLabel={`${subtitleStyle.backgroundWidth}px`}
-            min={BACKGROUND_WIDTH_RANGE.min}
-            max={BACKGROUND_WIDTH_RANGE.max}
-            step={BACKGROUND_WIDTH_RANGE.step}
-            value={subtitleStyle.backgroundWidth}
-            onChange={(backgroundWidth) => updateSubtitleStyle({ backgroundWidth })}
+            label={t('backgroundOpacity')}
+            valueLabel={`${Math.round(subtitleStyle.backgroundOpacity * PERCENTAGE_DISPLAY_MULTIPLIER)}%`}
+            min={BACKGROUND_OPACITY_RANGE.min}
+            max={BACKGROUND_OPACITY_RANGE.max}
+            step={BACKGROUND_OPACITY_RANGE.step}
+            value={subtitleStyle.backgroundOpacity}
+            disabled={isBackgroundControlDisabled}
+            onChange={(backgroundOpacity) => updateSubtitleStyle({ backgroundOpacity })}
           />
+
           <RangeSetting
-            label={t('backgroundHeight')}
-            valueLabel={`${subtitleStyle.backgroundHeight}px`}
-            min={BACKGROUND_HEIGHT_RANGE.min}
-            max={BACKGROUND_HEIGHT_RANGE.max}
-            step={BACKGROUND_HEIGHT_RANGE.step}
-            value={subtitleStyle.backgroundHeight}
-            onChange={(backgroundHeight) => updateSubtitleStyle({ backgroundHeight })}
+            label={t('cornerRadius')}
+            valueLabel={`${subtitleStyle.borderRadius}px`}
+            min={BORDER_RADIUS_RANGE.min}
+            max={BORDER_RADIUS_RANGE.max}
+            step={BORDER_RADIUS_RANGE.step}
+            value={subtitleStyle.borderRadius}
+            disabled={isBackgroundControlDisabled}
+            onChange={(borderRadius) => updateSubtitleStyle({ borderRadius })}
           />
+
+          <div className="grid grid-cols-2 gap-4">
+            <RangeSetting
+              label={t('backgroundWidth')}
+              valueLabel={`${subtitleStyle.backgroundWidth}px`}
+              min={BACKGROUND_WIDTH_RANGE.min}
+              max={BACKGROUND_WIDTH_RANGE.max}
+              step={BACKGROUND_WIDTH_RANGE.step}
+              value={subtitleStyle.backgroundWidth}
+              disabled={isBackgroundControlDisabled}
+              onChange={(backgroundWidth) => updateSubtitleStyle({ backgroundWidth })}
+            />
+            <RangeSetting
+              label={t('backgroundHeight')}
+              valueLabel={`${subtitleStyle.backgroundHeight}px`}
+              min={BACKGROUND_HEIGHT_RANGE.min}
+              max={BACKGROUND_HEIGHT_RANGE.max}
+              step={BACKGROUND_HEIGHT_RANGE.step}
+              value={subtitleStyle.backgroundHeight}
+              disabled={isBackgroundControlDisabled}
+              onChange={(backgroundHeight) => updateSubtitleStyle({ backgroundHeight })}
+            />
+          </div>
         </div>
       </div>
     </section>

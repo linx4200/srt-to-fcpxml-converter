@@ -18,6 +18,8 @@ export interface TimelineFrameSpec {
 export interface SubtitleReflowSpec extends SubtitleLayoutSpec, TimelineFrameSpec {}
 
 export interface SubtitleBackgroundSpec {
+  /* 是否启用字幕背景，关闭时 preview rendering 不渲染背景层。 */
+  isEnabled: boolean;
   /* 字幕背景颜色，同时用于 preview rendering 和 FCPXML 背景框。 */
   backgroundColor: string;
   /* 字幕背景透明度，同时用于 preview rendering 和 FCPXML 背景框。 */

@@ -59,10 +59,12 @@ export function PreviewSubtitle({
 
   const scale = containerHeight / referenceHeight;
   const fontSize = getFontPixelSize(subtitleRenderSpec.fontSize, referenceHeight).height;
-  const backgroundColor = getCssBackgroundColor(
-    subtitleRenderSpec.backgroundColor,
-    subtitleRenderSpec.backgroundOpacity
-  );
+  const backgroundColor = subtitleRenderSpec.isEnabled
+    ? getCssBackgroundColor(
+        subtitleRenderSpec.backgroundColor,
+        subtitleRenderSpec.backgroundOpacity
+      )
+    : null;
 
   /*
    * Preview rendering 这里刻意模拟 FCPXML 的分层：背景框是独立的矩形生成器，
@@ -74,16 +76,18 @@ export function PreviewSubtitle({
    */
   return (
     <div key={text} className="relative h-0 w-0">
-      <div
-        className="absolute left-1/2 top-1/2"
-        style={{
-          backgroundColor,
-          borderRadius: `${subtitleRenderSpec.borderRadius * scale}px`,
-          width: `${subtitleRenderSpec.backgroundWidth * scale}px`,
-          height: `${subtitleRenderSpec.backgroundHeight * scale}px`,
-          transform: 'translate(-50%, -50%)',
-        }}
-      />
+      {backgroundColor !== null && (
+        <div
+          className="absolute left-1/2 top-1/2"
+          style={{
+            backgroundColor,
+            borderRadius: `${subtitleRenderSpec.borderRadius * scale}px`,
+            width: `${subtitleRenderSpec.backgroundWidth * scale}px`,
+            height: `${subtitleRenderSpec.backgroundHeight * scale}px`,
+            transform: 'translate(-50%, -50%)',
+          }}
+        />
+      )}
       <div
         className="absolute left-1/2 top-1/2 text-center whitespace-pre"
         style={{
