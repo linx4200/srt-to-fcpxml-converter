@@ -38,8 +38,4 @@ export interface SubtitleBackgroundLayoutSpec extends SubtitleLayoutSpec {
 export interface SubtitleRenderSpec extends SubtitleBackgroundLayoutSpec, SubtitleBackgroundSpec {
   /* 字幕文字颜色，用于 preview rendering。 */
   textColor: string;
-  /* 字幕背景框宽度，单位为当前 Target Video Orientation 的 FCP 参考像素。 */
-  backgroundWidth: number;
-  /* 字幕背景框高度，单位为当前 Target Video Orientation 的 FCP 参考像素。 */
-  backgroundHeight: number;
 }

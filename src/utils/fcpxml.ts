@@ -1,5 +1,6 @@
 import type { FcpxmlExportSpec } from '../domain/fcpxmlExport';
 import type { SrtEntry } from '../types';
+import { getSubtitleBackgroundSize, type SubtitleBackgroundSize } from './subtitleLayout';
 
 const FCPXML_FILE_EXTENSION = '.fcpxml';
 const FCPXML_MIME_TYPE = 'application/xml';
@@ -158,14 +159,17 @@ function formatNormalizedCoordinate(value: number): string {
   return normalizedValue.toFixed(NORMALIZED_COORDINATE_PRECISION);
 }
 
-function getBackgroundRectangleCoordinates(fcpxmlExportSpec: FcpxmlExportSpec) {
+function getBackgroundRectangleCoordinates(
+  fcpxmlExportSpec: FcpxmlExportSpec,
+  subtitleBackgroundSize: SubtitleBackgroundSize
+) {
   const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
   const halfBackgroundWidth =
-    fcpxmlExportSpec.backgroundStyle.backgroundWidth /
+    subtitleBackgroundSize.width /
     fcpxmlExportSpec.format.width /
     RECTANGLE_HALF_SIZE_DIVISOR;
   const halfBackgroundHeight =
-    fcpxmlExportSpec.backgroundStyle.backgroundHeight /
+    subtitleBackgroundSize.height /
     fcpxmlExportSpec.format.height /
     RECTANGLE_HALF_SIZE_DIVISOR;
 
@@ -191,14 +195,27 @@ function buildCustomTitleParams(fcpxmlExportSpec: FcpxmlExportSpec): string {
 
 function buildSubtitleBackgroundVideo(
   fcpxmlExportSpec: FcpxmlExportSpec,
+  subtitleText: string,
   startOffset: number,
   durOffset: number,
   fpsScale: number
 ): string {
   if (!fcpxmlExportSpec.backgroundStyle.isEnabled || durOffset <= 0) return '';
 
+  const subtitleBackgroundSize = getSubtitleBackgroundSize(subtitleText, {
+    orientation: fcpxmlExportSpec.format.orientation,
+    fontSize: fcpxmlExportSpec.titleStyle.fontSize,
+    backgroundHorizontalPadding:
+      fcpxmlExportSpec.backgroundStyle.backgroundHorizontalPadding,
+    backgroundVerticalPadding: fcpxmlExportSpec.backgroundStyle.backgroundVerticalPadding,
+  });
+  if (subtitleBackgroundSize.width <= 0 || subtitleBackgroundSize.height <= 0) return '';
+
   const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
-  const backgroundRectangleCoordinates = getBackgroundRectangleCoordinates(fcpxmlExportSpec);
+  const backgroundRectangleCoordinates = getBackgroundRectangleCoordinates(
+    fcpxmlExportSpec,
+    subtitleBackgroundSize
+  );
   const backgroundFillColor = hexToRgbValues(fcpxmlExportSpec.backgroundStyle.backgroundColor, 6);
   const backgroundRoundness = fcpxmlExportSpec.backgroundStyle.borderRadius / FCP_ROUNDNESS_XML_SCALE;
   // 竖屏反导出样本包含矩形层 disableDRT；横屏样本没有该字段，因此按方向保留差异。
@@ -281,6 +298,7 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
     const escapedText = escapeXml(entry.text);
     const subtitleBackgroundVideo = buildSubtitleBackgroundVideo(
       fcpxmlExportSpec,
+      entry.text,
       startOffset,
       durOffset,
       fpsScale

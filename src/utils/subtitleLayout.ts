@@ -125,7 +125,7 @@ export function getSubtitleBackgroundSize(
   );
 
   return {
-    width: Math.min(videoWidth * SAFE_WIDTH_RATIO, widestLine + horizontalPadding),
+    width: widestLine + horizontalPadding,
     height: fontPixelSize * logicalLines.length + verticalPadding,
     lineCount: logicalLines.length,
   };

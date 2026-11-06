@@ -10,8 +10,8 @@ export const INITIAL_STYLE: SubtitleStyle = {
   backgroundColor: '#000000',
   /* 字幕背景默认透明度，匹配 Final Cut Pro 手动参考样式。 */
   backgroundOpacity: 0.4,
-  /* 背景圆角默认值，预览会按画幅缩放，导出会按 FCP 参数换算。 */
-  borderRadius: 8,
+  /* 背景默认使用直角，预览会按画幅缩放，导出会按 FCP 参数换算。 */
+  borderRadius: 0,
   /* 默认横向总留白，使背景左右两侧尽量贴近字幕文字。 */
   backgroundHorizontalPadding: 5,
   /* 默认纵向总留白，使背景上下两侧尽量贴近字幕文字。 */

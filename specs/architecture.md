@@ -31,7 +31,7 @@ store 主要维护以下状态：
 
 - 上传后只读的 Imported SRT Snapshot `sourceSrtEntries`，只作为自动重排和重建 Working Timeline 的输入。
 - 当前 Working Timeline `workingTimeline`。
-- 字幕样式与导出参数 `subtitleStyle`，其中包含 Target Video Orientation、字号、帧率、平台浮层选择和字幕背景开关。
+- 字幕样式与导出参数 `subtitleStyle`，其中包含 Target Video Orientation、字号、帧率、平台浮层选择，以及字幕背景开关、颜色、透明度、圆角和横纵总留白。
 - 参考音频文件、浏览器 object URL 与 Waveform 解码状态。
 - Subtitle Editing Mode、Clip Selection 和编辑会话状态。
 
@@ -45,7 +45,7 @@ store 主要维护以下状态：
 - `hooks/usePlayback.ts`：封装播放时间、音频同步和当前字幕片段计算。
 - `hooks/useAudioWaveform.ts`：作为 Waveform 解码的 React 生命周期 adapter，在参考音频变化时触发 media slice action。
 - `store/`：负责 Imported SRT Snapshot、Working Timeline、字幕样式、媒体文件状态、Waveform 解码状态、Subtitle Editing Mode 和 Clip Selection 的跨组件状态管理。
-- `utils/`：负责 SRT 解析、文本归一化、字幕预览布局计算、时间量化、Waveform 采样和 Working Timeline 结构性编辑操作。
+- `utils/`：负责 SRT 解析、文本归一化、字幕预览布局与背景尺寸计算、时间量化、Waveform 采样和 Working Timeline 结构性编辑操作。
 - `utils/fcpxml.ts`：负责将当前工作时间线生成 FCPXML。
 - `i18n.tsx` 与 `seo.ts`：分别负责双语文案和页面 SEO 元数据同步。
 
@@ -121,7 +121,7 @@ Waveform 是参考音频派生出的展示数据，不是独立的字幕编辑�
 
 `<title>` 的 `offset` 表示字幕在主时间线上的出现位置，`duration` 表示持续时间；`start` 则是字幕生成器内部的起始时间。当前实现固定使用 `start="3600s"`，避免将外部时间线时间误用为生成器内部时间，导致字幕在 FCP 中存在片段但不显示文字。
 
-开启字幕背景时，FCPXML 会为每个 Subtitle Clip 额外输出一段位于字幕下方的矩形生成器，作为该字幕片段的背景框；背景框与对应 `<title>` 使用相同的 `offset` 和 `duration`，避免 Subtitle Gap 中继续显示底板。背景框使用字幕样式中的背景色、透明度、圆角、宽度和高度参数，并根据 Target Video Orientation 选择不同的矩形中心点，再按当前背景框宽高换算矩形坐标。关闭字幕背景时，FCPXML 只输出字幕标题片段，不声明矩形生成器资源，也不为 Subtitle Clip 输出背景 `<video>`。横屏字幕标题还会写入 Custom title 的内部文字位置参数，以匹配 Final Cut Pro 手动调整后的底部字幕高度；竖屏字幕标题保留现有外层 `adjust-transform` 位置，不写入该内部位置参数。
+开启字幕背景时，FCPXML 会为每个 Subtitle Clip 额外输出一段位于字幕下方的矩形生成器，作为该字幕片段的背景框；背景框与对应 `<title>` 使用相同的 `offset` 和 `duration`，避免 Subtitle Gap 中继续显示底板。每个背景框根据该 Subtitle Clip 的 Logical Preview Lines、字号和横纵总留白独立计算宽高，再根据 Target Video Orientation 选择对应的矩形中心点并换算坐标。字幕安全宽度只控制文字换行，不截断用户设置的背景留白。浏览器 preview rendering 与 FCPXML 共用同一套背景尺寸算法，背景颜色、透明度和圆角也来自同一份字幕样式。关闭字幕背景时，FCPXML 只输出字幕标题片段，不声明矩形生成器资源，也不为 Subtitle Clip 输出背景 `<video>`。横屏字幕标题还会写入 Custom title 的内部文字位置参数，以匹配 Final Cut Pro 手动调整后的底部字幕高度；竖屏字幕标题保留现有外层 `adjust-transform` 位置，不写入该内部位置参数。
 
 ## 5. 已知限制与后续方向
 

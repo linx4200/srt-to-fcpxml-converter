@@ -1,6 +1,6 @@
 import { FCP_RESOLUTION, UI_LOGICAL_RESOLUTION } from '../../../constants';
 import type { SubtitleRenderSpec } from '../../../domain/subtitleStyle';
-import { getFontPixelSize } from '../../../utils';
+import { getFontPixelSize, getSubtitleBackgroundSize } from '../../../utils';
 
 /* CSS rgba 使用 0-255 色彩通道；透明度保持产品层 0-1 的语义。 */
 const RGB_CHANNEL_MIN_VALUE = 0;
@@ -59,6 +59,9 @@ export function PreviewSubtitle({
 
   const scale = containerHeight / referenceHeight;
   const fontSize = getFontPixelSize(subtitleRenderSpec.fontSize, referenceHeight).height;
+  const backgroundSize = subtitleRenderSpec.isEnabled
+    ? getSubtitleBackgroundSize(text, subtitleRenderSpec)
+    : null;
   const backgroundColor = subtitleRenderSpec.isEnabled
     ? getCssBackgroundColor(
         subtitleRenderSpec.backgroundColor,
@@ -76,14 +79,14 @@ export function PreviewSubtitle({
    */
   return (
     <div key={text} className="relative h-0 w-0">
-      {backgroundColor !== null && (
+      {backgroundColor !== null && backgroundSize !== null && (
         <div
           className="absolute left-1/2 top-1/2"
           style={{
             backgroundColor,
             borderRadius: `${subtitleRenderSpec.borderRadius * scale}px`,
-            width: `${subtitleRenderSpec.backgroundWidth * scale}px`,
-            height: `${subtitleRenderSpec.backgroundHeight * scale}px`,
+            width: `${backgroundSize.width * scale}px`,
+            height: `${backgroundSize.height * scale}px`,
             transform: 'translate(-50%, -50%)',
           }}
         />
