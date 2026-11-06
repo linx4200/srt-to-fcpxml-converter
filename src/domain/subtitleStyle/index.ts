@@ -1,5 +1,6 @@
 export * from './adapters';
 export type {
+  SubtitleBackgroundLayoutSpec,
   SubtitleBackgroundSpec,
   SubtitleLayoutSpec,
   SubtitleRenderSpec,

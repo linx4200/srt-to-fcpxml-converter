@@ -1,5 +1,8 @@
 import { FCP_RESOLUTION } from '../constants';
-import type { SubtitleLayoutSpec } from '../domain/subtitleStyle';
+import type {
+  SubtitleBackgroundLayoutSpec,
+  SubtitleLayoutSpec,
+} from '../domain/subtitleStyle';
 import { SrtEntry } from '../types';
 import { normalizeClipText } from './text';
 
@@ -8,12 +11,22 @@ const DEFAULT_WIDTH_FACTOR = 0.00092;
 const DEFAULT_HEIGHT_FACTOR = 0.0009;
 const WIDTH_OFFSET = 2;
 const HEIGHT_OFFSET = 1.5;
+const MIN_BACKGROUND_PADDING = 0;
 
 type FontMetricsOptions = {
   widthFactor?: number;
   heightFactor?: number;
   useOffset?: boolean;
 };
+
+export interface SubtitleBackgroundSize {
+  /* 当前 Subtitle Clip 的背景宽度，单位为 Target Video Orientation 的参考像素。 */
+  width: number;
+  /* 当前 Subtitle Clip 的背景高度，单位为 Target Video Orientation 的参考像素。 */
+  height: number;
+  /* 背景高度计算使用的 Logical Preview Line 数量。 */
+  lineCount: number;
+}
 
 export function getReferenceResolution(subtitleLayoutSpec: SubtitleLayoutSpec) {
   return subtitleLayoutSpec.orientation === 'portrait'
@@ -76,6 +89,46 @@ export function getRenderedSubtitleText(
 ): string {
   if (!entry) return '';
   return getLogicalPreviewLines(entry.text, subtitleLayoutSpec, videoWidth, videoHeight).join('\n');
+}
+
+export function getSubtitleBackgroundSize(
+  text: string,
+  subtitleBackgroundLayoutSpec: SubtitleBackgroundLayoutSpec,
+  videoWidth = getReferenceResolution(subtitleBackgroundLayoutSpec).width,
+  videoHeight = getReferenceResolution(subtitleBackgroundLayoutSpec).height
+): SubtitleBackgroundSize {
+  const logicalLines = getLogicalPreviewLines(
+    text,
+    subtitleBackgroundLayoutSpec,
+    videoWidth,
+    videoHeight
+  );
+
+  if (logicalLines.length === 0) {
+    return { width: 0, height: 0, lineCount: 0 };
+  }
+
+  const fontPixelSize = getFontPixelSize(
+    subtitleBackgroundLayoutSpec.fontSize,
+    videoHeight
+  ).height;
+  const widestLine = Math.max(
+    ...logicalLines.map((line) => measureSubtitleTextWidth(line, fontPixelSize))
+  );
+  const horizontalPadding = Math.max(
+    MIN_BACKGROUND_PADDING,
+    subtitleBackgroundLayoutSpec.backgroundHorizontalPadding
+  );
+  const verticalPadding = Math.max(
+    MIN_BACKGROUND_PADDING,
+    subtitleBackgroundLayoutSpec.backgroundVerticalPadding
+  );
+
+  return {
+    width: Math.min(videoWidth * SAFE_WIDTH_RATIO, widestLine + horizontalPadding),
+    height: fontPixelSize * logicalLines.length + verticalPadding,
+    lineCount: logicalLines.length,
+  };
 }
 
 export function getFontPixelSize(
