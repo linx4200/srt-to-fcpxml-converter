@@ -12,10 +12,10 @@ export const INITIAL_STYLE: SubtitleStyle = {
   backgroundOpacity: 0.4,
   /* 背景圆角默认值，预览会按画幅缩放，导出会按 FCP 参数换算。 */
   borderRadius: 8,
-  /* 默认背景框宽度，对应当前竖屏 FCPXML 参考矩形约 856px。 */
-  backgroundWidth: 856,
-  /* 默认背景框高度，对应当前竖屏 FCPXML 参考矩形约 144px。 */
-  backgroundHeight: 144,
+  /* 默认横向总留白，使背景左右两侧尽量贴近字幕文字。 */
+  backgroundHorizontalPadding: 5,
+  /* 默认纵向总留白，使背景上下两侧尽量贴近字幕文字。 */
+  backgroundVerticalPadding: 5,
   /* 默认 FCP 字号，作为 Subtitle Reflow 和 FCPXML 导出的共享输入。 */
   fontSize: 35,
   /* 默认竖屏布局，贴合短视频导出场景。 */

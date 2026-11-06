@@ -22,10 +22,8 @@ const PERCENTAGE_DISPLAY_MULTIPLIER = 100;
 const BACKGROUND_OPACITY_RANGE = { min: 0, max: 1, step: 0.01 } as const;
 /* 圆角在 preview 中按参考画幅缩放，导出时写成同数值的 FCP Roundness。 */
 const BORDER_RADIUS_RANGE = { min: 0, max: 40, step: 1 } as const;
-/* 背景框宽度使用当前 Target Video Orientation 的 FCP 参考像素，范围覆盖常见单双行字幕底板。 */
-const BACKGROUND_WIDTH_RANGE = { min: 200, max: 1200, step: 10 } as const;
-/* 背景框高度使用当前 Target Video Orientation 的 FCP 参考像素，范围覆盖单行到双行字幕底板。 */
-const BACKGROUND_HEIGHT_RANGE = { min: 40, max: 260, step: 10 } as const;
+/* 背景总留白使用 FCP 参考像素，允许从完全贴边到明显扩张之间细调。 */
+const BACKGROUND_PADDING_RANGE = { min: 0, max: 200, step: 1 } as const;
 
 function RangeSetting({
   label,
@@ -204,24 +202,28 @@ export function StyleSettings() {
 
           <div className="grid grid-cols-2 gap-4">
             <RangeSetting
-              label={t('backgroundWidth')}
-              valueLabel={`${subtitleStyle.backgroundWidth}px`}
-              min={BACKGROUND_WIDTH_RANGE.min}
-              max={BACKGROUND_WIDTH_RANGE.max}
-              step={BACKGROUND_WIDTH_RANGE.step}
-              value={subtitleStyle.backgroundWidth}
+              label={t('backgroundHorizontalPadding')}
+              valueLabel={`${subtitleStyle.backgroundHorizontalPadding}px`}
+              min={BACKGROUND_PADDING_RANGE.min}
+              max={BACKGROUND_PADDING_RANGE.max}
+              step={BACKGROUND_PADDING_RANGE.step}
+              value={subtitleStyle.backgroundHorizontalPadding}
               disabled={isBackgroundControlDisabled}
-              onChange={(backgroundWidth) => updateSubtitleStyle({ backgroundWidth })}
+              onChange={(backgroundHorizontalPadding) =>
+                updateSubtitleStyle({ backgroundHorizontalPadding })
+              }
             />
             <RangeSetting
-              label={t('backgroundHeight')}
-              valueLabel={`${subtitleStyle.backgroundHeight}px`}
-              min={BACKGROUND_HEIGHT_RANGE.min}
-              max={BACKGROUND_HEIGHT_RANGE.max}
-              step={BACKGROUND_HEIGHT_RANGE.step}
-              value={subtitleStyle.backgroundHeight}
+              label={t('backgroundVerticalPadding')}
+              valueLabel={`${subtitleStyle.backgroundVerticalPadding}px`}
+              min={BACKGROUND_PADDING_RANGE.min}
+              max={BACKGROUND_PADDING_RANGE.max}
+              step={BACKGROUND_PADDING_RANGE.step}
+              value={subtitleStyle.backgroundVerticalPadding}
               disabled={isBackgroundControlDisabled}
-              onChange={(backgroundHeight) => updateSubtitleStyle({ backgroundHeight })}
+              onChange={(backgroundVerticalPadding) =>
+                updateSubtitleStyle({ backgroundVerticalPadding })
+              }
             />
           </div>
         </div>

@@ -21,6 +21,10 @@ export interface FcpxmlExportSpec {
     backgroundColor: string;
     backgroundOpacity: number;
     borderRadius: number;
+    /* 字幕背景横向总留白，用于派生每个 Subtitle Clip 的矩形宽度。 */
+    backgroundHorizontalPadding: number;
+    /* 字幕背景纵向总留白，用于派生每个 Subtitle Clip 的矩形高度。 */
+    backgroundVerticalPadding: number;
     backgroundWidth: number;
     backgroundHeight: number;
   };

@@ -29,10 +29,10 @@ export interface SubtitleStyle {
   backgroundOpacity: number;
   /* 字幕背景圆角半径，同时用于预览和 FCPXML 背景框。 */
   borderRadius: number;
-  /* 字幕背景框宽度，单位为当前 Target Video Orientation 的 FCP 参考像素。 */
-  backgroundWidth: number;
-  /* 字幕背景框高度，单位为当前 Target Video Orientation 的 FCP 参考像素。 */
-  backgroundHeight: number;
+  /* 字幕背景横向总留白，单位为当前 Target Video Orientation 的 FCP 参考像素。 */
+  backgroundHorizontalPadding: number;
+  /* 字幕背景纵向总留白，单位为当前 Target Video Orientation 的 FCP 参考像素。 */
+  backgroundVerticalPadding: number;
   /* FCP 字号参数，是 Subtitle Reflow、预览和导出的共享布局输入。 */
   fontSize: number;
   /* Target Video Orientation，决定预览比例、参考分辨率和导出布局。 */

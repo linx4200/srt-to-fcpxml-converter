@@ -6,6 +6,10 @@ import type {
   TimelineFrameSpec,
 } from './types';
 
+/* 统一尺寸算法接入前，为现有 preview rendering 保留固定背景尺寸。 */
+const LEGACY_BACKGROUND_WIDTH = 856;
+const LEGACY_BACKGROUND_HEIGHT = 144;
+
 export function getSubtitleLayoutSpec(subtitleStyle: SubtitleStyle): SubtitleLayoutSpec {
   return {
     orientation: subtitleStyle.orientation,
@@ -34,7 +38,9 @@ export function getSubtitleRenderSpec(subtitleStyle: SubtitleStyle): SubtitleRen
     backgroundColor: subtitleStyle.backgroundColor,
     backgroundOpacity: subtitleStyle.backgroundOpacity,
     borderRadius: subtitleStyle.borderRadius,
-    backgroundWidth: subtitleStyle.backgroundWidth,
-    backgroundHeight: subtitleStyle.backgroundHeight,
+    backgroundHorizontalPadding: subtitleStyle.backgroundHorizontalPadding,
+    backgroundVerticalPadding: subtitleStyle.backgroundVerticalPadding,
+    backgroundWidth: LEGACY_BACKGROUND_WIDTH,
+    backgroundHeight: LEGACY_BACKGROUND_HEIGHT,
   };
 }
