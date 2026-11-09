@@ -121,7 +121,7 @@ Waveform 是参考音频派生出的展示数据，不是独立的字幕编辑�
 
 `<title>` 的 `offset` 表示字幕在主时间线上的出现位置，`duration` 表示持续时间；`start` 则是字幕生成器内部的起始时间。当前实现固定使用 `start="3600s"`，避免将外部时间线时间误用为生成器内部时间，导致字幕在 FCP 中存在片段但不显示文字。
 
-开启字幕背景时，FCPXML 会为每个 Subtitle Clip 额外输出一段位于字幕下方的矩形生成器，作为该字幕片段的背景框；背景框与对应 `<title>` 使用相同的 `offset` 和 `duration`，避免 Subtitle Gap 中继续显示底板。每个背景框根据该 Subtitle Clip 的 Logical Preview Lines、字号和横纵总留白独立计算宽高，再根据 Target Video Orientation 选择对应的矩形中心点并换算坐标。字幕安全宽度只控制文字换行，不截断用户设置的背景留白。浏览器 preview rendering 与 FCPXML 共用同一套背景尺寸算法，背景颜色、透明度和圆角也来自同一份字幕样式。关闭字幕背景时，FCPXML 只输出字幕标题片段，不声明矩形生成器资源，也不为 Subtitle Clip 输出背景 `<video>`。横屏字幕标题还会写入 Custom title 的内部文字位置参数，以匹配 Final Cut Pro 手动调整后的底部字幕高度；竖屏字幕标题保留现有外层 `adjust-transform` 位置，不写入该内部位置参数。
+开启字幕背景时，FCPXML 会为每个 Subtitle Clip 额外输出一段位于字幕下方的矩形生成器，作为该字幕片段的背景框；背景框与对应 `<title>` 使用相同的 `offset` 和 `duration`，避免 Subtitle Gap 中继续显示底板。透明 Gap 保留在 Primary Storyline 中作为时间和连接锚点，矩形背景使用正 `lane="1"`，字幕文字使用正 `lane="2"`，确保用户把生成内容复制到真实项目后，背景和文字都位于 Primary Storyline 画面上方，且文字位于背景上方。每个背景框根据该 Subtitle Clip 的 Logical Preview Lines、字号和横纵总留白独立计算宽高，再根据 Target Video Orientation 选择对应的矩形中心点并换算坐标。字幕安全宽度只控制文字换行，不截断用户设置的背景留白。浏览器 preview rendering 与 FCPXML 共用同一套背景尺寸算法，背景颜色、透明度和圆角也来自同一份字幕样式。关闭字幕背景时，FCPXML 只输出 `lane="1"` 的字幕标题片段，不声明矩形生成器资源，也不为 Subtitle Clip 输出背景 `<video>`。横屏字幕标题还会写入 Custom title 的内部文字位置参数，以匹配 Final Cut Pro 手动调整后的底部字幕高度；竖屏字幕标题保留现有外层 `adjust-transform` 位置，不写入该内部位置参数。
 
 ## 5. 已知限制与后续方向
 

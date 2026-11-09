@@ -7,6 +7,10 @@ const FCPXML_MIME_TYPE = 'application/xml';
 const UNTITLED_EXPORT_FILE_BASENAME = 'subtitles';
 const CUSTOM_TITLE_EFFECT_ID = 'r2';
 const BACKGROUND_RECTANGLE_EFFECT_ID = 'r3';
+/* 背景和文字都使用正 lane，确保复制到真实项目后位于 Primary Storyline 上方。 */
+const BACKGROUND_CONNECTED_LANE = 1;
+const TITLE_CONNECTED_LANE_WITH_BACKGROUND = 2;
+const TITLE_CONNECTED_LANE_WITHOUT_BACKGROUND = 1;
 /* FCPXML frameDuration 和 title offset/duration 使用 100/fpsScale 的时间单位。 */
 const FCP_TIME_UNIT_PER_FRAME = 100;
 const FCP_GENERATOR_START_TIME = '3600s';
@@ -225,7 +229,7 @@ function buildSubtitleBackgroundVideo(
     : '';
 
   return `
-                            <video ref="${BACKGROUND_RECTANGLE_EFFECT_ID}" lane="-1" offset="${startOffset}/${fpsScale}s" name="${BACKGROUND_RECTANGLE_EFFECT.name}" start="${FCP_GENERATOR_START_TIME}" duration="${durOffset}/${fpsScale}s">
+                            <video ref="${BACKGROUND_RECTANGLE_EFFECT_ID}" lane="${BACKGROUND_CONNECTED_LANE}" offset="${startOffset}/${fpsScale}s" name="${BACKGROUND_RECTANGLE_EFFECT.name}" start="${FCP_GENERATOR_START_TIME}" duration="${durOffset}/${fpsScale}s">
                                 <param name="${RECTANGLE_BUILD_IN_PARAM.name}" key="${RECTANGLE_BUILD_IN_PARAM.key}" value="${RECTANGLE_BUILD_IN_PARAM.value}"/>
                                 <param name="${RECTANGLE_BUILD_OUT_PARAM.name}" key="${RECTANGLE_BUILD_OUT_PARAM.key}" value="${RECTANGLE_BUILD_OUT_PARAM.value}"/>
                                 <param name="${RECTANGLE_RIGHT_TOP_PARAM.name}" key="${RECTANGLE_RIGHT_TOP_PARAM.key}" value="${backgroundRectangleCoordinates.rightTop}"/>
@@ -263,6 +267,9 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
         <effect id="${BACKGROUND_RECTANGLE_EFFECT_ID}" name="${BACKGROUND_RECTANGLE_EFFECT.name}" uid="${BACKGROUND_RECTANGLE_EFFECT.uid}"/>`
     : '';
   const customTitleParams = buildCustomTitleParams(fcpxmlExportSpec);
+  const titleConnectedLane = fcpxmlExportSpec.backgroundStyle.isEnabled
+    ? TITLE_CONNECTED_LANE_WITH_BACKGROUND
+    : TITLE_CONNECTED_LANE_WITHOUT_BACKGROUND;
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE fcpxml>
@@ -308,9 +315,10 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
     // 在苹果的 FCPXML 1.9+ 协议里，<adjust-transform> 的 position 并不是绝对像素，也不是 0.0 到 1.0 的浮点比例！
     // 它的底层机制是：【数值 1 代表 1% 的画幅尺寸】，即传 100 代表 100%。
     // FCPX 检查器中的原点 (0,0) 在屏幕正中央，Y 轴向下为负值。
-    // 开启字幕背景时，每个 Subtitle Clip 输出一段同 offset/duration 的矩形背景，避免字幕空档继续显示底板。
+    // 开启字幕背景时，矩形和文字分别使用正 lane 1/2，确保复制到真实项目后都位于 Primary Storyline 上方。
+    // 每个 Subtitle Clip 输出一段同 offset/duration 的矩形背景，避免 Subtitle Gap 继续显示底板。
     xml += `${subtitleBackgroundVideo}
-                            <title lane="1" ref="${CUSTOM_TITLE_EFFECT_ID}" offset="${startOffset}/${fpsScale}s" name="${escapedText.substring(0, 20)}" duration="${durOffset}/${fpsScale}s" start="${FCP_GENERATOR_START_TIME}">${customTitleParams}
+                            <title lane="${titleConnectedLane}" ref="${CUSTOM_TITLE_EFFECT_ID}" offset="${startOffset}/${fpsScale}s" name="${escapedText.substring(0, 20)}" duration="${durOffset}/${fpsScale}s" start="${FCP_GENERATOR_START_TIME}">${customTitleParams}
                             <text>
                                 <text-style ref="ts${index}">${escapedText}</text-style>
                             </text>
