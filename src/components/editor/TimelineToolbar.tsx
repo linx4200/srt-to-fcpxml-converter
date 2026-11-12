@@ -10,6 +10,7 @@ import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
 import { getSubtitleLayoutSpec } from '../../domain/subtitleStyle';
 import { formatTimestamp, getLogicalPreviewLines } from '../../utils';
+import { splitTextByRatio } from '../../utils/text';
 import { MAX_ZOOM, MIN_ZOOM } from './timelineGeometry';
 
 interface TimelineToolbarProps {
@@ -45,7 +46,9 @@ export function TimelineToolbar({
   const selectedClip = selectedClipId ? entries.find((entry) => entry.id === selectedClipId) ?? null : null;
   const selectedClipLines = selectedClip ? getLogicalPreviewLines(selectedClip.text, subtitleLayoutSpec) : [];
   const canSplitByLines = Boolean(selectedClip && selectedClipLines.length === 2 && editingClipId === null);
+  const canSplitText = Boolean(selectedClip && splitTextByRatio(selectedClip.text, (currentTime - selectedClip.startSeconds) / (selectedClip.endSeconds - selectedClip.startSeconds)));
   const canCutAtPlayhead = Boolean(
+    canSplitText &&
     selectedClip &&
       currentTime > selectedClip.startSeconds &&
       currentTime < selectedClip.endSeconds
@@ -60,6 +63,8 @@ export function TimelineToolbar({
         : '';
   const cutReason = !selectedClip
     ? t('selectClipToCut')
+    : !canSplitText
+      ? t('cutTextUnavailable')
     : !canCutAtPlayhead
       ? t('cutAtPlayheadDisabled')
       : '';

@@ -5,6 +5,8 @@ import { InlineClipTextarea } from './InlineClipTextarea';
 
 /* 普通 Subtitle Clip 在 Waveform Timeline 中的固定高度。 */
 const SUBTITLE_CLIP_HEIGHT_PX = 56;
+/* 每增加一行 Manual Line Break，为文字预留的额外高度。 */
+const SUBTITLE_CLIP_LINE_HEIGHT_PX = 20;
 /* Inline Clip Editing 打开时为 textarea 预留的固定高度。 */
 const EDITING_SUBTITLE_CLIP_HEIGHT_PX = 104;
 
@@ -47,7 +49,9 @@ export function SubtitleClip({
   const showPopover = isSelected && isShort;
   const trimStartLabel = formatTimestamp(entry.startSeconds);
   const trimEndLabel = formatTimestamp(entry.endSeconds);
-  const clipHeight = isEditing ? EDITING_SUBTITLE_CLIP_HEIGHT_PX : SUBTITLE_CLIP_HEIGHT_PX;
+  const textLineCount = entry.text.split('\n').length;
+  const textHeight = SUBTITLE_CLIP_HEIGHT_PX + (textLineCount - 1) * SUBTITLE_CLIP_LINE_HEIGHT_PX;
+  const clipHeight = isEditing ? Math.max(EDITING_SUBTITLE_CLIP_HEIGHT_PX, textHeight) : textHeight;
 
   return (
     <div
@@ -144,8 +148,10 @@ export function SubtitleClip({
               className="h-full w-full resize-none bg-transparent text-sm leading-snug text-white outline-none"
             />
           ) : (
-            <span className={`block ${isSelected ? 'text-white' : 'text-white/70'} ${isShort ? 'truncate text-xs' : 'truncate text-sm'}`}>
-              {entry.text.replace(/\n/g, ' / ')}
+            <span className={`block ${isSelected ? 'text-white' : 'text-white/70'} ${isShort ? 'text-xs' : 'text-sm'}`}>
+              {entry.text.split('\n').map((textLine, lineIndex) => (
+                <span key={lineIndex} className="block truncate">{textLine || '\u00a0'}</span>
+              ))}
             </span>
           )}
         </div>

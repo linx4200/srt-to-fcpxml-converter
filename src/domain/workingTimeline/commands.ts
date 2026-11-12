@@ -1,6 +1,6 @@
 import type { SrtEntry } from '../../types';
 import { getLogicalPreviewLines, getReferenceResolution } from '../../utils/subtitleLayout';
-import { normalizeClipText } from '../../utils/text';
+import { normalizeClipText, splitTextByRatio } from '../../utils/text';
 import {
   clampTimelineTime,
   createTimelineClip,
@@ -125,18 +125,21 @@ export function cutTimelineClipAtPlayhead({
     return { workingTimeline };
   }
 
+  const splitText = splitTextByRatio(clip.text, (cutTime - clip.startSeconds) / (clip.endSeconds - clip.startSeconds));
+  if (!splitText) return { workingTimeline };
+
   const firstClip = createTimelineClip({
     id: getNextTimelineClipId(workingTimeline, 0),
     startSeconds: clip.startSeconds,
     endSeconds: cutTime,
-    text: clip.text,
+    text: splitText[0],
     editState: 'manual',
   });
   const secondClip = createTimelineClip({
     id: getNextTimelineClipId(workingTimeline, 1),
     startSeconds: Math.min(cutTime + frameDuration, clip.endSeconds),
     endSeconds: clip.endSeconds,
-    text: clip.text,
+    text: splitText[1],
     editState: 'manual',
   });
 
