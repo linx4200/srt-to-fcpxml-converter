@@ -1,6 +1,6 @@
 import type { SrtEntry } from '../../types';
 import { getLogicalPreviewLines, getReferenceResolution } from '../../utils/subtitleLayout';
-import { normalizeClipText, splitTextByRatio } from '../../utils/text';
+import { normalizeClipText, splitTextByRatio, removeSubtitlePunctuation } from '../../utils/text';
 import {
   clampTimelineTime,
   createTimelineClip,
@@ -21,6 +21,7 @@ import type {
 
 export function reflowWorkingTimeline({
   sourceEntries,
+  removePunctuation = false,
   subtitleReflowSpec,
 }: WorkingTimelineStyleCommandInput): WorkingTimelineCommandResult {
   const { width, height } = getReferenceResolution(subtitleReflowSpec);
@@ -28,14 +29,17 @@ export function reflowWorkingTimeline({
   const nextEntries: SrtEntry[] = [];
 
   for (const entry of sourceEntries) {
-    const logicalLines = getLogicalPreviewLines(entry.text, subtitleReflowSpec, width, height);
+    const preparedText = removePunctuation ? removeSubtitlePunctuation(entry.text) : entry.text;
+    // 纯标点片段清理后作为 Subtitle Gap，不创建空白 Subtitle Clip。
+    if (!preparedText.trim()) continue;
+    const logicalLines = getLogicalPreviewLines(preparedText, subtitleReflowSpec, width, height);
     if (logicalLines.length <= 1) {
       nextEntries.push(
         createTimelineClip({
           id: nextId++,
           startSeconds: quantizeTimelineTime(entry.startSeconds, subtitleReflowSpec.fps),
           endSeconds: quantizeTimelineTime(entry.endSeconds, subtitleReflowSpec.fps),
-          text: logicalLines[0] ?? normalizeClipText(entry.text),
+          text: logicalLines[0] ?? normalizeClipText(preparedText),
           editState: 'reflowed',
         })
       );

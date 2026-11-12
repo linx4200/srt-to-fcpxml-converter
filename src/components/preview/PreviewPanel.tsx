@@ -46,16 +46,29 @@ export function PreviewPanel({
           </span>
         </div>
 
-        <div title={canEditTimeline ? '' : t('editTimelineNeedsAudio')}>
+        <div
+          className={`group/edit relative ${canEditTimeline ? '' : 'cursor-not-allowed'}`}
+          tabIndex={canEditTimeline ? undefined : 0}
+          aria-describedby={canEditTimeline ? undefined : 'edit-timeline-disabled-hint'}
+        >
           <button
             type="button"
             onClick={handleEnterEditingMode}
             disabled={!canEditTimeline}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 hover:cursor-pointer disabled:pointer-events-none disabled:opacity-40"
           >
             <Pencil size={15} />
             {t('editTimeline')}
           </button>
+          {!canEditTimeline && (
+            <span
+              id="edit-timeline-disabled-hint"
+              role="tooltip"
+              className="pointer-events-none absolute left-0 top-full z-20 mt-2 hidden w-full rounded-lg border border-white/10 bg-theme-surface p-3 text-xs leading-relaxed text-white/80 shadow-lg group-hover/edit:block group-focus-within/edit:block"
+            >
+              {t('editTimelineNeedsAudio')}
+            </span>
+          )}
         </div>
       </div>
 

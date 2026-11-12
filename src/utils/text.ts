@@ -32,3 +32,23 @@ export function splitTextByRatio(text: string, ratio: number): [string, string] 
   const cutIndex = choices[0]?.index;
   return cutIndex === undefined ? null : [characters.slice(0, cutIndex).join(''), characters.slice(cutIndex).join('')];
 }
+
+/* 在宽度测量前移除标点，保留 Manual Line Break、词内连接符和数字格式。 */
+export function removeSubtitlePunctuation(text: string): string {
+  const characters = Array.from(text);
+  return characters.map((character, index) => {
+    if (!/\p{Punctuation}/u.test(character)) return character;
+    const before = characters[index - 1] ?? '';
+    const after = characters[index + 1] ?? '';
+    const isWordConnector = /['’\-‐‑]/u.test(character)
+      && /\p{Script=Latin}/u.test(before) && /\p{Script=Latin}/u.test(after);
+    const isNumberSeparator = /[.,:：．／/\-]/u.test(character)
+      && /\p{Number}/u.test(before) && /\p{Number}/u.test(after);
+    if (isWordConnector || isNumberSeparator) return character;
+    // 拉丁文本之间用空格分隔，避免删除标点后把两个单词粘连。
+    const precedingText = characters.slice(0, index).join('').replace(/\p{Punctuation}+$/u, '');
+    const followingText = characters.slice(index + 1).join('').replace(/^\p{Punctuation}+/u, '');
+    return /[\p{Script=Latin}\p{Number}]$/u.test(precedingText)
+      && /^[\p{Script=Latin}\p{Number}]/u.test(followingText) ? ' ' : '';
+  }).join('');
+}

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Upload, X } from 'lucide-react';
+import { CircleHelp, Upload, X } from 'lucide-react';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
 
@@ -14,6 +14,8 @@ const COMPACT_UPLOAD_AREA_HEIGHT_CLASS = 'h-16';
 export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
   const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const removePunctuation = useAppStore((state) => state.removeSubtitlePunctuation);
+  const setRemovePunctuation = useAppStore((state) => state.setRemoveSubtitlePunctuation);
   const subtitleFileName = useAppStore((state) => state.subtitleFileName);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +72,31 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
           />
         </div>
       )}
+      <div className="relative flex items-center gap-2 text-xs text-white/60">
+        <label className="flex cursor-pointer items-center gap-2">
+          <input type="checkbox" checked={removePunctuation}
+            onChange={(event) => setRemovePunctuation(event.target.checked)}
+            className="accent-theme-primary" />
+          {t('removeSubtitlePunctuation')}
+        </label>
+        <span className="group/help inline-flex shrink-0">
+          <button
+            type="button"
+            aria-label={t('punctuationProcessingHint')}
+            aria-describedby="punctuation-processing-hint"
+            className="cursor-help text-white/40 hover:text-theme-primary focus-visible:text-theme-primary"
+          >
+            <CircleHelp size={14} />
+          </button>
+          <span
+            id="punctuation-processing-hint"
+            role="tooltip"
+            className="pointer-events-none absolute left-0 right-0 top-full z-20 mt-2 hidden rounded-lg border border-white/10 bg-theme-surface p-3 text-xs leading-relaxed text-white/80 shadow-lg group-hover/help:block group-focus-within/help:block"
+          >
+            {t('punctuationProcessingHint')}
+          </span>
+        </span>
+      </div>
     </section>
   );
 }

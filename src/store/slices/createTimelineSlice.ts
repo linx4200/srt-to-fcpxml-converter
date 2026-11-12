@@ -28,6 +28,8 @@ function applyWorkingTimelineResult(
 
 export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) => ({
   /* Imported SRT Snapshot 初始为空，导入后只作为全局重排重建 Working Timeline 的源输入。 */
+  removeSubtitlePunctuation: true,
+  setRemoveSubtitlePunctuation: (enabled) => set({ removeSubtitlePunctuation: enabled }),
   sourceSrtEntries: [],
   /* Working Timeline 初始为空，直到用户导入 SRT。 */
   workingTimeline: [],
@@ -36,6 +38,7 @@ export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) =>
     const parsedEntries = parseSrt(content);
     const result = reflowWorkingTimelineDomain({
       sourceEntries: parsedEntries,
+      removePunctuation: get().removeSubtitlePunctuation,
       subtitleReflowSpec: getSubtitleReflowSpec(get().subtitleStyle),
     });
     set({ sourceSrtEntries: parsedEntries });
@@ -48,6 +51,7 @@ export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) =>
 
     const result = reflowWorkingTimelineDomain({
       sourceEntries: sourceSrtEntries,
+      removePunctuation: get().removeSubtitlePunctuation,
       subtitleReflowSpec: getSubtitleReflowSpec(get().subtitleStyle),
     });
     applyWorkingTimelineResult(set, result);
