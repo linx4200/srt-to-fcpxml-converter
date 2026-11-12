@@ -51,7 +51,6 @@ export function WaveformTimelineViewport({
 }: WaveformTimelineViewportProps) {
   const session = useAppStore((state) => state.editingSession);
   const setEditingSession = useAppStore((state) => state.setEditingSession);
-  const setSelectedClipId = useAppStore((state) => state.setSelectedClipId);
   const timelineWidth = getTimelineWidth(totalDuration, pixelsPerSecond);
 
   useLayoutEffect(() => {
@@ -136,7 +135,6 @@ export function WaveformTimelineViewport({
               if (editingClipId !== null) {
                 onCommitEditing();
               }
-              setSelectedClipId(null);
               handleSeek(event.clientX);
             }}
           >

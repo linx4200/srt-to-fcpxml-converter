@@ -49,6 +49,8 @@ export function TimelineEditor({
   const setSelectedClipId = useAppStore((state) => state.setSelectedClipId);
   const deleteTimelineClip = useAppStore((state) => state.deleteTimelineClip);
 
+  /* 只响应暂停或定位事件，不让手动 Clip Selection 被普通重渲染覆盖。 */
+  const previousPlaybackRef = useRef({ currentTime, isPlaying });
   const viewportRef = useRef<HTMLDivElement>(null);
   const { samples } = useAudioWaveform();
   const {
@@ -98,6 +100,23 @@ export function TimelineEditor({
     }
   }, [currentTime, entries, setSelectedClipId, selectedClipId]);
 
+  useEffect(() => {
+    const previousPlayback = previousPlaybackRef.current;
+    previousPlaybackRef.current = { currentTime, isPlaying };
+    const didPause = previousPlayback.isPlaying && !isPlaying;
+    const didSeekWhilePaused = !isPlaying && previousPlayback.currentTime !== currentTime;
+    if (editingClipId !== null || (!didPause && !didSeekWhilePaused)) return;
+    setSelectedClipId(getTimelineClipAtTime(entries, currentTime)?.id ?? null);
+  }, [currentTime, isPlaying, editingClipId, entries, setSelectedClipId]);
+
+  /* 显式定位也处理相同时间的点击；播放过程中的自然推进不经过此入口。 */
+  const handleTimeUpdate = (time: number) => {
+    onTimeUpdate(time);
+    if (editingClipId === null) {
+      setSelectedClipId(getTimelineClipAtTime(entries, time)?.id ?? null);
+    }
+  };
+
   /* 双击 Subtitle Clip 时进入 Inline Clip Editing，并暂停播放避免文本编辑被播放跟随打断。 */
   const handleEnterEditing = (clip: SrtEntry) => {
     onSetIsPlaying(false);
@@ -119,7 +138,7 @@ export function TimelineEditor({
         totalDuration={totalDuration}
         isPlaying={isPlaying}
         onPlayPause={onPlayPause}
-        onTimeUpdate={onTimeUpdate}
+        onTimeUpdate={handleTimeUpdate}
         showControls={false}
         compact
         maxDisplayHeight={isLandscapePreview ? LANDSCAPE_PREVIEW_MAX_HEIGHT : undefined}
@@ -136,7 +155,7 @@ export function TimelineEditor({
             isPlaying={isPlaying}
             editingClipId={editingClipId}
             onPlayPause={onPlayPause}
-            onTimeUpdate={onTimeUpdate}
+            onTimeUpdate={handleTimeUpdate}
             onExit={handleExit}
           />
         </div>
@@ -158,7 +177,7 @@ export function TimelineEditor({
             onEnterEditing={handleEnterEditing}
             onDeleteSelected={handleDeleteSelected}
             onBeginFreeTrim={beginFreeTrim}
-            onTimeUpdate={onTimeUpdate}
+            onTimeUpdate={handleTimeUpdate}
           />
         </div>
       </div>

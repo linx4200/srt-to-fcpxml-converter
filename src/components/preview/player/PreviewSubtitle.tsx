@@ -44,13 +44,7 @@ export function PreviewSubtitle({
   subtitleRenderSpec,
   containerHeight = UI_LOGICAL_RESOLUTION.portrait.height,
 }: PreviewSubtitleProps) {
-  if (!text) {
-    return (
-      <div className="text-white/20 text-sm italic">
-        Upload SRT to see preview
-      </div>
-    );
-  }
+  if (!text) return null;
 
   const referenceHeight =
     subtitleRenderSpec.orientation === 'portrait'

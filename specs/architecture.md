@@ -148,3 +148,8 @@ Waveform 是参考音频派生出的展示数据，不是独立的字幕编辑�
 SRT 上传区域紧邻“去除字幕标点”复选框，默认勾选。该选项由 timeline slice 管理；切换只更新后续重建参数，不直接修改 Working Timeline。导入、确认 Subtitle Reflow 或确认 Target Video Orientation 切换时，从完整的 Imported SRT Snapshot 读取文本，先按选项去除标点，再执行宽度测量和自动切分。
 
 标点处理保留 Manual Line Break、拉丁单词内部的撇号与连字符，以及数字之间的小数点、分组符等数字格式符号。英文词间标点以空格分隔，中文标点直接移除。纯标点片段清理后不创建 Subtitle Clip，其时间范围保留为 Subtitle Gap。取消选项后确认重新排布，可从原始快照恢复标点；重新排布遵循现有覆盖手动编辑的确认流程。
+
+
+### Playhead 与 Clip Selection
+
+Subtitle Editing Mode 在暂停播放或显式 Timeline Seek 后，自动选中 Playhead 所在的 Subtitle Clip；落在 Subtitle Gap 时清除选择。连续播放不更新 Clip Selection，Inline Clip Editing 期间不自动改变选择。手动单击 Subtitle Clip 只改变选择，不移动 Playhead。Clip Split 和 Playhead Cut 对选中片段执行，并继续遵守各自的逻辑行数、文本可拆分性和时间边界条件。

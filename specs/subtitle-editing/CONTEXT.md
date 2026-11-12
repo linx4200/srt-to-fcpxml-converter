@@ -77,8 +77,8 @@ Boundary trimming that follows the dragged position without magnetic snapping, w
 _Avoid_: Magnetic trim, snapped trim
 
 **Clip Selection**:
-The explicit act of selecting a **Subtitle Clip** without moving the playhead.
-_Avoid_: Seek-on-select, implicit selection
+Selecting a **Subtitle Clip** without moving the playhead. Pausing playback or explicitly seeking automatically selects the clip at the playhead, or clears selection in a **Subtitle Gap**, unless **Inline Clip Editing** is active. Continuous playback does not change selection; manually selecting another clip remains supported.
+_Avoid_: Seek-on-select
 
 **Timeline Seek**:
 Moving the playhead by clicking the **Waveform Timeline** outside a **Subtitle Clip**.
