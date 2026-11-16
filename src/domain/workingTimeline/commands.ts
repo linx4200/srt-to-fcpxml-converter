@@ -162,6 +162,37 @@ export function cutTimelineClipAtPlayhead({
   };
 }
 
+/* 合并相邻 Subtitle Clips，保留上一段身份和已有 Manual Line Break，不执行 Subtitle Reflow。 */
+export function mergeTimelineClipIntoPrevious({
+  workingTimeline,
+  clipId,
+}: WorkingTimelineClipCommandInput): WorkingTimelineCommandResult {
+  const orderedClips = sortWorkingTimeline(workingTimeline);
+  const clipIndex = orderedClips.findIndex((clip) => clip.id === clipId);
+  if (clipIndex <= 0) return { workingTimeline };
+
+  const previousClip = orderedClips[clipIndex - 1];
+  const currentClip = orderedClips[clipIndex];
+  // 仅在两个拉丁字母或数字直接相接时补空格，避免中文被插入多余空格或英文单词粘连。
+  const needsSpace = /[\p{Script=Latin}\p{N}]$/u.test(previousClip.text)
+    && /^[\p{Script=Latin}\p{N}]/u.test(currentClip.text);
+  const mergedClip = createTimelineClip({
+    id: previousClip.id,
+    startSeconds: previousClip.startSeconds,
+    endSeconds: currentClip.endSeconds,
+    text: previousClip.text + (needsSpace ? ' ' : '') + currentClip.text,
+    editState: 'manual',
+  });
+  return {
+    workingTimeline: [
+      ...orderedClips.slice(0, clipIndex - 1),
+      mergedClip,
+      ...orderedClips.slice(clipIndex + 1),
+    ],
+    selectedClipId: mergedClip.id,
+  };
+}
+
 export function deleteTimelineClip({
   workingTimeline,
   clipId,

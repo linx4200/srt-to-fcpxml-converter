@@ -21,6 +21,8 @@ export interface TimelineSlice {
   deleteTimelineClip: (clipId: number) => void;
   /* 按两条 Logical Preview Lines 将一个 Subtitle Clip 拆分为两个 Subtitle Clips。 */
   splitTimelineClipByLogicalLines: (clipId: number) => void;
+  /* 将当前 Subtitle Clip 的文本和时间合并到上一段，并选中合并结果。 */
+  mergeTimelineClipIntoPrevious: (clipId: number) => void;
   /* 在当前 playhead 位置执行 Playhead Cut。 */
   cutTimelineClipAtPlayhead: (clipId: number, playhead: number) => void;
   /* 执行 Free Trim，并保持相邻 Subtitle Clip 边界约束。 */

@@ -1,6 +1,7 @@
 import {
   cutTimelineClipAtPlayhead,
   deleteTimelineClip,
+  mergeTimelineClipIntoPrevious,
   reflowWorkingTimeline as reflowWorkingTimelineDomain,
   sortWorkingTimeline,
   splitTimelineClipByLogicalLines,
@@ -91,6 +92,13 @@ export const createTimelineSlice: AppSliceCreator<TimelineSlice> = (set, get) =>
       timelineFrameSpec: getTimelineFrameSpec(get().subtitleStyle),
     });
     applyWorkingTimelineResult(set, result);
+  },
+  /* 合并直接写回 Working Timeline，不移动 playhead 或触发全局重排。 */
+  mergeTimelineClipIntoPrevious: (clipId) => {
+    applyWorkingTimelineResult(set, mergeTimelineClipIntoPrevious({
+      workingTimeline: get().workingTimeline,
+      clipId,
+    }));
   },
   /* Free Trim 只传用户拖动意图，frame quantization 和边界限制由 domain module 处理。 */
   trimTimelineClipBoundary: (clipId, edge, nextTime) => {

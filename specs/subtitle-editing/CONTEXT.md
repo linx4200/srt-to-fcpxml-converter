@@ -103,3 +103,8 @@ _Avoid_: Soft wrap, browser wrap, disposable newline
 **Logical Preview Line**:
 A subtitle line produced from **Manual Line Breaks** and layout-based wrapping, independent of incidental browser text wrapping.
 _Avoid_: Browser-only wrap line, accidental render line, SRT row
+
+**Clip Merge**:
+A local action that merges the selected **Subtitle Clip** into its immediately preceding clip. Text is concatenated in timeline order, adding a space between adjacent Latin letters or numbers when needed, while retaining existing **Manual Line Breaks**. The merged clip retains the preceding clip's identity and start time and ends at the selected clip's end time, including any intervening **Subtitle Gap**. It becomes the **Clip Selection**, and the playhead moves to its start for listening and cutting again. Playback retains its current playing or paused state. The action does not trigger **Subtitle Reflow**. The action is disabled for the first clip, absent selection, and active **Inline Clip Editing**.
+
+Toolbar labels display `M` for **Clip Merge** and `S` for **Playhead Cut**. These single-key shortcuts share button availability and operate only in **Subtitle Editing Mode**, outside text inputs and composition, without Ctrl, Meta, or Alt modifiers. Held keys do not repeat these actions.

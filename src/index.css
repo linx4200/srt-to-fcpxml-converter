@@ -4,6 +4,11 @@
   --color-theme-primary: #ff637e;
   --color-theme-primary-soft: #ff7f95;
   --color-theme-primary-tint: #ff9aac;
+  /* 次级操作的轻强调底色与描边；悬停时提高品牌色占比。 */
+  --color-theme-action-bg: color-mix(in srgb, var(--color-theme-primary) 12%, transparent);
+  --color-theme-action-border: color-mix(in srgb, var(--color-theme-primary) 40%, transparent);
+  --color-theme-action-hover-bg: color-mix(in srgb, var(--color-theme-primary) 20%, transparent);
+  --color-theme-action-hover-border: color-mix(in srgb, var(--color-theme-primary) 65%, transparent);
   --color-theme-bg: #0f0f0f;
   --color-theme-text: #fff;
   --color-theme-surface: #1a1a1a;

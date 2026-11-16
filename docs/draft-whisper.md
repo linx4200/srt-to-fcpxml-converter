@@ -12,8 +12,8 @@ https://github.com/openai/whisper.  反正如果安装不上，你就找 AI 帮�
 
 
 
-`whisper "audio.mp3" --model medium --language Chinese --fp16 False --output_format srt --output_dir ./subtitles --initial_prompt "以下是普通话的简体中文内容。" --word_timestamps True --hallucination_silence_threshold 2`
+`whisper "audio.mp3" --model medium --language Chinese --fp16 False --output_format srt --output_dir ./subtitles --initial_prompt "以下是普通话的简体中文内容。" --word_timestamps True`
 
+`--word_timestamps True`：输出词级时间戳，边界精度从「整句毛估」提升到「逐词对齐」，开头/结尾的时间点会准很多，整体时间轴也更稳。
 
-~~`--word_timestamps True`：输出词级时间戳，边界精度从「整句毛估」提升到「逐词对齐」，开头/结尾的时间点会准很多，整体时间轴也更稳。~~
 ~~`--hallucination_silence_threshold 2`（需要配合 word_timestamps）：超过 2 秒的静音直接跳过，专治「开头静音被算进第一句」和「静音段幻觉出重复字幕」。~~

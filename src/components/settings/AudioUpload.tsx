@@ -59,7 +59,7 @@ export function AudioUpload({ onAudioSelect, onClear }: AudioUploadProps) {
           </div>
           <div className="min-w-0 text-left">
             <p className="text-sm font-medium">{isAudioUploadDisabled ? t('uploadAudioFirstSubtitle') : t('addRelatedAudio')}</p>
-            <p className="text-xs text-white/30 mt-1">MP3, WAV, M4A</p>
+            <p className="text-xs text-white/30 mt-1">MP4, MP3, WAV, M4A</p>
           </div>
           <input
             type="file"

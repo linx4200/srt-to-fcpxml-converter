@@ -1,16 +1,18 @@
 import {
+  CornerUpLeft,
   Minus,
   Pause,
   Play,
   Plus,
   Scissors,
-  X,
+  Check,
 } from 'lucide-react';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../store/useAppStore';
 import { getSubtitleLayoutSpec } from '../../domain/subtitleStyle';
 import { formatTimestamp, getLogicalPreviewLines } from '../../utils';
 import { splitTextByRatio } from '../../utils/text';
+import { useTimelineActionShortcuts } from './hooks/useTimelineKeyboardShortcuts';
 import { MAX_ZOOM, MIN_ZOOM } from './timelineGeometry';
 
 interface TimelineToolbarProps {
@@ -42,13 +44,16 @@ export function TimelineToolbar({
   const splitTimelineClipByLogicalLines = useAppStore((state) => state.splitTimelineClipByLogicalLines);
   const cutTimelineClipAtPlayhead = useAppStore((state) => state.cutTimelineClipAtPlayhead);
 
+  const mergeTimelineClipIntoPrevious = useAppStore((state) => state.mergeTimelineClipIntoPrevious);
+  const canMergeIntoPrevious = editingClipId === null && entries.findIndex((clip) => clip.id === selectedClipId) > 0;
+
   const subtitleLayoutSpec = getSubtitleLayoutSpec(subtitleStyle);
   const selectedClip = selectedClipId ? entries.find((entry) => entry.id === selectedClipId) ?? null : null;
   const selectedClipLines = selectedClip ? getLogicalPreviewLines(selectedClip.text, subtitleLayoutSpec) : [];
   const canSplitByLines = Boolean(selectedClip && selectedClipLines.length === 2 && editingClipId === null);
   const canSplitText = Boolean(selectedClip && splitTextByRatio(selectedClip.text, (currentTime - selectedClip.startSeconds) / (selectedClip.endSeconds - selectedClip.startSeconds)));
   const canCutAtPlayhead = Boolean(
-    canSplitText &&
+    editingClipId === null && canSplitText &&
     selectedClip &&
       currentTime > selectedClip.startSeconds &&
       currentTime < selectedClip.endSeconds
@@ -61,7 +66,7 @@ export function TimelineToolbar({
       : selectedClipLines.length !== 2
         ? t('splitByLinesDisabled')
         : '';
-  const cutReason = !selectedClip
+  const cutReason = editingClipId !== null ? t('finishEditingFirst') : !selectedClip
     ? t('selectClipToCut')
     : !canSplitText
       ? t('cutTextUnavailable')
@@ -77,9 +82,23 @@ export function TimelineToolbar({
 
   /* 在当前 playhead 位置执行 Playhead Cut，生成两个新的 Subtitle Clips。 */
   const handleCutAtPlayhead = () => {
-    if (!selectedClip) return;
+    if (!selectedClip || !canCutAtPlayhead) return;
     cutTimelineClipAtPlayhead(selectedClip.id, currentTime);
   };
+
+  /* 连续合并始终针对最新 Clip Selection，可快速把多段短句接到上一段。 */
+  const handleMergeIntoPrevious = () => {
+    if (!canMergeIntoPrevious || selectedClipId === null) return;
+    mergeTimelineClipIntoPrevious(selectedClipId);
+    const mergedState = useAppStore.getState();
+    const mergedClip = mergedState.workingTimeline.find((clip) => clip.id === mergedState.selectedClipId);
+    if (!mergedClip) return;
+    // 定位回调可能仍持有合并前的时间线，最后明确保留合并结果的 Clip Selection。
+    onTimeUpdate(mergedClip.startSeconds);
+    setSelectedClipId(mergedClip.id);
+  };
+
+  useTimelineActionShortcuts(handleMergeIntoPrevious, handleCutAtPlayhead);
 
   /* 跳转到当前 playhead 之前最近的 Subtitle Clip，并同步 Clip Selection。 */
   const handlePreviousClip = () => {
@@ -120,7 +139,7 @@ export function TimelineToolbar({
           onClick={onExit}
           className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none"
         >
-          <X size={14} />
+          <Check size={14} />
           {t('exitEditing')}
         </button>
       </div>
@@ -172,6 +191,29 @@ export function TimelineToolbar({
       </div>
 
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleMergeIntoPrevious}
+          disabled={!canMergeIntoPrevious}
+          aria-keyshortcuts="M"
+          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-35"
+        >
+          <CornerUpLeft size={14} />
+          {t('mergeIntoPrevious')}
+        </button>
+        <div title={cutReason}>
+          <button
+            type="button"
+            aria-keyshortcuts="S"
+            onClick={handleCutAtPlayhead}
+            disabled={!canCutAtPlayhead}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-35"
+          >
+            <Scissors size={14} />
+            {t('cutAtPlayhead')}
+          </button>
+        </div>
+
         <div title={splitReason}>
           <button
             type="button"
@@ -181,18 +223,6 @@ export function TimelineToolbar({
           >
             <Scissors size={14} />
             {t('splitByLines')}
-          </button>
-        </div>
-
-        <div title={cutReason}>
-          <button
-            type="button"
-            onClick={handleCutAtPlayhead}
-            disabled={!canCutAtPlayhead}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-35"
-          >
-            <Scissors size={14} />
-            {t('cutAtPlayhead')}
           </button>
         </div>
       </div>
