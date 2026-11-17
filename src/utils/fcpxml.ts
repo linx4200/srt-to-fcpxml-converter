@@ -7,6 +7,10 @@ const FCPXML_MIME_TYPE = 'application/xml';
 const UNTITLED_EXPORT_FILE_BASENAME = 'subtitles';
 const CUSTOM_TITLE_EFFECT_ID = 'r2';
 const BACKGROUND_RECTANGLE_EFFECT_ID = 'r3';
+/* 所有 Subtitle Clips 共用一个复合片段资源，项目通过 ref-clip 整体连接。 */
+const SUBTITLE_COMPOUND_MEDIA_ID = 'r4';
+const SUBTITLE_COMPOUND_NAME = 'subtitles';
+const SUBTITLE_COMPOUND_CONNECTED_LANE = 1;
 /* 背景和文字都使用正 lane，确保复制到真实项目后位于 Primary Storyline 上方。 */
 const BACKGROUND_CONNECTED_LANE = 1;
 const TITLE_CONNECTED_LANE_WITH_BACKGROUND = 2;
@@ -168,8 +172,12 @@ function getBackgroundRectangleCoordinates(
   subtitleBackgroundSize: SubtitleBackgroundSize
 ) {
   const backgroundRectangle = BACKGROUND_RECTANGLE_BY_ORIENTATION[fcpxmlExportSpec.format.orientation];
+  const calibratedWidth = subtitleBackgroundSize.width;
+  // FCP 归一化坐标向上为正，浏览器参考像素偏移向下为正。
+  const centerY = backgroundRectangle.centerY -
+    subtitleBackgroundSize.offsetY / fcpxmlExportSpec.format.height;
   const halfBackgroundWidth =
-    subtitleBackgroundSize.width /
+    calibratedWidth /
     fcpxmlExportSpec.format.width /
     RECTANGLE_HALF_SIZE_DIVISOR;
   const halfBackgroundHeight =
@@ -178,8 +186,8 @@ function getBackgroundRectangleCoordinates(
     RECTANGLE_HALF_SIZE_DIVISOR;
 
   return {
-    leftBottom: `${formatNormalizedCoordinate(backgroundRectangle.centerX - halfBackgroundWidth)} ${formatNormalizedCoordinate(backgroundRectangle.centerY - halfBackgroundHeight)}`,
-    rightTop: `${formatNormalizedCoordinate(backgroundRectangle.centerX + halfBackgroundWidth)} ${formatNormalizedCoordinate(backgroundRectangle.centerY + halfBackgroundHeight)}`,
+    leftBottom: `${formatNormalizedCoordinate(backgroundRectangle.centerX - halfBackgroundWidth)} ${formatNormalizedCoordinate(centerY - halfBackgroundHeight)}`,
+    rightTop: `${formatNormalizedCoordinate(backgroundRectangle.centerX + halfBackgroundWidth)} ${formatNormalizedCoordinate(centerY + halfBackgroundHeight)}`,
   };
 }
 
@@ -271,6 +279,8 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
     ? TITLE_CONNECTED_LANE_WITH_BACKGROUND
     : TITLE_CONNECTED_LANE_WITHOUT_BACKGROUND;
 
+  /* 复合片段按 FCP 的 media/sequence + ref-clip 模型生成；仅用嵌套 gap 无法形成可整体操作的复合片段。
+   * 内部从 0s 保留 Working Timeline 的全部时间位置，外层同样从 0s 引用，避免重复叠加首条字幕偏移。 */
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE fcpxml>
 <fcpxml version="1.9">
@@ -278,10 +288,7 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
         <format id="r1" frameDuration="100/${fpsScale}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
         <!-- 使用 Custom.moti 是因为它是跨语言、跨版本兼容性最好的基础模板，路径极度稳定且没有预设的冲突动画 -->
         <effect id="${CUSTOM_TITLE_EFFECT_ID}" name="Custom" uid=".../Titles.localized/Build In:Out.localized/Custom.localized/Custom.moti"/>${backgroundRectangleEffectResource}
-    </resources>
-    <library>
-        <event name="SRT2FCPXML">
-            <project name="Subtitles">
+        <media id="${SUBTITLE_COMPOUND_MEDIA_ID}" name="${SUBTITLE_COMPOUND_NAME}">
                 <sequence duration="${sequenceDuration}/${fpsScale}s" format="r1" tcStart="0s" tcFormat="NDF">
                     <spine>
                         <gap name="Gap" offset="0s" duration="${sequenceDuration}/${fpsScale}s" start="0s">`;
@@ -330,6 +337,18 @@ export function generateFcpxml(entries: SrtEntry[], fcpxmlExportSpec: FcpxmlExpo
   });
 
   xml += `
+                        </gap>
+                    </spine>
+                </sequence>
+        </media>
+    </resources>
+    <library>
+        <event name="SRT2FCPXML">
+            <project name="Subtitles">
+                <sequence duration="${sequenceDuration}/${fpsScale}s" format="r1" tcStart="0s" tcFormat="NDF">
+                    <spine>
+                        <gap name="Gap" offset="0s" duration="${sequenceDuration}/${fpsScale}s" start="0s">
+                            <ref-clip ref="${SUBTITLE_COMPOUND_MEDIA_ID}" lane="${SUBTITLE_COMPOUND_CONNECTED_LANE}" offset="0s" name="${SUBTITLE_COMPOUND_NAME}" start="0s" duration="${sequenceDuration}/${fpsScale}s"/>
                         </gap>
                     </spine>
                 </sequence>

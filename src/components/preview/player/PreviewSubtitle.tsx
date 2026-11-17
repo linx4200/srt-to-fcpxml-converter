@@ -78,6 +78,7 @@ export function PreviewSubtitle({
           className="absolute left-1/2 top-1/2"
           style={{
             backgroundColor,
+            marginTop: `${backgroundSize.offsetY * scale}px`,
             borderRadius: `${subtitleRenderSpec.borderRadius * scale}px`,
             width: `${backgroundSize.width * scale}px`,
             height: `${backgroundSize.height * scale}px`,

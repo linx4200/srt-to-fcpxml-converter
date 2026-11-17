@@ -14,7 +14,7 @@ The exported subtitle text and its rectangle background must both remain visible
 
 ## Decision
 
-Keep the transparent Gap in the Primary Storyline as the structural timing anchor.
+Keep the transparent Gap inside the `subtitles` compound sequence as the structural timing anchor. Put all subtitle titles and enabled backgrounds in one media resource, referenced by a single positive-lane ref-clip on the project’s transparent Primary Storyline Gap. Both sequences and the reference start at zero to preserve Working Timeline timing.
 
 When subtitle backgrounds are enabled:
 

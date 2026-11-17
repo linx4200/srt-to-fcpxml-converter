@@ -13,6 +13,19 @@ const WIDTH_OFFSET = 2;
 const HEIGHT_OFFSET = 1.5;
 const MIN_BACKGROUND_PADDING = 0;
 
+/* FCP 手调样本的校准范围限定为字号 35 或 50 的单行字幕，不插值到其他字号。 */
+const BACKGROUND_CALIBRATION_FONT_SIZE = 35;
+const BACKGROUND_CALIBRATION_LINE_COUNT = 1;
+/* 字号 50 使用两组留白样本选定的试调比例及向上参考像素偏移。 */
+const LARGE_BACKGROUND_CALIBRATION_FONT_SIZE = 50;
+const LARGE_PORTRAIT_BACKGROUND_WIDTH_SCALE = 1.025;
+const LARGE_BACKGROUND_UPWARD_OFFSET = 6.5;
+/* 竖屏背景对称增加的参考像素宽度，以及向下的归一化偏移。 */
+const PORTRAIT_BACKGROUND_EXTRA_WIDTH = 21.20688;
+const PORTRAIT_BACKGROUND_DOWNWARD_OFFSET = 0.0017045;
+/* 横屏背景围绕原中心增加 3% 宽度。 */
+const LANDSCAPE_BACKGROUND_WIDTH_SCALE = 1.03;
+
 type FontMetricsOptions = {
   widthFactor?: number;
   heightFactor?: number;
@@ -26,6 +39,8 @@ export interface SubtitleBackgroundSize {
   height: number;
   /* 背景高度计算使用的 Logical Preview Line 数量。 */
   lineCount: number;
+  /* 背景中心向下的参考像素偏移，预览与导出共用。 */
+  offsetY: number;
 }
 
 export function getReferenceResolution(subtitleLayoutSpec: SubtitleLayoutSpec) {
@@ -105,7 +120,7 @@ export function getSubtitleBackgroundSize(
   );
 
   if (logicalLines.length === 0) {
-    return { width: 0, height: 0, lineCount: 0 };
+    return { width: 0, height: 0, lineCount: 0, offsetY: 0 };
   }
 
   const fontPixelSize = getFontPixelSize(
@@ -124,8 +139,34 @@ export function getSubtitleBackgroundSize(
     subtitleBackgroundLayoutSpec.backgroundVerticalPadding
   );
 
+  const shouldCalibrateBackground =
+    subtitleBackgroundLayoutSpec.fontSize === BACKGROUND_CALIBRATION_FONT_SIZE &&
+    logicalLines.length === BACKGROUND_CALIBRATION_LINE_COUNT;
+  const shouldCalibrateLargeBackground =
+    subtitleBackgroundLayoutSpec.fontSize === LARGE_BACKGROUND_CALIBRATION_FONT_SIZE &&
+    logicalLines.length === BACKGROUND_CALIBRATION_LINE_COUNT;
+  const isPortrait = subtitleBackgroundLayoutSpec.orientation === 'portrait';
+  const baseWidth = widestLine + horizontalPadding;
+  // 样本补偿独立于文字换行，只改变背景矩形的尺寸与位置。
+  const calibratedWidth = shouldCalibrateLargeBackground
+    ? baseWidth * (isPortrait
+      ? LARGE_PORTRAIT_BACKGROUND_WIDTH_SCALE
+      : LANDSCAPE_BACKGROUND_WIDTH_SCALE)
+    : !shouldCalibrateBackground
+    ? baseWidth
+    : isPortrait
+      ? baseWidth + PORTRAIT_BACKGROUND_EXTRA_WIDTH * videoWidth /
+        getReferenceResolution(subtitleBackgroundLayoutSpec).width
+      : baseWidth * LANDSCAPE_BACKGROUND_WIDTH_SCALE;
+
   return {
-    width: widestLine + horizontalPadding,
+    width: calibratedWidth,
+    offsetY: shouldCalibrateLargeBackground
+      ? -LARGE_BACKGROUND_UPWARD_OFFSET * videoHeight /
+        getReferenceResolution(subtitleBackgroundLayoutSpec).height
+      : shouldCalibrateBackground && isPortrait
+      ? PORTRAIT_BACKGROUND_DOWNWARD_OFFSET * videoHeight
+      : 0,
     height: fontPixelSize * logicalLines.length + verticalPadding,
     lineCount: logicalLines.length,
   };

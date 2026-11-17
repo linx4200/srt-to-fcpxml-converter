@@ -121,6 +121,8 @@ Waveform 是参考音频派生出的展示数据，不是独立的字幕编辑�
 
 `<title>` 的 `offset` 表示字幕在主时间线上的出现位置，`duration` 表示持续时间；`start` 则是字幕生成器内部的起始时间。当前实现固定使用 `start="3600s"`，避免将外部时间线时间误用为生成器内部时间，导致字幕在 FCP 中存在片段但不显示文字。
 
+全部 Subtitle Clips 和启用的矩形背景统一放在名为 `subtitles` 的复合片段资源 `<media><sequence>` 中；项目 Primary Storyline 的透明 Gap 通过正 `lane="1"` 的单个 `<ref-clip>` 引用该资源。复合片段内部保留全时长透明 Gap 和现有背景、文字连接层级；内部与外层引用均从 `0s` 开始，保留 Working Timeline 的首段空白和字幕间隔。关闭背景时仍输出同一个复合片段。
+
 开启字幕背景时，FCPXML 会为每个 Subtitle Clip 额外输出一段位于字幕下方的矩形生成器，作为该字幕片段的背景框；背景框与对应 `<title>` 使用相同的 `offset` 和 `duration`，避免 Subtitle Gap 中继续显示底板。透明 Gap 保留在 Primary Storyline 中作为时间和连接锚点，矩形背景使用正 `lane="1"`，字幕文字使用正 `lane="2"`，确保用户把生成内容复制到真实项目后，背景和文字都位于 Primary Storyline 画面上方，且文字位于背景上方。每个背景框根据该 Subtitle Clip 的 Logical Preview Lines、字号和横纵总留白独立计算宽高，再根据 Target Video Orientation 选择对应的矩形中心点并换算坐标。字幕安全宽度只控制文字换行，不截断用户设置的背景留白。浏览器 preview rendering 与 FCPXML 共用同一套背景尺寸算法，背景颜色、透明度和圆角也来自同一份字幕样式。关闭字幕背景时，FCPXML 只输出 `lane="1"` 的字幕标题片段，不声明矩形生成器资源，也不为 Subtitle Clip 输出背景 `<video>`。横屏字幕标题还会写入 Custom title 的内部文字位置参数，以匹配 Final Cut Pro 手动调整后的底部字幕高度；竖屏字幕标题保留现有外层 `adjust-transform` 位置，不写入该内部位置参数。
 
 ## 5. 已知限制与后续方向
@@ -153,3 +155,8 @@ SRT 上传区域紧邻“去除字幕标点”复选框，默认勾选。该选�
 ### Playhead 与 Clip Selection
 
 Subtitle Editing Mode 在暂停播放或显式 Timeline Seek 后，自动选中 Playhead 所在的 Subtitle Clip；落在 Subtitle Gap 时清除选择。连续播放不更新 Clip Selection，Inline Clip Editing 期间不自动改变选择。手动单击 Subtitle Clip 只改变选择，不移动 Playhead。Clip Split 和 Playhead Cut 对选中片段执行，并继续遵守各自的逻辑行数、文本可拆分性和时间边界条件。
+
+
+### 字幕背景样本校准
+
+`utils/subtitleLayout.ts` 统一派生背景宽高与向下的参考像素偏移，供浏览器预览和 FCPXML 使用。字号 35 或 50 的单行字幕按横竖屏应用独立的 FCP 样本补偿，具体数值与范围见 `subtitle-background-sizing-framework.md`。预览按画布比例缩放背景偏移；导出将偏移转换为向上为正的矩形归一化坐标，不重复补偿尺寸。
