@@ -152,3 +152,10 @@ Subtitle Reflow 先根据当前 Target Video Orientation 的字幕安全区域�
 ## 8. 字号 50 单行的共享校准
 
 字号 50 的单行 Subtitle Clip 在预览与 FCPXML 中统一采用：竖屏背景总宽度乘以 1.025，横屏乘以 1.03；两种方向背景均相对基础锚点上移 6.5 个参考像素。水平中心与高度保持基础算法，不叠加字号 35 的校准。其他字号与多行不插值。样本、绝对中心与选值依据见 `subtitle-background-configuration-reference.md` 的当前执行配置总表。
+
+
+## 浏览器预览的独立字体布局
+
+浏览器预览通过 `getPreviewSubtitleBackgroundLayout` 使用浏览器文字排版宽度加横向总留白，不应用 FCP 的加宽比例或固定加宽。背景高度采用行数、字号换算高度及纵向总留白；垂直中心依据浏览器字体行盒和实际字形 ascent/descent 度量定位，不应用 FCP 垂直偏移。文字位置保持不变，背景作为独立 sibling layer 绘制。
+
+本文的 FCP 校准参数表与共享补偿说明仅适用于导出路径；预览与导出共用样式输入及基础字体测量能力，分别计算各自渲染模型的背景布局。`getSubtitleBackgroundSize` 保留 FCP 导出的既有计算，预览函数不参与导出。

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+<fcpxml version="1.9">
+    <resources>
+        <format id="r1" frameDuration="100/6000s" width="1920" height="1080" colorSpace="1-1-1 (Rec. 709)" />
+
+        <effect id="r2" name="Custom" uid=".../Titles.localized/Build In:Out.localized/Custom.localized/Custom.moti" />
+        <effect id="r3" name="矩形" uid="Cloud:D3FDCEBA-B513-4136-B9C9-9D22EE453213" />
+        <media id="r4" name="subtitles">
+                <sequence duration="566600/6000s" format="r1" tcStart="0s" tcFormat="NDF">
+                    <spine>
+                        <gap name="Gap" offset="0s" duration="566600/6000s" start="0s">
+                            <video ref="r3" lane="1" offset="51500/6000s" name="矩形" start="3600s" duration="33000/6000s">
+                                <param name="Build In" key="9999/3191505825/2/101" value="0" />
+                                <param name="Build Out" key="9999/3191505825/2/102" value="0" />
+                                <param name="Right Top" key="9999/3191888958/3191889159/3/3296647477/2" value="0.750439 0.093817" />
+                                <param name="Left Bottom" key="9999/3191888958/3191889159/3/3296647477/3" value="0.247735 0.057687" />
+                                <param name="Roundness" key="9999/3192238800/100/3296679287/2/100" value="0" />
+                                <param name="Fill Opacity" key="9999/3298577735/3298577563/1/200/202" value="0.4" />
+                                <param name="Fill Color" key="9999/3298577735/3298577563/3296684920/3296685085/3323204807/3296692804/2/353/113/111" value="0.000000 0.000000 0.000000" />
+                            </video>
+                            <title lane="2" ref="r2" offset="51500/6000s" name="甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬H" duration="33000/6000s" start="3600s">
+                            <param name="位置" key="9999/10199/10201/1/100/101" value="0 -200" />
+                            <param name="对齐" key="9999/10199/10201/2/354/1002961760/401" value="1 (居中)" />
+                            <param name="Out Sequencing" key="9999/10199/10201/4/10233/201/202" value="0 (到)" />
+                            <param name="disableDRT" key="3733" value="1" />
+                            <text>
+                                <text-style ref="ts2">甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬HDMI丁戊己庚辛壬</text-style>
+                            </text>
+                            <text-style-def id="ts2">
+                                <text-style font="PingFang SC" fontSize="35" fontFace="Regular" fontColor="1.00 1.00 1.00 1" alignment="center" />
+                            </text-style-def>
+                            <adjust-transform position="0 -25" />
+                        </title>
+                            <video ref="r3" lane="1" offset="149200/6000s" name="矩形" start="3600s" duration="2200/6000s">
+                                <param name="Build In" key="9999/3191505825/2/101" value="0" />
+                                <param name="Build Out" key="9999/3191505825/2/102" value="0" />
+                                <param name="Right Top" key="9999/3191888958/3191889159/3/3296647477/2" value="0.508212 0.093817" />
+                                <param name="Left Bottom" key="9999/3191888958/3191889159/3/3296647477/3" value="0.489962 0.057687" />
+                                <param name="Roundness" key="9999/3192238800/100/3296679287/2/100" value="0" />
+                                <param name="Fill Opacity" key="9999/3298577735/3298577563/1/200/202" value="0.4" />
+                                <param name="Fill Color" key="9999/3298577735/3298577563/3296684920/3296685085/3323204807/3296692804/2/353/113/111" value="0.000000 0.000000 0.000000" />
+                            </video>
+                            <title lane="2" ref="r2" offset="149200/6000s" name="甲" duration="2200/6000s" start="3600s">
+                            <param name="位置" key="9999/10199/10201/1/100/101" value="0 -200" />
+                            <param name="对齐" key="9999/10199/10201/2/354/1002961760/401" value="1 (居中)" />
+                            <param name="Out Sequencing" key="9999/10199/10201/4/10233/201/202" value="0 (到)" />
+                            <param name="disableDRT" key="3733" value="1" />
+                            <text>
+                                <text-style ref="ts5">甲</text-style>
+                            </text>
+                            <text-style-def id="ts5">
+                                <text-style font="PingFang SC" fontSize="35" fontFace="Regular" fontColor="1.00 1.00 1.00 1" alignment="center" />
+                            </text-style-def>
+                            <adjust-transform position="0 -25" />
+                        </title>
+                            <video ref="r3" lane="1" offset="493700/6000s" name="矩形" start="3600s" duration="45800/6000s">
+                                <param name="Build In" key="9999/3191505825/2/101" value="0" />
+                                <param name="Build Out" key="9999/3191505825/2/102" value="0" />
+                                <param name="Right Top" key="9999/3191888958/3191889159/3/3296647477/2" value="0.851355 0.093817" />
+                                <param name="Left Bottom" key="9999/3191888958/3191889159/3/3296647477/3" value="0.146819 0.057687" />
+                                <param name="Roundness" key="9999/3192238800/100/3296679287/2/100" value="0" />
+                                <param name="Fill Opacity" key="9999/3298577735/3298577563/1/200/202" value="0.4" />
+                                <param name="Fill Color" key="9999/3298577735/3298577563/3296684920/3296685085/3323204807/3296692804/2/353/113/111" value="0.000000 0.000000 0.000000" />
+                            </video>
+                            <title lane="2" ref="r2" offset="493700/6000s" name="甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬癸" duration="45800/6000s" start="3600s">
+                            <param name="位置" key="9999/10199/10201/1/100/101" value="0 -200" />
+                            <param name="对齐" key="9999/10199/10201/2/354/1002961760/401" value="1 (居中)" />
+                            <param name="Out Sequencing" key="9999/10199/10201/4/10233/201/202" value="0 (到)" />
+                            <param name="disableDRT" key="3733" value="1" />
+                            <text>
+                                <text-style ref="ts16">甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬癸甲乙丙specific乙丙</text-style>
+                            </text>
+                            <text-style-def id="ts16">
+                                <text-style font="PingFang SC" fontSize="35" fontFace="Regular" fontColor="1.00 1.00 1.00 1" alignment="center" />
+                            </text-style-def>
+                            <adjust-transform position="0 -25" />
+                        </title>
+                            </gap>
+                    </spine>
+                </sequence>
+        </media>
+    </resources>
+    <library>
+        <event name="SRT2FCPXML">
+            <project name="Subtitles">
+                <sequence duration="566600/6000s" format="r1" tcStart="0s" tcFormat="NDF">
+                    <spine>
+                        <gap name="Gap" offset="0s" duration="566600/6000s" start="0s">
+                            <ref-clip ref="r4" lane="1" offset="0s" name="subtitles" start="0s" duration="566600/6000s" />
+                        </gap>
+                    </spine>
+                </sequence>
+            </project>
+        </event>
+    </library>
+</fcpxml>

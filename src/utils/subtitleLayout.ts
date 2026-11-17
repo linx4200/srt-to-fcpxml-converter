@@ -219,3 +219,39 @@ function measureSubtitleTextWidth(text: string, fontPixelSize: number): number {
     return total + fontPixelSize * charScale;
   }, 0);
 }
+
+/* 浏览器预览使用自身字体度量，不套用已校准的 FCP 矩形补偿。 */
+export function getPreviewSubtitleBackgroundLayout(
+  text: string,
+  subtitleLayoutSpec: SubtitleBackgroundLayoutSpec
+): SubtitleBackgroundSize {
+  const fontPixelSize = getFontPixelSize(
+    subtitleLayoutSpec.fontSize,
+    getReferenceResolution(subtitleLayoutSpec).height
+  ).height;
+  // 与 whitespace-pre 的实际排版一致，只读取已有换行，不在背景计算中再次软换行。
+  const lines = text.split('\n');
+  textMeasureCanvas ??= typeof document !== 'undefined' ? document.createElement('canvas') : null;
+  const context = textMeasureCanvas?.getContext('2d');
+  let offsetY = 0;
+  if (context) {
+    context.font = `${fontPixelSize}px "PingFang SC", "Microsoft YaHei", sans-serif`;
+    const metrics = context.measureText(text.replace(/\n/g, ''));
+    /* CSS line-height:1 的基线由字体 ascent/descent 决定，不能将行盒中心当作字形中心。
+     * 用实际字形的上下界定位背景，避免 FCP 上移补偿使浏览器背景进一步偏上。
+     * 缺少字体行盒度量的浏览器使用 em 框近似，保持有限值。
+     */
+    const fontAscent = metrics.fontBoundingBoxAscent ?? fontPixelSize;
+    const fontDescent = metrics.fontBoundingBoxDescent ?? 0;
+    offsetY = (fontAscent - fontDescent +
+      metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent) / 2;
+  }
+  return {
+    width: Math.max(...lines.map((line) => measureSubtitleTextWidth(line, fontPixelSize))) +
+      Math.max(MIN_BACKGROUND_PADDING, subtitleLayoutSpec.backgroundHorizontalPadding),
+    height: fontPixelSize * lines.length +
+      Math.max(MIN_BACKGROUND_PADDING, subtitleLayoutSpec.backgroundVerticalPadding),
+    lineCount: lines.length,
+    offsetY,
+  };
+}

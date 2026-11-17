@@ -1,0 +1,234 @@
+[
+  {
+    "file": "landscape-default.fcpxml",
+    "entries": [
+      {
+        "id": 1,
+        "text": "甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬HDMI丁戊己庚辛壬",
+        "startSeconds": 8.583333333333334,
+        "endSeconds": 14.083333333333334,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      },
+      {
+        "id": 2,
+        "text": "甲",
+        "startSeconds": 24.866666666666667,
+        "endSeconds": 25.233333333333334,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      },
+      {
+        "id": 3,
+        "text": "甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬癸甲乙丙specific乙丙",
+        "startSeconds": 82.28333333333333,
+        "endSeconds": 89.91666666666667,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      }
+    ],
+    "spec": {
+      "frameRate": 60,
+      "format": {
+        "orientation": "landscape",
+        "width": 1920,
+        "height": 1080
+      },
+      "titleStyle": {
+        "fontSize": 35,
+        "textColor": "#ffffff"
+      },
+      "backgroundStyle": {
+        "isEnabled": true,
+        "backgroundColor": "#000000",
+        "backgroundOpacity": 0.4,
+        "borderRadius": 0.0,
+        "backgroundHorizontalPadding": 5,
+        "backgroundVerticalPadding": 5
+      }
+    },
+    "measuredWidths": {
+      "甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬HDMI丁戊己庚辛壬": 932.0793009708736,
+      "甲": 29.019417475728133,
+      "甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛壬癸甲乙丙specific乙丙": 1308.3098252427185
+    },
+    "sha256": "ee3d115fdb5330410a5fc624471295609ffe9f10fa1e7fe4f4ecae7311f3802e"
+  },
+  {
+    "file": "portrait-large-padding.fcpxml",
+    "entries": [
+      {
+        "id": 1,
+        "text": "甲Jelly Cat甲乙丙",
+        "startSeconds": 45.35,
+        "endSeconds": 47.53333333333333,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      },
+      {
+        "id": 2,
+        "text": "甲乙丙丁戊己庚辛",
+        "startSeconds": 48.36666666666667,
+        "endSeconds": 50.18333333333334,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      },
+      {
+        "id": 3,
+        "text": "甲",
+        "startSeconds": 100.11666666666666,
+        "endSeconds": 100.58333333333333,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      }
+    ],
+    "spec": {
+      "frameRate": 60,
+      "format": {
+        "orientation": "portrait",
+        "width": 1080,
+        "height": 1920
+      },
+      "titleStyle": {
+        "fontSize": 50,
+        "textColor": "#ffffff"
+      },
+      "backgroundStyle": {
+        "isEnabled": true,
+        "backgroundColor": "#ff0000",
+        "backgroundOpacity": 0.4,
+        "borderRadius": 20.0,
+        "backgroundHorizontalPadding": 40,
+        "backgroundVerticalPadding": 40
+      }
+    },
+    "measuredWidths": {
+      "甲Jelly Cat甲乙丙": 692.3221853658537,
+      "甲乙丙丁戊己庚辛": 691.1989853658537,
+      "甲": 86.39898536585368
+    },
+    "sha256": "629ca2b405d685319a8b7daca0d0e761077d3f25f37f3f890f1b767f35cc82a8"
+  },
+  {
+    "file": "landscape-large-padding.fcpxml",
+    "entries": [
+      {
+        "id": 1,
+        "text": "Type-C庚辛Mac乙丙丁戊HDMI癸甲Switch辛壬癸甲",
+        "startSeconds": 3.683333333333333,
+        "endSeconds": 8.366666666666667,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      },
+      {
+        "id": 2,
+        "text": "甲乙丙丁戊己庚辛壬癸",
+        "startSeconds": 56.833333333333336,
+        "endSeconds": 59.1,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      },
+      {
+        "id": 3,
+        "text": "甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛Mac乙",
+        "startSeconds": 64.33333333333333,
+        "endSeconds": 68.06666666666666,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      }
+    ],
+    "spec": {
+      "frameRate": 60,
+      "format": {
+        "orientation": "landscape",
+        "width": 1920,
+        "height": 1080
+      },
+      "titleStyle": {
+        "fontSize": 50,
+        "textColor": "#ffffff"
+      },
+      "backgroundStyle": {
+        "isEnabled": true,
+        "backgroundColor": "#ff0000",
+        "backgroundOpacity": 0.4,
+        "borderRadius": 20.0,
+        "backgroundHorizontalPadding": 40,
+        "backgroundVerticalPadding": 40
+      }
+    },
+    "measuredWidths": {
+      "Type-C庚辛Mac乙丙丁戊HDMI癸甲Switch辛壬癸甲": 1128.6387572815534,
+      "甲乙丙丁戊己庚辛壬癸": 486.0017087378641,
+      "甲乙丙丁戊己庚辛壬癸甲乙丙丁戊己庚辛Mac乙": 1020.0152233009708
+    },
+    "sha256": "222ad41315e80ac75af9c49c595a8e532ab98247dea180cfd3c00d577179d22b"
+  },
+  {
+    "file": "portrait-default.fcpxml",
+    "entries": [
+      {
+        "id": 1,
+        "text": "甲乙 jelly cat 丁戊己庚辛",
+        "startSeconds": 45.4,
+        "endSeconds": 47.83333333333333,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      },
+      {
+        "id": 2,
+        "text": "甲乙丙丁戊己庚辛",
+        "startSeconds": 94.61666666666666,
+        "endSeconds": 96.28333333333333,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      },
+      {
+        "id": 3,
+        "text": "甲乙",
+        "startSeconds": 183.51666666666668,
+        "endSeconds": 184.11666666666667,
+        "startTime": "",
+        "endTime": "",
+        "editState": "manual"
+      }
+    ],
+    "spec": {
+      "frameRate": 60,
+      "format": {
+        "orientation": "portrait",
+        "width": 1080,
+        "height": 1920
+      },
+      "titleStyle": {
+        "fontSize": 35,
+        "textColor": "#ffffff"
+      },
+      "backgroundStyle": {
+        "isEnabled": true,
+        "backgroundColor": "#ff0000",
+        "backgroundOpacity": 0.4,
+        "borderRadius": 0.0,
+        "backgroundHorizontalPadding": 5,
+        "backgroundVerticalPadding": 5
+      }
+    },
+    "measuredWidths": {
+      "甲乙 jelly cat 丁戊己庚辛": 680.27944,
+      "甲乙丙丁戊己庚辛": 483.84039999999993,
+      "甲乙": 120.96040000000006
+    },
+    "sha256": "e4ea1c8b38f07e3d9d40bf27f6508829262bd37df3c32bdf37b924e61ca95b57"
+  }
+]

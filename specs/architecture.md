@@ -164,3 +164,10 @@ Subtitle Editing Mode 在暂停播放或显式 Timeline Seek 后，自动选中 
 ### 字幕背景样本校准
 
 `utils/subtitleLayout.ts` 统一派生背景宽高与向下的参考像素偏移，供浏览器预览和 FCPXML 使用。字号 35 或 50 的单行字幕按横竖屏应用独立的 FCP 样本补偿，具体数值与范围见 `subtitle-background-sizing-framework.md`。预览按画布比例缩放背景偏移；导出将偏移转换为向上为正的矩形归一化坐标，不重复补偿尺寸。
+
+
+## 浏览器预览的独立字体布局
+
+浏览器预览通过 `getPreviewSubtitleBackgroundLayout` 使用浏览器文字排版宽度加横向总留白，不应用 FCP 的加宽比例或固定加宽。背景高度采用行数、字号换算高度及纵向总留白；垂直中心依据浏览器字体行盒和实际字形 ascent/descent 度量定位，不应用 FCP 垂直偏移。文字位置保持不变，背景作为独立 sibling layer 绘制。
+
+本文的 FCP 校准参数表与共享补偿说明仅适用于导出路径；预览与导出共用样式输入及基础字体测量能力，分别计算各自渲染模型的背景布局。`getSubtitleBackgroundSize` 保留 FCP 导出的既有计算，预览函数不参与导出。

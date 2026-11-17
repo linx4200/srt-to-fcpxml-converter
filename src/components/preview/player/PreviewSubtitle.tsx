@@ -1,6 +1,6 @@
 import { FCP_RESOLUTION, UI_LOGICAL_RESOLUTION } from '../../../constants';
 import type { SubtitleRenderSpec } from '../../../domain/subtitleStyle';
-import { getFontPixelSize, getSubtitleBackgroundSize } from '../../../utils';
+import { getFontPixelSize, getPreviewSubtitleBackgroundLayout } from '../../../utils';
 
 /* CSS rgba 使用 0-255 色彩通道；透明度保持产品层 0-1 的语义。 */
 const RGB_CHANNEL_MIN_VALUE = 0;
@@ -54,7 +54,7 @@ export function PreviewSubtitle({
   const scale = containerHeight / referenceHeight;
   const fontSize = getFontPixelSize(subtitleRenderSpec.fontSize, referenceHeight).height;
   const backgroundSize = subtitleRenderSpec.isEnabled
-    ? getSubtitleBackgroundSize(text, subtitleRenderSpec)
+    ? getPreviewSubtitleBackgroundLayout(text, subtitleRenderSpec)
     : null;
   const backgroundColor = subtitleRenderSpec.isEnabled
     ? getCssBackgroundColor(
