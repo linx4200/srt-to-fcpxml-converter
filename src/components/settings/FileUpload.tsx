@@ -61,7 +61,6 @@ export function FileUpload({ onFileSelect, onClearAll }: FileUploadProps) {
           </div>
           <div className="min-w-0 text-left">
             <p className="text-sm font-medium">{t('uploadSrt')}</p>
-            <p className="text-xs text-white/30 mt-1">{t('dragAndDrop')}</p>
           </div>
           <input
             type="file"

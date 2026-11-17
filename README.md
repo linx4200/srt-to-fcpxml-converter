@@ -1,27 +1,39 @@
 # SRT to FCPXML Converter
 
-A browser-based subtitle tool for Final Cut Pro: convert `.srt` files into importable `.fcpxml`, with automatic line splitting, waveform-assisted preview, and in-browser editing.
+面向 Final Cut Pro 的浏览器字幕工具：导入 SRT、调整排版与时间，再导出 FCPXML。字幕与参考音频均在浏览器本地处理。
 
-一个面向 Final Cut Pro 的浏览器字幕工具：将 `.srt` 文件转换为可导入的 `.fcpxml`，并提供自动拆行、波形辅助预览和在线编辑能力。
+A browser-based subtitle tool for Final Cut Pro. Import SRT, adjust layout and timing, and export FCPXML. Subtitle and reference-audio processing runs locally in your browser.
 
-![Website Introduction](./docs/intro_screenshot.png)
+<!-- 占位地址：上线后替换为真实域名 -->
+在线使用：<https://xinranliu.me/srt-to-fcpxml/>　Use it online: <https://xinranliu.me/srt-to-fcpxml/>
 
-## Highlights
+## 核心亮点 / Highlights
 
-- Import `.srt` subtitle files / 导入 `.srt` 字幕文件
-- Export Final Cut Pro compatible `.fcpxml` / 导出兼容 Final Cut Pro 的 `.fcpxml`
-- Automatically split long subtitle lines for portrait layouts / 针对竖屏布局自动拆分长字幕
-- Keep subtitle positioning within the video safe area / 字幕位置已适配视频安全区域
-- Preview subtitles with RedNote / Douyin overlays / 支持小红书和抖音浮层预览
-- Review subtitles against a reference audio waveform and edit text in place / 结合参考音频波形检查字幕，并支持直接在线编辑字幕文本
-- Adjust subtitle text color and font size / 支持调整字幕文字颜色和字号
+- **SRT → Final Cut Pro** — 导出可导入 FCP 的字幕 / Export importable FCPXML.
+- **自动字幕排版 / Automatic subtitle layout** — 横竖屏自动拆分长字幕 / Split long lines for portrait or landscape video.
+- **样式预览后再导出 / Style before export** — 调整文字与圆角背景 / Customize text and rounded backgrounds.
+- **听音看波形，直接改字幕 / Edit with audio waveforms** — 改字、拆分、合并、修剪时间 / Refine text, split, merge, and trim timing.
+- **浏览器本地处理 / Local browser processing** — 字幕与参考音频在本机处理 / Process subtitles and reference audio on your device.
 
-## Coming soon
+![字幕工作区 / Subtitle workspace](./docs/images/intro_screenshot.png)
 
-- Landscape layout support / 支持横屏布局
-- Subtitle timing editing / 支持编辑字幕时间点
+## 文档 / Documentation
 
-## Docs
+| | 中文 | English |
+| --- | --- | --- |
+| 简介与本地运行 / Overview & local setup | [项目说明](./README.zh-CN.md) | [Project overview](./README.en.md) |
+| 使用流程与编辑 / Workflow & editing | [用户指南](./docs/user-guide.zh-CN.md) | [User Guide](./docs/user-guide.en.md) |
+| 生成 SRT / Generate an SRT | [如何生成 SRT](./docs/how-to-generate-srt.zh-CN.md) | [How to generate an SRT](./docs/how-to-generate-srt.en.md) |
+| Final Cut Pro 工作流 / Final Cut Pro workflow | [FCP 使用说明](./docs/final-cut-pro-workflow.zh-CN.md) | [FCP workflow](./docs/final-cut-pro-workflow.en.md) |
 
-- 中文: [README.zh-CN.md](./README.zh-CN.md)
-- English: [README.en.md](./README.en.md)
+## 快速流程 / Quick workflow
+
+导入 SRT → 设置画幅与样式 → 校对（可添加参考音频进行编辑）→ 导出 FCPXML → 导入 Final Cut Pro。
+
+Import SRT → choose orientation and style → review and edit with optional reference audio → export FCPXML → import into Final Cut Pro.
+
+参考音频和平台预览浮层不参与导出，最终效果请在 Final Cut Pro 中检查。
+
+Reference audio and platform preview overlays are not included in the export. Check the final appearance in Final Cut Pro.
+
+许可 / License：MIT，详见 [LICENSE](./LICENSE)。

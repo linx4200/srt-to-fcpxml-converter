@@ -103,9 +103,9 @@ export function DouyinOverlay({ currentTime, totalDuration }: DouyinOverlayProps
       </div>
 
       <div className="absolute left-4 right-4 bottom-11 z-20">
-        <div className="text-[14px] font-semibold leading-none">@闹钟响了就起床</div>
+        <div className="text-[14px] font-semibold leading-none">@茶茶闹钟响了就起床</div>
         <p className="mt-3 max-w-[270px] text-[12px] leading-[1.35] text-white/80">
-          请在小红书🍠上关注 @闹钟响了就起床 ｜ 提 Bug 请到 Github ... 展开
+          请在小红书上关注 @茶茶闹钟响了就起床 ｜ 提 Bug 请到 Github ... 展开
         </p>
       </div>
 

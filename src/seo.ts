@@ -1,4 +1,6 @@
 import type { Language } from './i18n';
+/* 通过模块导入让 Vite 输出带 hash 的静态资源地址；docs/ 目录不参与部署，直接写路径会在线上 404。 */
+import introScreenshotUrl from '../docs/images/intro_screenshot.png';
 
 type SeoConfig = {
   title: string;
@@ -8,7 +10,7 @@ type SeoConfig = {
 };
 
 const SITE_NAME = 'SRT to FCPXML Converter';
-const DEFAULT_IMAGE_PATH = '/docs/intro_screenshot.png';
+const DEFAULT_IMAGE_PATH = introScreenshotUrl;
 const AUTHOR_WEBSITE_URL = 'https://xinranliu.me/';
 const GITHUB_REPO_URL = 'https://github.com/linx4200/srt-to-fcpxml-converter';
 const CANONICAL_URL = 'https://xinranliu.me/';

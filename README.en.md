@@ -1,77 +1,66 @@
 # SRT to FCPXML Converter
 
-[中文说明](./README.zh-CN.md)
+[中文](./README.zh-CN.md) · [User Guide](./docs/user-guide.en.md)
 
-This is a lightweight subtitle tool for Final Cut Pro workflows. After you upload an `.srt` subtitle file, the app can automatically split overly long lines based on the current frame format and font size, then export an `.fcpxml` file that can be imported directly into Final Cut Pro. It is well suited for short-form subtitle production and review.
+Convert existing `.srt` subtitles into `.fcpxml` for Final Cut Pro, with layout, review, and lightweight editing before export. Designed for desktop users who already have subtitles and want to reduce manual adjustments in FCP.
 
-## Overview
+<!-- Placeholder URL: replace with the real domain once live -->
+Use it online: <https://xinranliu.me/srt-to-fcpxml/>　or run it locally as described in [Local development](#local-development).
 
-This project is built to solve a very specific workflow problem:
-
-- You already have an `.srt` subtitle file
-- You need to import those subtitles into Final Cut Pro
-- You want the lines to be pre-split before import so there is less manual adjustment afterward
-
-The app reads subtitle content in the browser, parses the timeline automatically, estimates subtitle width based on the current font size and frame format, splits overly long text into subtitle segments better suited for short-form video layouts, and finally exports the result as FCPXML.
+![Subtitle workspace](./docs/images/intro_screenshot.png)
 
 ## Features
 
-- Import `.srt` subtitle files
-- Automatically split overly long subtitle lines based on frame width
-- Re-run subtitle splitting with the current settings
-- Adjust subtitle font size and text color
-- Choose `30 FPS` or `60 FPS`
-- Preview modes: clean / RedNote / Douyin
-- Upload reference audio and display the waveform
-- Preview, play back, and edit subtitles on a timeline
-- Export `.fcpxml` files that can be imported directly into Final Cut Pro
-- Switch the UI between Chinese and English
+- Automatically split long subtitles based on orientation and font size; reflow all subtitles when needed.
+- Portrait 9:16 (1080 × 1920) and landscape 16:9 (1920 × 1080), at 30 or 60 FPS.
+- Text color and size, plus subtitle background color, opacity, corner radius, and total horizontal / vertical padding.
+- RedNote and Douyin preview overlays in portrait; clean preview in landscape.
+- Reference audio and waveform-assisted text editing, splitting by lines, cutting at the playhead, merging into the previous clip, and trimming timing boundaries.
+- Export the current edits as FCPXML.
+- Chinese and English UI.
 
-## Getting Started
+## Quick start
 
-### 1. Install dependencies
+1. Open the app and choose the target orientation and frame rate.
+2. Import an `.srt` file. Keep or disable the default “Remove subtitle punctuation” option as needed.
+3. Adjust the style and review the preview. To edit, add reference audio and choose “Edit Subtitles”.
+4. Finish reviewing, choose “Export FCPXML”, and import the downloaded file into Final Cut Pro.
+
+See the [User Guide](./docs/user-guide.en.md) for editing controls and the FCP workflow.
+
+> Reflow All Subtitles and confirmed orientation changes rebuild the result from the original imported subtitles. They may replace manual text, splits, line breaks, and timing edits. Choose the overall layout before reviewing individual clips.
+
+## Data and scope
+
+- Subtitle parsing, audio processing, and export run locally in the browser without server-side media processing.
+- Reference audio is used only for playback and waveforms and is not exported. Real video files are not imported.
+- Export includes subtitle text. If you turn on “Subtitle Background”, the corresponding background boxes are also exported. Platform overlays are not exported.
+- Exported subtitles always use PingFang SC Regular; the font cannot be changed in the app. Replace it in Final Cut Pro if your project needs another font.
+- Export format is FCPXML 1.9 (Apple documents Final Cut Pro 10.4.9 or later as the requirement); keep orientation and frame rate consistent with the target project.
+- Browser preview assists review; check the final font, placement, and background appearance in FCP.
+- Project saving / recovery, undo / redo, and bulk movement are not available. Export the result before refreshing or leaving, and keep your source SRT.
+
+## Local development
+
+Requires Node.js 20 or later, plus npm. Run from the repository directory:
 
 ```bash
 npm install
-```
-
-### 2. Start the dev server
-
-```bash
 npm run dev
 ```
 
-Default local URL:
-
-- [http://localhost:3000](http://localhost:3000)
-
-### 3. Build for production
+Open the address printed in the terminal; the default port is [3000](http://localhost:3000).
 
 ```bash
-npm run build
+npm run lint   # TypeScript type checking
+npm run build  # Production build
+npm test       # FCPXML regression tests
 ```
 
-### 4. Run type checks
+Stack: React 19, TypeScript, Vite, Tailwind CSS 4, and Zustand.
 
-```bash
-npm run lint
-```
+Developer references: [architecture](./specs/architecture.md), [subtitle editing terminology](./specs/subtitle-editing/CONTEXT.md), and [ADRs](./specs/adr/).
 
-## Stack
+## License
 
-- React 19
-- TypeScript
-- Vite
-- Tailwind CSS 4
-
-## Known Limitations
-
-### 1. No auto-resizing subtitle background box
-
-The exported FCPXML is based on Final Cut Pro's built-in `Custom.moti` title template to preserve compatibility and keep the workflow installation-free. However, standard FCP title templates do not support a background box that automatically resizes with the text. As a result, the exporter currently outputs text styling only and does not generate a truly adaptive rounded subtitle background.
-
-That means the background color, opacity, corner radius, and padding fields in the codebase are currently placeholders and are not part of the actual export result.
-
-### 2. Preview is only for assisted review
-
-The subtitle preview and waveform timeline are mainly intended for quickly checking layout and timing. The final imported result in Final Cut Pro remains the source of truth.
+MIT. See [LICENSE](./LICENSE).

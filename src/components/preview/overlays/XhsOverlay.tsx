@@ -45,7 +45,7 @@ export function XhsOverlay({ currentTime, totalDuration }: XhsOverlayProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-white/30 border border-white/20 overflow-hidden shrink-0" />
-              <span className="text-white text-[14px] font-medium ml-2 drop-shadow-sm">闹钟响了就起床</span>
+              <span className="text-white text-[14px] font-medium ml-2 drop-shadow-sm">茶茶闹钟响了就起床</span>
               <div className="bg-[#ff2442] text-white text-[12px] px-2.5 py-0.5 rounded-full ml-2 font-medium tracking-wide">关注</div>
             </div>
           </div>
@@ -58,7 +58,7 @@ export function XhsOverlay({ currentTime, totalDuration }: XhsOverlayProps) {
               <ChevronDown size={10} className="opacity-70 -ml-0.5" />
             </div>
             <div className="text-white/80 text-[12px] drop-shadow-md line-clamp-1 flex-1">
-              ⬆️ 请关注 @闹钟响了就起床
+              ⬆️ 请关注 @茶茶闹钟响了就起床
             </div>
           </div>
 
