@@ -147,7 +147,7 @@ Waveform 是参考音频派生出的展示数据，不是独立的字幕编辑�
 
 ### 导入标点处理
 
-SRT 上传区域紧邻“去除字幕标点”复选框，默认勾选。该选项由 timeline slice 管理；切换只更新后续重建参数，不直接修改 Working Timeline。导入、确认 Subtitle Reflow 或确认 Target Video Orientation 切换时，从完整的 Imported SRT Snapshot 读取文本，先按选项去除标点，再执行宽度测量和自动切分。
+SRT 上传区域紧邻“去除字幕标点”复选框，默认勾选。该选项由 timeline slice 管理；切换只更新后续重建参数，不直接修改 Working Timeline。导入、确认 Subtitle Reflow 或确认 Target Video Orientation 切换时，从完整的 Imported SRT Snapshot 读取文本，先保留标点执行宽度测量和自动切分，再按选项清理各片段标点。宽度溢出时，在可容纳文字末尾 30% 内选择最靠近上限的有效断句标点；数字内部符号不作为断点，连续标点和紧随的闭引号、右括号尽量归前段，且不得超过宽度上限。没有有效标点时优先保持英文单词完整，单词本身超宽时按完整字符切分。Manual Line Break 保留为明确边界。清理后不合并片段，时间按清理前的各行文本权重分配。
 
 标点处理保留 Manual Line Break、拉丁单词内部的撇号与连字符，以及数字之间的小数点、分组符等数字格式符号。英文词间标点以空格分隔，中文标点直接移除。纯标点片段清理后不创建 Subtitle Clip，其时间范围保留为 Subtitle Gap。取消选项后确认重新排布，可从原始快照恢复标点；重新排布遵循现有覆盖手动编辑的确认流程。
 

@@ -4,7 +4,7 @@ import type { TimelineClipBoundaryEdge } from '../domain/workingTimeline';
 import type { EditingSessionState, SrtEntry, SubtitleStyle } from '../types';
 
 export interface TimelineSlice {
-  /* 下次从 Imported SRT Snapshot 重建时，在宽度切分前去除标点；不直接修改 Working Timeline。 */
+  /* 下次从 Imported SRT Snapshot 重建时，在宽度切分后去除标点；不直接修改 Working Timeline。 */
   removeSubtitlePunctuation: boolean;
   setRemoveSubtitlePunctuation: (enabled: boolean) => void;
   /* 上传 SRT 解析后的只读 Imported SRT Snapshot，只作为导入、确认后的 Subtitle Reflow 和确认后的 Target Video Orientation 切换时重建 Working Timeline 的输入；不参与预览、编辑或导出。 */

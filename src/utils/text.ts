@@ -33,7 +33,7 @@ export function splitTextByRatio(text: string, ratio: number): [string, string] 
   return cutIndex === undefined ? null : [characters.slice(0, cutIndex).join(''), characters.slice(cutIndex).join('')];
 }
 
-/* 在宽度测量前移除标点，保留 Manual Line Break、词内连接符和数字格式。 */
+/* 清理切分后的标点，保留 Manual Line Break、词内连接符和数字格式。 */
 export function removeSubtitlePunctuation(text: string): string {
   const characters = Array.from(text);
   return characters.map((character, index) => {
@@ -51,4 +51,38 @@ export function removeSubtitlePunctuation(text: string): string {
     return /[\p{Script=Latin}\p{Number}]$/u.test(precedingText)
       && /^[\p{Script=Latin}\p{Number}]/u.test(followingText) ? ' ' : '';
   }).join('');
+}
+
+/* 只在可容纳文本的末尾 30% 寻找语义断点，避免过早断句。 */
+const WIDTH_BREAK_SEARCH_RATIO = 0.3;
+const SENTENCE_PUNCTUATION = /[，,。.!！?？;；:：、…]/u;
+const CLOSING_PUNCTUATION = /[”’」』）)】\]》〉"']/u;
+
+/* 在不超过宽度边界的前提下选择断点；characters 必须是完整 grapheme。 */
+export function findWidthBreakIndex(characters: string[], fittingCount: number): number {
+  const searchStart = Math.ceil(fittingCount * (1 - WIDTH_BREAK_SEARCH_RATIO));
+  let punctuationBreak = 0;
+  for (let index = 0; index < fittingCount; index += 1) {
+    const character = characters[index];
+    if (!SENTENCE_PUNCTUATION.test(character)) continue;
+    // 数字格式中的小数点、分组符和时间分隔符不代表断句。
+    if (/[.,:：]/u.test(character)
+      && /\p{Number}/u.test(characters[index - 1] ?? '')
+      && /\p{Number}/u.test(characters[index + 1] ?? '')) continue;
+    let end = index + 1;
+    while (end < characters.length
+      && (SENTENCE_PUNCTUATION.test(characters[end]) || CLOSING_PUNCTUATION.test(characters[end]))) end += 1;
+    if (end <= fittingCount && end >= searchStart) punctuationBreak = end;
+  }
+  if (punctuationBreak) return punctuationBreak;
+
+  // 普通英文单词整体移到下一行；单词本身超宽时允许按字符切分。
+  const isWordCharacter = (character: string) => /[\p{Script=Latin}\p{Number}'’\-‐‑]/u.test(character);
+  if (isWordCharacter(characters[fittingCount - 1] ?? '')
+    && isWordCharacter(characters[fittingCount] ?? '')) {
+    let wordStart = fittingCount;
+    while (wordStart > 0 && isWordCharacter(characters[wordStart - 1])) wordStart -= 1;
+    if (wordStart > 0 && characters.slice(0, wordStart).join('').trim()) return wordStart;
+  }
+  return fittingCount;
 }

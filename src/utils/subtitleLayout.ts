@@ -4,7 +4,7 @@ import type {
   SubtitleLayoutSpec,
 } from '../domain/subtitleStyle';
 import { SrtEntry } from '../types';
-import { normalizeClipText } from './text';
+import { findWidthBreakIndex, normalizeClipText } from './text';
 
 const SAFE_WIDTH_RATIO = 0.7;
 const DEFAULT_WIDTH_FACTOR = 0.00092;
@@ -73,23 +73,25 @@ export function getLogicalPreviewLines(
       continue;
     }
 
-    const chars = Array.from(segment);
-    let currentLine = '';
-
-    for (const char of chars) {
-      const nextLine = currentLine + char;
-      const estimatedWidth = measureSubtitleTextWidth(nextLine, fontPixelSize);
-
-      if (estimatedWidth > maxWidth && currentLine.length > 0) {
-        logicalLines.push(currentLine.trim());
-        currentLine = char;
-      } else {
-        currentLine = nextLine;
+    const characters = Array.from(
+      new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(segment),
+      ({ segment: character }) => character
+    );
+    let remainingCharacters = characters;
+    while (remainingCharacters.length > 0) {
+      let fittingCount = 0;
+      while (fittingCount < remainingCharacters.length
+        && measureSubtitleTextWidth(remainingCharacters.slice(0, fittingCount + 1).join(''), fontPixelSize) <= maxWidth) {
+        fittingCount += 1;
       }
-    }
-
-    if (currentLine.trim()) {
-      logicalLines.push(currentLine.trim());
+      // 单个字符超宽时仍需推进，避免无限循环。
+      fittingCount = Math.max(1, fittingCount);
+      const breakIndex = fittingCount >= remainingCharacters.length
+        ? remainingCharacters.length
+        : findWidthBreakIndex(remainingCharacters, fittingCount);
+      const line = remainingCharacters.slice(0, breakIndex).join('').trim();
+      if (line) logicalLines.push(line);
+      remainingCharacters = remainingCharacters.slice(breakIndex);
     }
   }
 

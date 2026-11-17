@@ -29,17 +29,19 @@ export function reflowWorkingTimeline({
   const nextEntries: SrtEntry[] = [];
 
   for (const entry of sourceEntries) {
-    const preparedText = removePunctuation ? removeSubtitlePunctuation(entry.text) : entry.text;
-    // 纯标点片段清理后作为 Subtitle Gap，不创建空白 Subtitle Clip。
-    if (!preparedText.trim()) continue;
-    const logicalLines = getLogicalPreviewLines(preparedText, subtitleReflowSpec, width, height);
+    // 保留标点完成语义切分，再清理各行；时间仍按原始行分配，空行留下 Subtitle Gap。
+    const sourceLines = getLogicalPreviewLines(entry.text, subtitleReflowSpec, width, height);
+    const logicalLines = sourceLines.map((line) => normalizeClipText(
+      removePunctuation ? removeSubtitlePunctuation(line) : line
+    ));
+    if (!logicalLines.some((line) => line.trim())) continue;
     if (logicalLines.length <= 1) {
       nextEntries.push(
         createTimelineClip({
           id: nextId++,
           startSeconds: quantizeTimelineTime(entry.startSeconds, subtitleReflowSpec.fps),
           endSeconds: quantizeTimelineTime(entry.endSeconds, subtitleReflowSpec.fps),
-          text: logicalLines[0] ?? normalizeClipText(preparedText),
+          text: logicalLines[0],
           editState: 'reflowed',
         })
       );
@@ -49,11 +51,12 @@ export function reflowWorkingTimeline({
     const segments = splitClipDurationByText(
       entry.startSeconds,
       entry.endSeconds,
-      logicalLines,
+      sourceLines,
       subtitleReflowSpec.fps
     );
 
     for (let index = 0; index < logicalLines.length; index += 1) {
+      if (!logicalLines[index].trim()) continue;
       nextEntries.push(
         createTimelineClip({
           id: nextId++,
