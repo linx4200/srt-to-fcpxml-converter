@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
-    "test": "python3 tests/test_fcpxml_snapshots.py"
+    "test": "node --import tsx --test tests/fcpxml-regression.ts"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
@@ -26,6 +26,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.21",
+    "fast-xml-parser": "^5.12.1",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",

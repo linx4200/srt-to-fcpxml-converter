@@ -1,4 +1,7 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { test } from 'node:test';
+import { XMLParser } from 'fast-xml-parser';
 import { generateFcpxml } from '../src/utils/fcpxml';
 import { getSubtitleBackgroundSize, getPreviewSubtitleBackgroundLayout } from '../src/utils/subtitleLayout';
 import assert from 'node:assert/strict';
@@ -18,12 +21,51 @@ const context = {
   },
 };
 Object.assign(globalThis, { document: { createElement: () => ({ getContext: () => context }) } });
-const output = [];
+const parser = new XMLParser({ ignoreAttributes: false, parseAttributeValue: false, parseTagValue: false });
+
+/* 仅忽略容器时长与 style 编号；其余 XML 参数和结构完整比较。 */
+function normalizeXml(node: unknown, tag = ''): unknown {
+  if (Array.isArray(node)) return node.map((child) => normalizeXml(child, tag));
+  if (node === null || typeof node !== 'object') return node;
+  const attributes = { ...node } as Record<string, any>;
+  if (['sequence', 'gap', 'ref-clip'].includes(tag)) delete attributes['@_duration'];
+  if (tag === 'title') {
+    assert.equal(attributes['text-style-def']['@_id'], attributes.text['text-style']['@_ref']);
+    attributes['text-style-def'] = { ...attributes['text-style-def'], '@_id': 'normalized' };
+    attributes.text = { ...attributes.text, 'text-style': { ...attributes.text['text-style'], '@_ref': 'normalized' } };
+  }
+  return Object.fromEntries(Object.entries(attributes).map(([key, child]) => [key, normalizeXml(child, key)]));
+}
+
+function visitXml(node: unknown, callback: (tag: string, child: any) => void): void {
+  if (!node || typeof node !== 'object') return;
+  for (const [tag, child] of Object.entries(node)) {
+    for (const element of Array.isArray(child) ? child : [child]) {
+      callback(tag, element);
+      visitXml(element, callback);
+    }
+  }
+}
 for (const fixture of fixtures) {
   measuredWidths = fixture.measuredWidths;
-  output.push({ file: fixture.file, xml: generateFcpxml(fixture.entries, fixture.spec) });
+  test(fixture.file, () => {
+    measuredWidths = fixture.measuredWidths;
+    const baseline = readFileSync(new URL('./fixtures/fcpxml-preview-regression/' + fixture.file, import.meta.url));
+    assert.equal(createHash('sha256').update(baseline).digest('hex'), fixture.sha256);
+    const expected = parser.parse(baseline.toString());
+    const actual = parser.parse(generateFcpxml(fixture.entries, fixture.spec));
+    let titles = 0;
+    const duration = Math.round(fixture.entries.at(-1).endSeconds * fixture.spec.frameRate) * 100 + '/' + fixture.spec.frameRate * 100 + 's';
+    visitXml(actual, (tag, child) => {
+      if (tag === 'title') titles++;
+      if (['sequence', 'gap', 'ref-clip'].includes(tag)) assert.equal(child['@_duration'], duration);
+    });
+    assert.equal(titles, 3);
+    assert.deepEqual(normalizeXml(actual), normalizeXml(expected));
+  });
 }
 /* 独立验证尺寸算法，测量值不从生成结果回填。 */
+test('布局与预览规则', () => {
 measuredWidths = { '甲乙丙': 120 };
 for (const orientation of ['portrait', 'landscape'] as const) {
   for (const fontSize of [35, 50]) for (const padding of [5, 40]) {
@@ -45,4 +87,4 @@ for (const orientation of ['portrait', 'landscape'] as const) {
     assert.equal(multiline.lineCount, 2);
   }
 }
-writeFileSync(process.argv[2], JSON.stringify(output));
+});
