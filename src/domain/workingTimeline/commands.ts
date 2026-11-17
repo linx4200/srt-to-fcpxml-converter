@@ -126,7 +126,6 @@ export function cutTimelineClipAtPlayhead({
 
   const clip = workingTimeline[index];
   const cutTime = quantizeTimelineTime(playhead, timelineFrameSpec.fps);
-  const frameDuration = 1 / timelineFrameSpec.fps;
 
   if (cutTime <= clip.startSeconds || cutTime >= clip.endSeconds) {
     return { workingTimeline };
@@ -144,7 +143,7 @@ export function cutTimelineClipAtPlayhead({
   });
   const secondClip = createTimelineClip({
     id: getNextTimelineClipId(workingTimeline, 1),
-    startSeconds: Math.min(cutTime + frameDuration, clip.endSeconds),
+    startSeconds: cutTime,
     endSeconds: clip.endSeconds,
     text: splitText[1],
     editState: 'manual',

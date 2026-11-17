@@ -57,7 +57,7 @@ A local timeline action that turns one selected **Subtitle Clip** into two clips
 _Avoid_: Global split, subtitle reflow, playhead cut
 
 **Playhead Cut**:
-A local timeline action that divides one selected **Subtitle Clip** into two clips at the current playhead position. Text is divided approximately by the frame-quantized time ratio, preferring nearby punctuation, whitespace, or Manual Line Breaks and preserving Latin words and grapheme clusters. Each resulting clip must contain non-empty text.
+A local timeline action that divides one selected **Subtitle Clip** into two clips at the current playhead position. The first clip ends and the second starts at the same frame-quantized playhead time. Text is divided at the nearest internal grapheme boundary to that time ratio, without searching for punctuation, whitespace, Manual Line Breaks, or Latin word boundaries. Grapheme clusters and existing punctuation are preserved. Each resulting clip must contain non-empty text; otherwise the cut is unavailable. Text placement is an estimate, not word-level audio alignment.
 _Avoid_: Clip split, subtitle reflow
 
 **Subtitle Editing Mode**:

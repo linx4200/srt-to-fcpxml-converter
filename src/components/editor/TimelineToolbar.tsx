@@ -12,6 +12,7 @@ import { useAppStore } from '../../store/useAppStore';
 import { getSubtitleLayoutSpec } from '../../domain/subtitleStyle';
 import { formatTimestamp, getLogicalPreviewLines } from '../../utils';
 import { splitTextByRatio } from '../../utils/text';
+import { quantizeToFrame } from '../../utils/time';
 import { useTimelineActionShortcuts } from './hooks/useTimelineKeyboardShortcuts';
 import { MAX_ZOOM, MIN_ZOOM } from './timelineGeometry';
 
@@ -51,12 +52,14 @@ export function TimelineToolbar({
   const selectedClip = selectedClipId ? entries.find((entry) => entry.id === selectedClipId) ?? null : null;
   const selectedClipLines = selectedClip ? getLogicalPreviewLines(selectedClip.text, subtitleLayoutSpec) : [];
   const canSplitByLines = Boolean(selectedClip && selectedClipLines.length === 2 && editingClipId === null);
-  const canSplitText = Boolean(selectedClip && splitTextByRatio(selectedClip.text, (currentTime - selectedClip.startSeconds) / (selectedClip.endSeconds - selectedClip.startSeconds)));
+  /* 按实际执行使用的帧量化时间判断可用性，避免边界附近按钮可点但无法切分。 */
+  const cutTime = quantizeToFrame(currentTime, subtitleStyle.fps);
+  const canSplitText = Boolean(selectedClip && splitTextByRatio(selectedClip.text, (cutTime - selectedClip.startSeconds) / (selectedClip.endSeconds - selectedClip.startSeconds)));
   const canCutAtPlayhead = Boolean(
     editingClipId === null && canSplitText &&
     selectedClip &&
-      currentTime > selectedClip.startSeconds &&
-      currentTime < selectedClip.endSeconds
+      cutTime > selectedClip.startSeconds &&
+      cutTime < selectedClip.endSeconds
   );
 
   const splitReason = !selectedClip
