@@ -86,6 +86,7 @@ export function SettingsPanel({
   return (
     <aside className="w-80 border-r border-white/10 bg-[#141414] flex flex-col overflow-y-auto shrink-0 scrollbar-hide">
       <div className="p-6 space-y-8">
+        <LayoutSettings />
         <FileUpload
           onFileSelect={handleFileSelect}
           onClearAll={handleClearAll}
@@ -94,7 +95,6 @@ export function SettingsPanel({
           onAudioSelect={handleAudioSelect}
           onClear={handleAudioClear}
         />
-        <LayoutSettings />
         <FpsSettings />
         <PlatformSettings />
         <StyleSettings />
