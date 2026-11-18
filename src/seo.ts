@@ -1,6 +1,4 @@
 import type { Language } from './i18n';
-/* 通过模块导入让 Vite 输出带 hash 的静态资源地址；docs/ 目录不参与部署，直接写路径会在线上 404。 */
-import introScreenshotUrl from '../docs/images/intro_screenshot.png';
 
 type SeoConfig = {
   title: string;
@@ -10,10 +8,11 @@ type SeoConfig = {
 };
 
 const SITE_NAME = 'SRT to FCPXML Converter';
-const DEFAULT_IMAGE_PATH = introScreenshotUrl;
+/* 分享图片作为 public 资源发布，使用稳定的正式地址供外部爬虫读取。 */
+const SHARE_IMAGE_URL = 'https://tools.xinranliu.me/srt-to-fcpxml/assets/og-image.png';
 const AUTHOR_WEBSITE_URL = 'https://xinranliu.me/';
 const GITHUB_REPO_URL = 'https://github.com/linx4200/srt-to-fcpxml-converter';
-const CANONICAL_URL = 'https://xinranliu.me/';
+const CANONICAL_URL = 'https://tools.xinranliu.me/srt-to-fcpxml/';
 const JSON_LD_ID = 'app-seo-json-ld';
 
 const SEO_BY_LANGUAGE: Record<Language, SeoConfig> = {
@@ -59,10 +58,6 @@ function upsertLink(selector: string, attributes: Record<string, string>) {
   });
 }
 
-function getAbsoluteUrl(path: string) {
-  return new URL(path, window.location.origin).toString();
-}
-
 function isIndexableUrl() {
   const { hostname, protocol } = window.location;
   return protocol === 'https:' && hostname !== 'localhost' && hostname !== '127.0.0.1';
@@ -71,7 +66,7 @@ function isIndexableUrl() {
 export function syncSeo(language: Language) {
   const seo = SEO_BY_LANGUAGE[language];
   const canonicalUrl = CANONICAL_URL;
-  const imageUrl = getAbsoluteUrl(DEFAULT_IMAGE_PATH);
+  const imageUrl = SHARE_IMAGE_URL;
   const robots = isIndexableUrl() ? 'index,follow' : 'noindex,nofollow';
 
   document.title = seo.title;
@@ -167,6 +162,6 @@ export function syncSeo(language: Language) {
       name: 'Xinran Liu',
       url: AUTHOR_WEBSITE_URL,
     },
-    sameAs: [AUTHOR_WEBSITE_URL, GITHUB_REPO_URL],
+    sameAs: [GITHUB_REPO_URL],
   });
 }

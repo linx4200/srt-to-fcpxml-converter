@@ -49,6 +49,8 @@ store 主要维护以下状态：
 - `utils/fcpxml.ts`：负责将当前工作时间线生成 FCPXML。
 - `i18n.tsx` 与 `seo.ts`：分别负责双语文案和页面 SEO 元数据同步。
 
+SEO 使用 `https://tools.xinranliu.me/srt-to-fcpxml/` 作为工具的正式地址。`index.html` 提供初始 canonical 与分享地址，`seo.ts` 在语言切换时保持同一页面身份，并同步 WebApplication 结构化数据。作者链接指向个人主站，应用的 sameAs 指向工具仓库。分享图片维护在 `public/assets/og-image.png`，由 Vite 原样复制到构建产物。初始 HTML 与运行时 SEO 均使用其正式绝对地址，不引用 `docs/` 图片，不依赖专用构建插件。
+
 界面初始化优先读取 `manual-preferred-language` 中用户手动选择的中文或英文；没有有效手动偏好时，按浏览器语言偏好顺序匹配中文或英文，均不支持时回退英文。自动匹配结果不持久化；用户手动切换时保存偏好，供刷新及后续访问使用。`preferred-language` 不参与初始化判断。
 
 `components` 与主界面的对应关系如下：
