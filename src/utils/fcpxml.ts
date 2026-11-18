@@ -29,8 +29,8 @@ const RECTANGLE_HALF_SIZE_DIVISOR = 2;
 /* FCPXML 中 Roundness 的 XML value 按当前实测为 Final Cut Pro 检查器 Roundness 数值的五百分之一。 */
 const FCP_ROUNDNESS_XML_SCALE = 500;
 
-/* FCPXML 里 Custom title 的内部文字位置参数，用于匹配横屏手动调整后的字幕高度。 */
-const LANDSCAPE_CUSTOM_TITLE_TEXT_POSITION = '0 -200';
+/* Custom title 内部位置使用参考像素、Y 向上为正；与背景一起从样本中心移至距顶部 90%，保留样本的文字对齐关系。 */
+const LANDSCAPE_CUSTOM_TITLE_TEXT_POSITION = '0 -173.81216';
 
 /*
  * 不同 Target Video Orientation 的背景框参数来自 Final Cut Pro 反导出的矩形生成器样本。
@@ -38,9 +38,9 @@ const LANDSCAPE_CUSTOM_TITLE_TEXT_POSITION = '0 -200';
  */
 const BACKGROUND_RECTANGLE_BY_ORIENTATION = {
   landscape: {
-    /* 横屏中心点来自 732px x 80px 手动样本，位于 1920x1080 画面底部字幕区域。 */
+    /* 横屏背景中心距顶部 90%；矩形生成器 Y 坐标从底部起算。 */
     centerX: 0.499087,
-    centerY: 0.075752,
+    centerY: 0.1,
     /* 横屏手动样本通过 Custom title 内部位置参数下移文字。 */
     shouldWriteTextPositionParam: true,
     /* 横屏样本的矩形层没有写入 disableDRT，保持样本最小结构。 */
