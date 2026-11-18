@@ -49,6 +49,8 @@ store 主要维护以下状态：
 - `utils/fcpxml.ts`：负责将当前工作时间线生成 FCPXML。
 - `i18n.tsx` 与 `seo.ts`：分别负责双语文案和页面 SEO 元数据同步。
 
+界面初始化优先读取 `manual-preferred-language` 中用户手动选择的中文或英文；没有有效手动偏好时，按浏览器语言偏好顺序匹配中文或英文，均不支持时回退英文。自动匹配结果不持久化；用户手动切换时保存偏好，供刷新及后续访问使用。`preferred-language` 不参与初始化判断。
+
 `components` 与主界面的对应关系如下：
 
 - 顶部栏：`components/layout/Header.tsx`，承载应用标题、语言切换、外部链接和 FCPXML 导出入口。

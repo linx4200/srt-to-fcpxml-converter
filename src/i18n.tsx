@@ -17,7 +17,8 @@ type I18nContextValue = {
   t: (key: TranslationKey) => string;
 };
 
-const STORAGE_KEY = 'preferred-language';
+/* 仅保存用户手动选择，避免将浏览器自动匹配的语言固化为用户偏好。 */
+const STORAGE_KEY = 'manual-preferred-language';
 
 const translations = {
   zh: {
@@ -176,21 +177,30 @@ function getInitialLanguage(): Language {
     return savedLanguage;
   }
 
+  for (const browserLanguage of window.navigator.languages.length
+    ? window.navigator.languages
+    : [window.navigator.language]) {
+    const language = browserLanguage.toLowerCase().split('-')[0];
+    if (language === 'zh' || language === 'en') return language;
+  }
+
   return 'en';
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  const [language, setCurrentLanguage] = useState<Language>(getInitialLanguage);
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, language);
     document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
   }, [language]);
 
   const value = useMemo<I18nContextValue>(
     () => ({
       language,
-      setLanguage,
+      setLanguage: (selectedLanguage) => {
+        window.localStorage.setItem(STORAGE_KEY, selectedLanguage);
+        setCurrentLanguage(selectedLanguage);
+      },
       t: (key) => translations[language][key],
     }),
     [language],
