@@ -18,9 +18,13 @@ Choose the target orientation and frame rate first:
 
 Set the overall orientation, font size, and layout before editing individual clips.
 
+![Prepare files and layout (Chinese interface)](./images/layout_screenshot.png)
+
 ## 2. Import subtitles and handle punctuation
 
 Choose an `.srt` file in the upload area. The app automatically splits long subtitles and creates the preview.
+
+![Import subtitles and handle punctuation (Chinese interface)](./images/import_screenshot.png)
 
 “Remove subtitle punctuation” is enabled by default. Processing preserves manual line breaks, apostrophes and hyphens within Latin words, and numeric formatting symbols within numbers. Chinese punctuation is removed; punctuation between English words becomes a space. Punctuation-only clips may become empty time ranges.
 
@@ -29,6 +33,8 @@ Toggling this option does not immediately change existing subtitles. To apply it
 ## 3. Style and preview
 
 Adjust font size and text color. To add a background to subtitles, turn on “Subtitle Background”, then adjust its color, opacity, corner radius, and total horizontal / vertical padding. Total padding is the combined space on both sides of that axis.
+
+![Style and preview (Chinese interface)](./images/style_screenshot.jpeg)
 
 Each box is sized for its subtitle and appears only for that subtitle's duration. Subtitle backgrounds are exported; the preview background image and platform overlays are not.
 
@@ -56,17 +62,23 @@ Reference audio supports playback synchronization and the Waveform Timeline and 
 
 S / M operate on the timeline outside text input. If a button is unavailable, finish text editing and check the selected clip and playhead position.
 
-Cut at Playhead estimates the text split from the time ratio. It may cut within an English word and is not word-level audio alignment. Listen and check the resulting text. Pausing or seeking on the timeline selects the subtitle at the playhead; a gap clears selection.
+Pausing or seeking on the timeline selects the subtitle at the playhead; a gap clears selection.
+
+> **Note:** Cut at Playhead estimates the text split from the time ratio. It may cut within an English word and is not word-level audio alignment. Listen and check the resulting text.
 
 ## 5. Understand reflow
 
 “Reflow All Subtitles” (Subtitle Reflow) rebuilds the Working Timeline from the original imported subtitles. Confirming an orientation change also triggers this process.
 
+![Understand reflow (Chinese interface)](./images/reflow_screenshot.png)
+
 Reflow may replace edited text, splits, line breaks, merges, and timing boundaries. It does not simply wrap the current edits again. Complete global layout work before individual edits. Export an FCPXML first if you need to preserve a usable result; that export is for FCP, not a project backup that this app can reopen.
 
 ## 6. Export and use in Final Cut Pro
 
-After reviewing, leave editing mode and choose “Export FCPXML” in the header. To learn how to use the exported FCPXML file in Final Cut Pro, see the separate [Final Cut Pro Workflow](./final-cut-pro-workflow.en.md) guide.
+After reviewing, leave editing mode and choose “Export FCPXML” in the header. To learn how to use the exported FCPXML file in Final Cut Pro, see the separate [Use Exported Subtitles in Final Cut Pro](./final-cut-pro-workflow.en.md) guide.
+
+FCPXML contains subtitle text from the current Working Timeline and, when “Subtitle Background” is enabled, the corresponding background boxes. Reference audio, actual video, and platform overlays are not exported; manage actual media in Final Cut Pro.
 
 ## Troubleshooting
 

@@ -4,8 +4,7 @@
 
 A browser-based subtitle tool for Final Cut Pro. Import SRT, adjust layout and timing, and export FCPXML. Subtitle and reference-audio processing runs locally in your browser.
 
-<!-- 占位地址：上线后替换为真实域名 -->
-在线使用：<https://xinranliu.me/srt-to-fcpxml/>　Use it online: <https://xinranliu.me/srt-to-fcpxml/>
+在线使用：<https://tools.xinranliu.me/srt-to-fcpxml/>　Use it online: <https://tools.xinranliu.me/srt-to-fcpxml/>
 
 ## 核心亮点 / Highlights
 
@@ -24,7 +23,7 @@ A browser-based subtitle tool for Final Cut Pro. Import SRT, adjust layout and t
 | 简介与本地运行 / Overview & local setup | [项目说明](./README.zh-CN.md) | [Project overview](./README.en.md) |
 | 使用流程与编辑 / Workflow & editing | [用户指南](./docs/user-guide.zh-CN.md) | [User Guide](./docs/user-guide.en.md) |
 | 生成 SRT / Generate an SRT | [如何生成 SRT](./docs/how-to-generate-srt.zh-CN.md) | [How to generate an SRT](./docs/how-to-generate-srt.en.md) |
-| Final Cut Pro 工作流 / Final Cut Pro workflow | [FCP 使用说明](./docs/final-cut-pro-workflow.zh-CN.md) | [FCP workflow](./docs/final-cut-pro-workflow.en.md) |
+| 在 Final Cut Pro 中使用导出的字幕 / Use Exported Subtitles in Final Cut Pro | [在 Final Cut Pro 中使用导出的字幕](./docs/final-cut-pro-workflow.zh-CN.md) | [Use Exported Subtitles in Final Cut Pro](./docs/final-cut-pro-workflow.en.md) |
 
 ## 快速流程 / Quick workflow
 

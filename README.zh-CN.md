@@ -4,8 +4,7 @@
 
 将已有的 `.srt` 字幕转换为 Final Cut Pro 可导入的 `.fcpxml`，在导出前完成字幕排版、校对和轻量编辑。适合已经有字幕文件、希望减少 FCP 内逐条调整工作的桌面用户。
 
-<!-- 占位地址：上线后替换为真实域名 -->
-在线使用：<https://xinranliu.me/srt-to-fcpxml/>　本地运行见[本地运行与开发](#本地运行与开发)。
+在线使用：<https://tools.xinranliu.me/srt-to-fcpxml/>　本地运行见[本地运行与开发](#本地运行与开发)。
 
 ![字幕工作区](./docs/images/intro_screenshot.png)
 
