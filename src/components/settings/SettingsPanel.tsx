@@ -1,3 +1,4 @@
+import { trackAnalyticsEvent } from '../../utils/analytics';
 import React from 'react';
 import { FileUpload } from './FileUpload';
 import { SplitSubtitlesButton } from './SplitSubtitlesButton';
@@ -36,12 +37,16 @@ export function SettingsPanel({
     const file = event.target.files?.[0];
     if (!file) return;
 
+    trackAnalyticsEvent('subtitle_file_selected');
+
     try {
       await importSubtitleFile(file);
+      trackAnalyticsEvent('subtitle_processing_succeeded');
       onTimeReset();
       onStopPlayback();
       message.success(t('uploadSuccess'));
     } catch (error) {
+      trackAnalyticsEvent('subtitle_processing_failed');
       console.error('Failed to import subtitles:', error);
       message.error(t('splitError'));
     }

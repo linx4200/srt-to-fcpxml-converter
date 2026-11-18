@@ -1,3 +1,4 @@
+import { trackAnalyticsEvent } from '../../utils/analytics';
 import { Type, Download, Github } from 'lucide-react';
 import { message } from '../message';
 import { useI18n } from '../../i18n';
@@ -30,6 +31,7 @@ export function Header() {
     anchor.download = fcpxmlExportArtifact.fileName;
     document.body.appendChild(anchor);
     anchor.click();
+    trackAnalyticsEvent('download_started');
     document.body.removeChild(anchor);
     URL.revokeObjectURL(url);
     message.success(t('downloadStarted'));

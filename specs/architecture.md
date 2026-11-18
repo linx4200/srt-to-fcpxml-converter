@@ -173,3 +173,18 @@ Subtitle Editing Mode 在暂停播放或显式 Timeline Seek 后，自动选中 
 浏览器预览通过 `getPreviewSubtitleBackgroundLayout` 使用浏览器文字排版宽度加横向总留白，不应用 FCP 的加宽比例或固定加宽。背景高度采用行数、字号换算高度及纵向总留白；垂直中心依据浏览器字体行盒和实际字形 ascent/descent 度量定位，不应用 FCP 垂直偏移。文字位置保持不变，背景作为独立 sibling layer 绘制。
 
 本文的 FCP 校准参数表与共享补偿说明仅适用于导出路径；预览与导出共用样式输入及基础字体测量能力，分别计算各自渲染模型的背景布局。`getSubtitleBackgroundSize` 保留 FCP 导出的既有计算，预览函数不参与导出。
+
+
+## 产品使用统计
+
+生产构建通过 Umami Cloud 脚本自动统计 PV 和 UV；开发环境不加载统计脚本。统计初始化与事件上报由 `src/utils/analytics.ts` 统一管理，UI 在业务节点调用上报工具，统计加载或请求失败不影响业务流程。
+
+| 事件 | 统计口径 |
+| --- | --- |
+| `subtitle_file_selected` | 用户实际选择 SRT 文件，取消文件选择不计入。 |
+| `subtitle_processing_succeeded` | 上传文件读取、解析及初始 Working Timeline 生成完成，导入 action 成功返回。 |
+| `subtitle_processing_failed` | 上传文件读取、解析或初始 Working Timeline 生成流程抛出错误。 |
+| `download_started` | 已触发浏览器 FCPXML 下载，不代表文件最终保存成功。 |
+| `editing_completed` | 提交当前文本草稿后主动退出 Subtitle Editing Mode，按钮与退出快捷键共用此口径；无需实际修改内容。 |
+
+处理成功与失败仅统计上传流程；后续 Subtitle Reflow 不重复计入。事件不附加文件名、字幕内容、音频内容或原始错误信息。统计脚本尚未就绪或被阻止时跳过事件，不缓存业务内容。

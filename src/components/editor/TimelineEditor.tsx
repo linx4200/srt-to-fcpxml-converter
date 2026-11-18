@@ -1,3 +1,4 @@
+import { trackAnalyticsEvent } from '../../utils/analytics';
 import { useEffect, useRef } from 'react';
 import { useAudioWaveform } from '../../hooks/useAudioWaveform';
 import { useI18n } from '../../i18n';
@@ -77,6 +78,7 @@ export function TimelineEditor({
       commitEditing();
     }
     exitSubtitleEditingMode(currentTime);
+    trackAnalyticsEvent('editing_completed');
   };
 
   /* 删除当前 Clip Selection，并清理本地编辑草稿。 */
