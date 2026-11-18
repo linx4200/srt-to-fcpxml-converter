@@ -9,6 +9,8 @@
   --color-theme-action-border: color-mix(in srgb, var(--color-theme-primary) 40%, transparent);
   --color-theme-action-hover-bg: color-mix(in srgb, var(--color-theme-primary) 20%, transparent);
   --color-theme-action-hover-border: color-mix(in srgb, var(--color-theme-primary) 65%, transparent);
+  /* 完成操作使用绿色强调。 */
+  --color-theme-success: #4ade80;
   --color-theme-bg: #0f0f0f;
   --color-theme-text: #fff;
   --color-theme-surface: #1a1a1a;
@@ -22,4 +24,20 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+}
+
+/* 导航快捷键采用固定尺寸键帽，使方向键与按钮动作图标区分，且不随语言变化。 */
+.timeline-shortcut-key {
+  --shortcut-key-size: 1.25rem;
+  --shortcut-key-radius: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--shortcut-key-size);
+  height: var(--shortcut-key-size);
+  border-radius: var(--shortcut-key-radius);
+  border: 1px solid color-mix(in srgb, var(--color-theme-text) 25%, transparent);
+  background: color-mix(in srgb, var(--color-theme-bg) 80%, transparent);
+  font-family: inherit;
+  line-height: 1;
 }

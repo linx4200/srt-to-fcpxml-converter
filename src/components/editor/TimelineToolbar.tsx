@@ -13,7 +13,7 @@ import { getSubtitleLayoutSpec } from '../../domain/subtitleStyle';
 import { formatTimestamp, getLogicalPreviewLines } from '../../utils';
 import { splitTextByRatio } from '../../utils/text';
 import { quantizeToFrame } from '../../utils/time';
-import { useTimelineActionShortcuts } from './hooks/useTimelineKeyboardShortcuts';
+import { useTimelineActionShortcuts, useTimelineNavigationShortcuts } from './hooks/useTimelineKeyboardShortcuts';
 import { MAX_ZOOM, MIN_ZOOM } from './timelineGeometry';
 
 interface TimelineToolbarProps {
@@ -103,21 +103,22 @@ export function TimelineToolbar({
 
   useTimelineActionShortcuts(handleMergeIntoPrevious, handleCutAtPlayhead);
 
-  /* 跳转到当前 playhead 之前最近的 Subtitle Clip，并同步 Clip Selection。 */
-  const handlePreviousClip = () => {
-    const previousClip = entries.slice().reverse().find((entry) => entry.startSeconds < currentTime - 0.5);
-    if (!previousClip) return;
-    onTimeUpdate(previousClip.startSeconds);
-    setSelectedClipId(previousClip.id);
+  /* 优先按 Clip Selection 导航，避免播放头位于片段内部时再次选中同一条。 */
+  const navigateClip = (direction: 'previous' | 'next') => {
+    if (editingClipId !== null) return;
+    const selectedIndex = entries.findIndex((clip) => clip.id === selectedClipId);
+    const targetClip = selectedIndex >= 0
+      ? entries[selectedIndex + (direction === 'previous' ? -1 : 1)]
+      : direction === 'previous'
+        ? entries.slice().reverse().find((clip) => clip.startSeconds < currentTime)
+        : entries.find((clip) => clip.startSeconds > currentTime);
+    if (!targetClip) return;
+    onTimeUpdate(targetClip.startSeconds);
+    setSelectedClipId(targetClip.id);
   };
-
-  /* 跳转到当前 playhead 之后最近的 Subtitle Clip，并同步 Clip Selection。 */
-  const handleNextClip = () => {
-    const nextClip = entries.find((entry) => entry.startSeconds > currentTime + 0.1);
-    if (!nextClip) return;
-    onTimeUpdate(nextClip.startSeconds);
-    setSelectedClipId(nextClip.id);
-  };
+  const handlePreviousClip = () => navigateClip('previous');
+  const handleNextClip = () => navigateClip('next');
+  useTimelineNavigationShortcuts(handlePreviousClip, handleNextClip);
 
   /* 调整 Waveform Timeline 缩放，并把倍率保存到编辑会话。 */
   const changeZoom = (delta: number) => {
@@ -140,34 +141,10 @@ export function TimelineToolbar({
         <button
           type="button"
           onClick={onExit}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none"
+          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-theme-success/40 bg-theme-success/20 px-3 py-2 text-sm font-medium text-theme-success transition-colors hover:bg-theme-success/30 focus:outline-none focus-visible:outline-none"
         >
           <Check size={14} />
           {t('exitEditing')}
-        </button>
-      </div>
-
-      <div className="flex items-center gap-2 pr-3 border-r border-white/10">
-        <button
-          type="button"
-          onClick={handlePreviousClip}
-          className="cursor-pointer rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none"
-        >
-          {t('prev')}
-        </button>
-        <button
-          type="button"
-          onClick={onPlayPause}
-          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-theme-primary text-black transition-transform hover:scale-105 focus:outline-none focus-visible:outline-none"
-        >
-          {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
-        </button>
-        <button
-          type="button"
-          onClick={handleNextClip}
-          className="cursor-pointer rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none"
-        >
-          {t('next')}
         </button>
       </div>
 
@@ -190,6 +167,39 @@ export function TimelineToolbar({
           className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-30"
         >
           <Plus size={14} />
+        </button>
+      </div>
+
+        <button
+          type="button"
+          onClick={onPlayPause}
+          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-theme-primary text-black transition-transform hover:scale-105 focus:outline-none focus-visible:outline-none"
+        >
+          {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
+        </button>
+
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handlePreviousClip}
+          aria-keyshortcuts="ArrowLeft"
+          title={t('prevShortcut')}
+          disabled={editingClipId !== null}
+          className="inline-flex items-center gap-2 cursor-pointer rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none"
+        >
+          {t('prev')}
+          <kbd className="timeline-shortcut-key" aria-hidden="true">←</kbd>
+        </button>
+        <button
+          type="button"
+          onClick={handleNextClip}
+          aria-keyshortcuts="ArrowRight"
+          title={t('nextShortcut')}
+          disabled={editingClipId !== null}
+          className="inline-flex items-center gap-2 cursor-pointer rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none"
+        >
+          {t('next')}
+          <kbd className="timeline-shortcut-key" aria-hidden="true">→</kbd>
         </button>
       </div>
 

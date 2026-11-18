@@ -35,6 +35,9 @@ export function InlineClipTextarea({
       onChange={(event) => onDraftTextChange(event.target.value)}
       onBlur={onCommit}
       onKeyDown={(event) => {
+        // 输入法确认候选词的 Enter 不应提交字幕；阻止冒泡避免全局快捷键再次处理。
+        event.stopPropagation();
+        if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229 || event.repeat) return;
         if (event.key === 'Escape') {
           event.preventDefault();
           onCancel();

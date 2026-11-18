@@ -92,6 +92,10 @@ export function TimelineEditor({
     onCancelEditing: cancelEditing,
     onExit: handleExit,
     onDeleteSelected: handleDeleteSelected,
+    onEditSelected: () => {
+      const selectedClip = entries.find((clip) => clip.id === selectedClipId);
+      if (selectedClip) handleEnterEditing(selectedClip);
+    },
   });
 
   useEffect(() => {

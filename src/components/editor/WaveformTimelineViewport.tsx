@@ -51,6 +51,21 @@ export function WaveformTimelineViewport({
 }: WaveformTimelineViewportProps) {
   const session = useAppStore((state) => state.editingSession);
   const setEditingSession = useAppStore((state) => state.setEditingSession);
+  const selectedClipId = useAppStore((state) => state.selectedClipId);
+  const entries = useAppStore((state) => state.workingTimeline);
+
+  /* Clip Selection 切换时确保目标起点可见，不干扰播放跟随或用户手动滚动。 */
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    const selectedClip = entries.find((clip) => clip.id === selectedClipId);
+    if (!viewport || !selectedClip || isPlaying) return;
+    const clipStartX = getTimelineX(selectedClip.startSeconds, pixelsPerSecond);
+    const clipEndX = getTimelineX(selectedClip.endSeconds, pixelsPerSecond);
+    if (clipStartX < viewport.scrollLeft || clipEndX > viewport.scrollLeft + viewport.clientWidth) {
+      viewport.scrollLeft = Math.max(0, clipStartX - viewport.clientWidth * PLAYHEAD_FOLLOW_ANCHOR_RATIO);
+    }
+  }, [selectedClipId, entries, pixelsPerSecond, isPlaying, viewportRef]);
+
   const timelineWidth = getTimelineWidth(totalDuration, pixelsPerSecond);
 
   useLayoutEffect(() => {

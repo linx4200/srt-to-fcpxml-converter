@@ -6,6 +6,7 @@ interface UseTimelineKeyboardShortcutsParams {
   onCancelEditing: () => void;
   onExit: () => void;
   onDeleteSelected: () => void;
+  onEditSelected: () => void;
 }
 
 function isTypingTarget(target: HTMLElement | null) {
@@ -23,12 +24,22 @@ export function useTimelineKeyboardShortcuts({
   onCancelEditing,
   onExit,
   onDeleteSelected,
+  onEditSelected,
 }: UseTimelineKeyboardShortcutsParams) {
   useEffect(() => {
     /* Escape 取消 Inline Clip Editing 或退出 Subtitle Editing Mode；删除键删除当前 Clip Selection。 */
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       const typingTarget = isTypingTarget(target);
+
+      if (event.defaultPrevented || event.isComposing || event.keyCode === 229 || event.repeat) return;
+
+      if (event.key === 'Enter' && !typingTarget && editingClipId === null
+        && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey) {
+        event.preventDefault();
+        onEditSelected();
+        return;
+      }
 
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -53,7 +64,7 @@ export function useTimelineKeyboardShortcuts({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [editingClipId, onCancelEditing, onDeleteSelected, onExit, selectedClipId]);
+  }, [editingClipId, onCancelEditing, onDeleteSelected, onEditSelected, onExit, selectedClipId]);
 }
 
 /* 工具栏操作的键盘订阅与按钮共享 command；文本输入、输入法和修饰键组合不触发。 */
@@ -72,4 +83,21 @@ export function useTimelineActionShortcuts(onMerge: () => void, onCut: () => voi
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onMerge, onCut]);
+}
+
+/* 导航与按钮共享入口；输入文字时方向键留给光标，长按不连续跳转。 */
+export function useTimelineNavigationShortcuts(onPrevious: () => void, onNext: () => void) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.isComposing || event.keyCode === 229 || event.repeat
+        || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey
+        || isTypingTarget(event.target as HTMLElement | null)) return;
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      if (event.key === 'ArrowLeft') onPrevious();
+      else onNext();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onPrevious, onNext]);
 }
