@@ -19,7 +19,7 @@ const SEO_BY_LANGUAGE: Record<Language, SeoConfig> = {
   zh: {
     title: 'SRT 转 FCPXML 转换器 | Final Cut Pro 字幕导入工具',
     description:
-      '浏览器内将 SRT 字幕转换为 Final Cut Pro 可导入的 FCPXML，支持自动拆行、音频波形预览、字幕编辑和短视频浮层预览。',
+      '将 SRT 转换为 Final Cut Pro 可导入的 FCPXML，支持字幕排版、音频波形校对和轻量编辑。字幕与音频均在浏览器本地处理。',
     keywords:
       'SRT 转 FCPXML,FCPXML 转换器,Final Cut Pro 字幕,字幕转换,在线字幕工具,短视频字幕',
     locale: 'zh_CN',
@@ -27,7 +27,7 @@ const SEO_BY_LANGUAGE: Record<Language, SeoConfig> = {
   en: {
     title: 'SRT to FCPXML Converter | Final Cut Pro Subtitle Tool',
     description:
-      'Convert SRT subtitles into Final Cut Pro compatible FCPXML in the browser with auto line splitting, waveform preview, subtitle editing, and short-form UI overlays.',
+      'Convert SRT to FCPXML for Final Cut Pro with subtitle formatting, waveform review, and lightweight editing. Subtitles and audio stay in your browser.',
     keywords:
       'SRT to FCPXML,FCPXML converter,Final Cut Pro subtitles,subtitle converter,browser subtitle tool,short-form video subtitles',
     locale: 'en_US',

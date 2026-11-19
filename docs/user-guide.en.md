@@ -1,6 +1,6 @@
 # User Guide
 
-[Project overview](../README.en.md) · [中文](./user-guide.zh-CN.md)
+[Open the tool](https://tools.xinranliu.me/srt-to-fcpxml/) · [Project overview](../README.en.md) · [中文](./user-guide.zh-CN.md)
 
 Start with an existing SRT, review its layout and timing, and export FCPXML for Final Cut Pro. Use a desktop browser; see the project overview for local setup.
 

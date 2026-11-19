@@ -23,6 +23,8 @@ const STORAGE_KEY = 'manual-preferred-language';
 const translations = {
   zh: {
     appTitle: 'SRT 转 FCPXML',
+    appDescription: '为 Final Cut Pro 转换与编辑字幕。字幕和音频本地处理。',
+    userGuide: '使用说明',
     exportFcpxml: '导出 FCPXML',
     authorWebsite: '作者网站',
     githubRepo: 'GitHub 仓库',
@@ -95,6 +97,8 @@ const translations = {
   },
   en: {
     appTitle: 'SRT to FCPXML',
+    appDescription: 'Convert and edit subtitles for Final Cut Pro. Process media locally.',
+    userGuide: 'User Guide',
     exportFcpxml: 'Export FCPXML',
     authorWebsite: 'Author Website',
     githubRepo: 'GitHub Repository',

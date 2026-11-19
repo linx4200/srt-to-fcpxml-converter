@@ -41,3 +41,16 @@
   font-family: inherit;
   line-height: 1;
 }
+
+/* 品牌底框与标题 text-lg、说明 text-xs 的两行默认行高之和对齐。 */
+.header-brand-icon {
+  --header-brand-size: calc(var(--text-lg--line-height) * var(--text-lg) + var(--text-xs--line-height) * var(--text-xs));
+  width: var(--header-brand-size);
+  height: var(--header-brand-size);
+}
+
+/* 字幕画框占底框高度的一半，保持与圆形导航图标相近的视觉留白。 */
+.header-brand-glyph {
+  width: 50%;
+  height: 50%;
+}
